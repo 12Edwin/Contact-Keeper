@@ -1,0 +1,227 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Contact-Keeper
+
+  Application to save and manage contacts
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  MyDatabase:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      AllocatedStorage: '5'
+      DBInstanceClass: db.t2.micro
+      Engine: mysql
+      EngineVersion: '8.0'
+      MasterUsername: admin
+      MasterUserPassword: admin
+      DBName: contact_keeper
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: lambda-execute
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+  ContactsApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: ContactApi
+      StageName: Prod
+
+  UsersApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: UserApi
+      StageName: Prod
+
+  CreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: user_management/
+      Handler: app.create_user
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        CreateUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsersApiGateway
+            Path: /users
+            Method: POST
+
+  ReadUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: user_management/
+      Handler: app.read_user
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        ReadUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsersApiGateway
+            Path: /users/{id}
+            Method: GET
+
+  UpdateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: user_management/
+      Handler: app.update_user
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        UpdateUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsersApiGateway
+            Path: /users/{id}
+            Method: PUT
+
+  DeleteUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: user_management/
+      Handler: app.delete_user
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        DeleteUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsersApiGateway
+            Path: /users/{id}
+            Method: DELETE
+
+  CreateContactFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: contact_management/
+      Handler: app.create_contact
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        CreateContact:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ContactsApiGateway
+            Path: /contacts
+            Method: POST
+
+  ReadContactFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: contact_management/
+      Handler: app.read_contact
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        ReadContact:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ContactsApiGateway
+            Path: /contacts/{id}
+            Method: GET
+
+  UpdateContactFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: contact_management/
+      Handler: app.update_contact
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        UpdateContact:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ContactsApiGateway
+            Path: /contacts/{id}
+            Method: PUT
+
+  DeleteContactFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: contact_management/
+      Handler: app.delete_contact
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Architectures:
+        - x86_64
+      Events:
+        DeleteContact:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ContactsApiGateway
+            Path: /contacts/{id}
+            Method: DELETE
+
+Outputs:
+  ContactKeeperApi:
+    Description: "API Gateway endpoint URL for Prod stage for Contact Keeper functions"
+    Value: !Sub "https://${ContactsApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/contacts/"
+  UserManagementApi:
+    Description: "API Gateway endpoint URL for Prod stage for User Management functions"
+    Value: !Sub "https://${UsersApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/"
+  CreateUserFunction:
+    Description: "Create User Lambda Function ARN"
+    Value: !GetAtt CreateUserFunction.Arn
+  ReadUserFunction:
+    Description: "Read User Lambda Function ARN"
+    Value: !GetAtt ReadUserFunction.Arn
+  UpdateUserFunction:
+    Description: "Update User Lambda Function ARN"
+    Value: !GetAtt UpdateUserFunction.Arn
+  DeleteUserFunction:
+    Description: "Delete User Lambda Function ARN"
+    Value: !GetAtt DeleteUserFunction.Arn
+  CreateContactFunction:
+    Description: "Create Contact Lambda Function ARN"
+    Value: !GetAtt CreateContactFunction.Arn
+  ReadContactFunction:
+    Description: "Read Contact Lambda Function ARN"
+    Value: !GetAtt ReadContactFunction.Arn
+  UpdateContactFunction:
+    Description: "Update Contact Lambda Function ARN"
+    Value: !GetAtt UpdateContactFunction.Arn
+  DeleteContactFunction:
+    Description: "Delete Contact Lambda Function ARN"
+    Value: !GetAtt DeleteContactFunction.Arn
