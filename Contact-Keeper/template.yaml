@@ -35,7 +35,7 @@ Resources:
               - sts:AssumeRole
       Path: "/"
       Policies:
-        - PolicyName: lambda-execute
+        - PolicyName: AWSLambdaBasicExecutionRole
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
