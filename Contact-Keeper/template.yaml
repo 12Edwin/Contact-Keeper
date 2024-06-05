@@ -3,22 +3,33 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Contact-Keeper
 
-  Application to save and manage contacts
+  Application to save and manage events
 
 Globals:
   Function:
     Timeout: 3
+    MemorySize: 256
 
 Resources:
+  MyDatabaseSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: MyDatabaseSecret
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "admin"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\\'
+
   MyDatabase:
     Type: AWS::RDS::DBInstance
     Properties:
       AllocatedStorage: '5'
-      DBInstanceClass: db.t2.micro
+      DBInstanceClass: db.t3.micro
       Engine: mysql
-      EngineVersion: '8.0'
-      MasterUsername: admin
-      MasterUserPassword: admin
+      EngineVersion: '8.0.35'
+      MasterUsername: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MyDatabaseSecret, ':SecretString:username}}' ] ]
+      MasterUserPassword: !Join [ '', [ '{{resolve:secretsmanager:', !Ref MyDatabaseSecret, ':SecretString:password}}' ] ]
       DBName: contact_keeper
 
   LambdaExecutionRole:
@@ -33,9 +44,8 @@ Resources:
                 - lambda.amazonaws.com
             Action:
               - sts:AssumeRole
-      Path: "/"
       Policies:
-        - PolicyName: AWSLambdaBasicExecutionRole
+        - PolicyName: LambdaExecutionPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -45,11 +55,19 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: '*'
+        - PolicyName: SecretsManagerReadWrite
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: '*'
 
-  ContactsApiGateway:
+  EventsApiGateway:
     Type: AWS::Serverless::Api
     Properties:
-      Name: ContactApi
+      Name: EventApi
       StageName: Prod
 
   UsersApiGateway:
@@ -126,78 +144,78 @@ Resources:
             Path: /users/{id}
             Method: DELETE
 
-  CreateContactFunction:
+  CreateEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: contact_management/
-      Handler: app.create_contact
+      CodeUri: events_management/
+      Handler: app.create_event
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
       Architectures:
         - x86_64
       Events:
-        CreateContact:
+        CreateEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref ContactsApiGateway
-            Path: /contacts
+            RestApiId: !Ref EventsApiGateway
+            Path: /events
             Method: POST
 
-  ReadContactFunction:
+  ReadEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: contact_management/
-      Handler: app.read_contact
+      CodeUri: events_management/
+      Handler: app.read_event
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
       Architectures:
         - x86_64
       Events:
-        ReadContact:
+        ReadEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref ContactsApiGateway
-            Path: /contacts/{id}
+            RestApiId: !Ref EventsApiGateway
+            Path: /events/{id}
             Method: GET
 
-  UpdateContactFunction:
+  UpdateEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: contact_management/
-      Handler: app.update_contact
+      CodeUri: events_management/
+      Handler: app.update_event
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
       Architectures:
         - x86_64
       Events:
-        UpdateContact:
+        UpdateEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref ContactsApiGateway
-            Path: /contacts/{id}
+            RestApiId: !Ref EventsApiGateway
+            Path: /events/{id}
             Method: PUT
 
-  DeleteContactFunction:
+  DeleteEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: contact_management/
-      Handler: app.delete_contact
+      CodeUri: events_management/
+      Handler: app.delete_event
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
       Architectures:
         - x86_64
       Events:
-        DeleteContact:
+        DeleteEvent:
           Type: Api
           Properties:
-            RestApiId: !Ref ContactsApiGateway
-            Path: /contacts/{id}
+            RestApiId: !Ref EventsApiGateway
+            Path: /events/{id}
             Method: DELETE
 
 Outputs:
-  ContactKeeperApi:
-    Description: "API Gateway endpoint URL for Prod stage for Contact Keeper functions"
-    Value: !Sub "https://${ContactsApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/contacts/"
+  EventKeeperApi:
+    Description: "API Gateway endpoint URL for Prod stage for Event Keeper functions"
+    Value: !Sub "https://${EventsApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/contacts/"
   UserManagementApi:
     Description: "API Gateway endpoint URL for Prod stage for User Management functions"
     Value: !Sub "https://${UsersApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/"
@@ -213,15 +231,15 @@ Outputs:
   DeleteUserFunction:
     Description: "Delete User Lambda Function ARN"
     Value: !GetAtt DeleteUserFunction.Arn
-  CreateContactFunction:
-    Description: "Create Contact Lambda Function ARN"
-    Value: !GetAtt CreateContactFunction.Arn
-  ReadContactFunction:
-    Description: "Read Contact Lambda Function ARN"
-    Value: !GetAtt ReadContactFunction.Arn
-  UpdateContactFunction:
-    Description: "Update Contact Lambda Function ARN"
-    Value: !GetAtt UpdateContactFunction.Arn
-  DeleteContactFunction:
-    Description: "Delete Contact Lambda Function ARN"
-    Value: !GetAtt DeleteContactFunction.Arn
+  CreateEventFunction:
+    Description: "Create Event Lambda Function ARN"
+    Value: !GetAtt CreateEventFunction.Arn
+  ReadEventFunction:
+    Description: "Read Event Lambda Function ARN"
+    Value: !GetAtt ReadEventFunction.Arn
+  UpdateEventFunction:
+    Description: "Update Event Lambda Function ARN"
+    Value: !GetAtt UpdateEventFunction.Arn
+  DeleteEventFunction:
+    Description: "Delete Event Lambda Function ARN"
+    Value: !GetAtt DeleteEventFunction.Arn

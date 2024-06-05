@@ -1,0 +1,6 @@
+
+ycloudformation:S6333@"-Make sure creating a public API is safe here.(ë8˜úĞü1J$dfe9af4b-81be-4a1d-a40b-f190be23b0fd
+ycloudformation:S6333F"-Make sure creating a public API is safe here.(ë8˜úĞü1J$7f91191e-b0be-4e4a-8f72-9aebd059fff7
+æcloudformation:S6364"“Omitting "BackupRetentionPeriod" sets the backup retention period to 1 day. Make sure that defining a short backup retention duration is safe here.(ƒ‚ÒŠøÿÿÿÿ8¨úĞü1J$0033edaf-973f-4d2c-8f0f-f9013e34fa39
+§cloudformation:S6303"UOmitting "StorageEncrypted" disables databases encryption. Make sure it is safe here.(ƒ‚ÒŠøÿÿÿÿ8·úĞü1J$80575859-c050-4476-b4f2-cd7093914c12
+„cloudformation:S63049"8Make sure granting access to all resources is safe here.(€ëåC8¬ûĞü1J$86fc63c5-7004-4906-bd91-3b8b35d39c06
