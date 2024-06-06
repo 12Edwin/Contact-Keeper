@@ -1,12 +1,12 @@
 from datetime import datetime
 import re
-from user_management.commons import get_db_connection
+from .database import get_db_connection
 
 
 def validate_name(value):
     if not isinstance(value, str):
         return False
-    pattern = r"^(?!.*  )(?!.*['\";--\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$"
+    pattern = r"^(?!.*  )(?!.*['\";\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$"
     if re.match(pattern, value):
         return True
     return False
@@ -15,7 +15,7 @@ def validate_name(value):
 def validate_description(value):
     if not isinstance(value, str):
         return False
-    pattern = r"^(?!.*  )(?!.*['\";--\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,}$"
+    pattern = r"^(?!.*  )(?!.*['\";\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,}$"
     if re.match(pattern, value):
         return True
     return False
@@ -24,10 +24,10 @@ def validate_description(value):
 def validate_start_date(value):
     if not isinstance(value, str):
         return False
-    pattern = r"^\d{4}-\d{2}-\d{2}$"
+    pattern = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
     if not re.match(pattern, value):
         return False
-    event_date = datetime.strptime(value, "%Y-%m-%d")
+    event_date = datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
     today = datetime.today()
     if event_date < today:
         return False
@@ -37,11 +37,11 @@ def validate_start_date(value):
 def validate_end_date(start_date, end_date):
     if not isinstance(end_date, str):
         return False
-    pattern = r"^\d{4}-\d{2}-\d{2}$"
+    pattern = r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$"
     if not re.match(pattern, end_date):
         return False
-    event_end_date = datetime.strptime(end_date, "%Y-%m-%d")
-    event_start_date = datetime.strptime(start_date, "%Y-%m-%d")
+    event_end_date = datetime.strptime(end_date, "%Y-%m-%d %H:%M:%S")
+    event_start_date = datetime.strptime(start_date, "%Y-%m-%d %H:%M:%S")
     if event_end_date < event_start_date:
         return False
     if (event_end_date - event_start_date).days > 1:
@@ -61,7 +61,7 @@ def validate_event_type(value):
 def validate_location(value):
     if not isinstance(value, str):
         return False
-    pattern = r"^(?!.*  )(?!.*['\";--\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$"
+    pattern = r"^(?!.*  )(?!.*['\";\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$"
     if re.match(pattern, value):
         return True
     return False
@@ -88,7 +88,7 @@ def validate_role_meeting(value):
 def validate_title_meeting(value):
     if not isinstance(value, str):
         return False
-    pattern = r"^(?!.*  )(?!.*['\";--\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$"
+    pattern = r"^(?!.*  )(?!.*['\";\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$"
     if re.match(pattern, value):
         return True
     return False
@@ -97,32 +97,18 @@ def validate_title_meeting(value):
 def validate_notes_meeting(value):
     if not isinstance(value, str):
         return False
-    pattern = r"^(?!.*  )(?!.*['\";--\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,}$"
+    pattern = r"^(?!.*  )(?!.*['\";\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,}$"
     if re.match(pattern, value):
         return True
     return False
 
 
 def validate_id(value):
-    if not isinstance(value, int):
-        return False
-    if value < 1 or value > 999999999:
-        return False
-    return True
-
-
-def validate_group_id(value):
-    if not isinstance(value, int):
-        return False
-    if value < 1 or value > 999999999:
-        return False
-    return True
-
-
-def validate_user_id(value):
-    if not isinstance(value, int):
-        return False
-    if value < 1 or value > 999999999:
+    if isinstance(value, str):
+        if not value.isdigit():
+            return False
+        value = int(value)
+    if isinstance(value, int) and (value < 1 or value > 999999999):
         return False
     return True
 
@@ -134,8 +120,8 @@ def exists_by_id(value):
         with connection.cursor() as cursor:
             query = """SELECT id FROM events WHERE id = %s"""
             cursor.execute(query, value)
-            rows = cursor.rownumber()
-            if rows > 0:
+            rows = cursor.fetchall()
+            if len(rows) > 0:
                 return True
             else:
                 return False
@@ -151,8 +137,8 @@ def exists_user(value):
         with connection.cursor() as cursor:
             query = """SELECT id FROM users WHERE id = %s"""
             cursor.execute(query, value)
-            rows = cursor.rownumber()
-            if rows > 0:
+            rows = cursor.fetchall()
+            if len(rows) > 0:
                 return True
             else:
                 return False
@@ -168,8 +154,8 @@ def exists_group(value):
         with connection.cursor() as cursor:
             query = """SELECT id FROM group_members WHERE id = %s"""
             cursor.execute(query, value)
-            rows = cursor.rownumber()
-            if rows > 0:
+            rows = cursor.fetchall()
+            if len(rows) > 0:
                 return True
             else:
                 return False

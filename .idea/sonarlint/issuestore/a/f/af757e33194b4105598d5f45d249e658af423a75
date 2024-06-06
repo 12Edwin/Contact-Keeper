@@ -1,0 +1,12 @@
+
+Õpython:S1192	"ŠDefine a constant instead of duplicating this literal r"^(?!.*  )(?!.*['\";\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$" 3 times.(É»½—þÿÿÿÿ8Ö‹Ûôþ1J$c108c248-3bee-42bb-9657-caa3546daed1
+tpython:S5869	"*Remove duplicates in this character class.(É»½—þÿÿÿÿ8ß‹Ûôþ1J$c5a49227-011d-46f5-bf90-ba7264e10178
+opython:S6326	"%Replace spaces with quantifier `{2}`.(É»½—þÿÿÿÿ8à‹Ûôþ1J$35bd2db3-bd2a-4372-9342-2ce793ee194a
+tpython:S5869"*Remove duplicates in this character class.(¥äó×üÿÿÿÿ8à‹Ûôþ1J$5f3dcd36-7993-411e-990e-7c1594c691b4
+opython:S6326"%Replace spaces with quantifier `{2}`.(¥äó×üÿÿÿÿ8à‹Ûôþ1J$54f8fd1e-39d4-4e3a-8db1-6db22fd3715b
+tpython:S5869@"*Remove duplicates in this character class.(É»½—þÿÿÿÿ8á‹Ûôþ1J$1d7eb5f3-5b17-4097-b83b-aca0f6232672
+opython:S6326@"%Replace spaces with quantifier `{2}`.(É»½—þÿÿÿÿ8á‹Ûôþ1J$762524d0-9b24-4049-ae59-4edbd20a7f0b
+tpython:S5869["*Remove duplicates in this character class.(É»½—þÿÿÿÿ8á‹Ûôþ1J$7379b019-4875-4f22-bf85-804380b91668
+opython:S6326["%Replace spaces with quantifier `{2}`.(É»½—þÿÿÿÿ8â‹Ûôþ1J$b058c957-f1eb-4000-a41c-d5a18fba7b1b
+tpython:S5869d"*Remove duplicates in this character class.(¥äó×üÿÿÿÿ8â‹Ûôþ1J$abb5dd5a-dc5d-4306-82e2-d7f10e013f53
+opython:S6326d"%Replace spaces with quantifier `{2}`.(¥äó×üÿÿÿÿ8â‹Ûôþ1J$14da3f47-aea7-4b53-bb55-19cc8fe30f58

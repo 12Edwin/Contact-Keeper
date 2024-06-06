@@ -9,10 +9,6 @@ I
 Contact-Keeper/.gitignore,f\2\f201bf16ab211de5fc747b3010002da02a04388d
 L
 Contact-Keeper/template.yaml,e\8\e88d4f4bab8cf7119d95986050be41e07ca56bd4
-O
-Contact-Keeper/commons/utils.py,5\0\508e4f8dff32d418e12b0668b3deb8e5dc73e212
-`
-0Contact-Keeper/events_management/create_event.py,3\0\30194760a82f1ab6bec2895d2dd9663665322d98
 ^
 .Contact-Keeper/events_management/read_event.py,6\a\6a53e1d5e1f7bd336757a90bfd5d08015061b8e4
 `
@@ -27,9 +23,19 @@ W
 +Contact-Keeper/user_management/read_user.py,7\b\7bd7b8dc09c89e6d624c6e0a44c8985e892df9ac
 U
 %Contact-Keeper/user_management/app.py,f\d\fd9a3bf78a3cba34dcb1588488284e950adc4b43
-R
-"Contact-Keeper/commons/database.py,2\f\2f1fa66e65e5214f4ab9409cd15034e1cfb44be4
-W
-'Contact-Keeper/commons/requirements.txt,a\0\a04177b8f2640b3fe8c5d6cbc7ced263f36089b2
 \
 ,Contact-Keeper/events_management/__init__.py,1\a\1aaca4004a6f3a700d403705b7afa0cbbd3fbd10
+_
+/Contact-Keeper/user_management/commons/utils.py,2\8\2866fb03b58dd6dc986c9fad8557f22193161950
+d
+4Contact-Keeper/events_management/commons/database.py,e\0\e00e0966cdf431ca963f6993a3bc2890b26ce912
+e
+5Contact-Keeper/events_management/commons/ErrorType.py,a\0\a0c3a884bd96098d1894df661bc89c32b30c2297
+i
+9Contact-Keeper/events_management/commons/type_response.py,9\3\93b06991a64961cb27434aac60fe53196a8b2ee7
+a
+1Contact-Keeper/events_management/commons/utils.py,a\f\af757e33194b4105598d5f45d249e658af423a75
+a
+1Contact-Keeper/events_management/requirements.txt,6\3\63add97d3321cd7c0d49a1832ad94ea89a7215ff
+j
+:Contact-Keeper/events_management/create_event_for_group.py,c\7\c7a75ec49bff8e97fe187aa42e9795de154892d0
