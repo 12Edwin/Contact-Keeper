@@ -39,3 +39,5 @@ a
 1Contact-Keeper/events_management/requirements.txt,6\3\63add97d3321cd7c0d49a1832ad94ea89a7215ff
 j
 :Contact-Keeper/events_management/create_event_for_group.py,c\7\c7a75ec49bff8e97fe187aa42e9795de154892d0
+<
+coverage.xml,c\4\c45a48339f057a507b3872e5fc9d0c53a03231eb
