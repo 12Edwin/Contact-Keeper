@@ -1,72 +1,74 @@
 import json
-
 import pytest
-
-from hello_world import app
+from events_management.read_event import lambda_handler as read_event
+from events_management.update_event import lambda_handler as update_event
+from events_management.delete_event import lambda_handler as delete_event
+from events_management.create_event_for_group import lambda_handler as create_event
 
 
 @pytest.fixture()
-def apigw_event():
-    """ Generates API GW Event"""
-
+def sample_event():
+    """ Generates a sample event """
     return {
-        "body": '{ "test": "body"}',
-        "resource": "/{proxy+}",
-        "requestContext": {
-            "resourceId": "123456",
-            "apiId": "1234567890",
-            "resourcePath": "/{proxy+}",
-            "httpMethod": "POST",
-            "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
-            "accountId": "123456789012",
-            "identity": {
-                "apiKey": "",
-                "userArn": "",
-                "cognitoAuthenticationType": "",
-                "caller": "",
-                "userAgent": "Custom User Agent String",
-                "user": "",
-                "cognitoIdentityPoolId": "",
-                "cognitoIdentityId": "",
-                "cognitoAuthenticationProvider": "",
-                "sourceIp": "127.0.0.1",
-                "accountId": "",
-            },
-            "stage": "prod",
-        },
-        "queryStringParameters": {"foo": "bar"},
-        "headers": {
-            "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
-            "Accept-Language": "en-US,en;q=0.8",
-            "CloudFront-Is-Desktop-Viewer": "true",
-            "CloudFront-Is-SmartTV-Viewer": "false",
-            "CloudFront-Is-Mobile-Viewer": "false",
-            "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
-            "CloudFront-Viewer-Country": "US",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Upgrade-Insecure-Requests": "1",
-            "X-Forwarded-Port": "443",
-            "Host": "1234567890.execute-api.us-east-1.amazonaws.com",
-            "X-Forwarded-Proto": "https",
-            "X-Amz-Cf-Id": "aaaaaaaaaae3VYQb9jd-nvCd-de396Uhbp027Y2JvkCPNLmGJHqlaA==",
-            "CloudFront-Is-Tablet-Viewer": "false",
-            "Cache-Control": "max-age=0",
-            "User-Agent": "Custom User Agent String",
-            "CloudFront-Forwarded-Proto": "https",
-            "Accept-Encoding": "gzip, deflate, sdch",
-        },
-        "pathParameters": {"proxy": "/examplepath"},
-        "httpMethod": "POST",
-        "stageVariables": {"baz": "qux"},
-        "path": "/examplepath",
+        "body": json.dumps({
+            "id": 1,
+            "name": "Test Event",
+            "description": "This is a test event",
+            "start_date": "2024-06-12 15:00:00",
+            "end_date": "2024-06-12 16:00:00",
+            "type": "session",
+            "location": "Test Location",
+            "id_group_member": 1
+        })
     }
 
 
-def test_lambda_handler(apigw_event):
+def test_read_event(sample_event):
+    mock = {
+        "pathParameters": {
+            "id": 1
+        }
+    }
+    context = {}
+    response = read_event(mock, context)
+    data = json.loads(response["body"])
 
-    ret = app.lambda_handler(apigw_event, "")
-    data = json.loads(ret["body"])
+    assert response["statusCode"] == 200
+    assert "message" in response["body"]
+    assert data["message"] == "Success"
+    assert data["data"]["id"] == mock["pathParameters"]["id"]
 
-    assert ret["statusCode"] == 200
-    assert "message" in ret["body"]
-    assert data["message"] == "hello world"
+
+def test_create_event(sample_event):
+    context = {}
+    response = create_event(sample_event, context)
+    data = json.loads(response["body"])
+
+    assert "message" in response["body"]
+    assert data["message"] == "Success"
+    assert response["statusCode"] == 200
+
+
+def test_update_event(sample_event):
+    context = {}
+    response = update_event(sample_event, context)
+    data = json.loads(response["body"])
+
+    assert response["statusCode"] == 200
+    assert "message" in response["body"]
+    assert data["message"] == "Success"
+
+
+def test_delete_event(sample_event):
+    context = {}
+    event = {
+        "pathParameters": {
+            "id": 1
+        }
+    }
+    response = delete_event(event, context)
+    data = json.loads(response["body"])
+
+    assert response["statusCode"] == 200
+    assert "message" in response["body"]
+    assert data["message"] == "Success"
