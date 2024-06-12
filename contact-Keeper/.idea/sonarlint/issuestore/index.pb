@@ -11,8 +11,18 @@ F
 user_management/app.py,f\a\fa49ce0e2f439bd949104a63fa23820b7b7579db
 Q
 !events_management/delete_event.py,b\e\bef4e1e53784591af38a7ac8b623b52f28a315ef
-<
-coverage.xml,c\4\c45a48339f057a507b3872e5fc9d0c53a03231eb
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
+;
+.coveragerc,e\f\eff4cd4a1e08155d42c85e48787c9e4c288b8d02
+=
+template.yaml,a\5\a59ab7db7e728017a7f55483d5aa97d97a4f9a87
+J
+tests/unit/test_handler.py,a\1\a10f4ada4f2cc4831c7dde426e9f4f62bc45c2bb
+Z
+*events_management/create_event_for_meet.py,a\a\aa2e6ae9a3abcdf3f5ca56f33592ba8e8e52c76b
+[
++events_management/create_event_for_group.py,d\4\d4eb62a28be9d3b6ac4b88e9999a1cd1aeeb369f
+<
+coverage.xml,c\4\c45a48339f057a507b3872e5fc9d0c53a03231eb
