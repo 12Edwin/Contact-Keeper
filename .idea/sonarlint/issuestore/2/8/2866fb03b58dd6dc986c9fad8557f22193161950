@@ -1,5 +1,0 @@
-
-�python:S1192"xDefine a constant instead of duplicating this literal r"^(?!.*  )[A-Za-zÑñÁáÉéÍíÓóÚúÜü\s]{3,70}$" 3 times.(�ĨE
-<python:S6326"%Replace spaces with quantifier `{2}`.(�ĨE
-<python:S6326"%Replace spaces with quantifier `{2}`.(�ĨE
-<python:S6326%"%Replace spaces with quantifier `{2}`.(�ĨE

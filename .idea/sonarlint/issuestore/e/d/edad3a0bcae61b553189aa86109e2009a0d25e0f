@@ -1,12 +1,0 @@
-
-¨python:S1192	"ŠDefine a constant instead of duplicating this literal r"^(?!.*  )(?!.*['\";\/\*\@\@\(\)=<>\!\+\-\*\/%\^\&\|\~\{\}\[\]]).{3,255}$" 3 times.(É»½—þÿÿÿÿ
-Gpython:S5869	"*Remove duplicates in this character class.(É»½—þÿÿÿÿ
-Bpython:S6326	"%Replace spaces with quantifier `{2}`.(É»½—þÿÿÿÿ
-Gpython:S5869"*Remove duplicates in this character class.(¥äó×üÿÿÿÿ
-Bpython:S6326"%Replace spaces with quantifier `{2}`.(¥äó×üÿÿÿÿ
-Gpython:S5869@"*Remove duplicates in this character class.(É»½—þÿÿÿÿ
-Bpython:S6326@"%Replace spaces with quantifier `{2}`.(É»½—þÿÿÿÿ
-Gpython:S5869["*Remove duplicates in this character class.(É»½—þÿÿÿÿ
-Bpython:S6326["%Replace spaces with quantifier `{2}`.(É»½—þÿÿÿÿ
-Gpython:S5869d"*Remove duplicates in this character class.(¥äó×üÿÿÿÿ
-Bpython:S6326d"%Replace spaces with quantifier `{2}`.(¥äó×üÿÿÿÿ
