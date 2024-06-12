@@ -1,0 +1,9 @@
+[paths]
+source =
+    .
+    C:/Users/elpor/Documents/Github/Contact-Keeper/contact-Keeper
+
+[run]
+source =
+    events_management/
+    user_management/
