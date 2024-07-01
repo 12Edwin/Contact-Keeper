@@ -1,6 +1,6 @@
 from datetime import datetime
 import re
-from .database import get_db_connection
+from commons.database import get_db_connection
 
 
 def validate_name(value):
