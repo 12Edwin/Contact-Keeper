@@ -1,10 +1,10 @@
 import datetime
 import pymysql
-from .commons.utils import validate_id, exists_by_id
-from .commons.database import get_db_connection
-from .commons.type_response import response_200, response_400, response_500
-from .commons.ErrorType import ErrorType
-from .read_event import read_event
+from commons.utils import validate_id, exists_by_id
+from commons.database import get_db_connection
+from commons.type_response import response_200, response_400, response_500
+from commons.ErrorType import ErrorType
+from read_event import read_event
 
 
 def datetime_handler(obj):

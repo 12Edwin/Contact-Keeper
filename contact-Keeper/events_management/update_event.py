@@ -1,10 +1,10 @@
 import json
 import pymysql
 from datetime import datetime
-from .commons.utils import validate_name, validate_start_date, validate_end_date, validate_event_type, exists_group, validate_id, exists_by_id
-from .commons.database import get_db_connection
-from .commons.type_response import response_200, response_400, response_500
-from .commons.ErrorType import ErrorType
+from commons.utils import validate_name, validate_start_date, validate_end_date, validate_event_type, exists_group, validate_id, exists_by_id
+from commons.database import get_db_connection
+from commons.type_response import response_200, response_400, response_500
+from commons.ErrorType import ErrorType
 
 
 def datetime_handler(obj):
