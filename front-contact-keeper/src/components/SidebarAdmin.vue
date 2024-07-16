@@ -31,7 +31,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+ @import '@/styles/colors.scss';
+
 .custom-sidebar {
   width: 250px;
   height: 100vh;
@@ -48,6 +50,6 @@ export default {
 
 .sidebar-header p {
   margin: 0;
-  color: #666;
+  color: $secondary-color;
 }
 </style>

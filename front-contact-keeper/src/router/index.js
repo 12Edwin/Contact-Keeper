@@ -2,7 +2,8 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import Login from '@/modules/login/views/Login.vue';
-import Dashboard from "@/modules/events/views/Dashboard.vue"
+import Dashboard from "@/modules/events/views/admin/Dashboard.vue"
+import UserPanel from "@/modules/events/views/user/UserPanel.vue"
 
 Vue.use(VueRouter)
 
@@ -21,6 +22,11 @@ const routes = [
     path: '/dashboard',
     name: 'dashboard',
     component: Dashboard
+  },
+  {
+    path: '/user-panel',
+    name: 'UserPanel',
+    component: UserPanel
   },
   {
     path: '/about',

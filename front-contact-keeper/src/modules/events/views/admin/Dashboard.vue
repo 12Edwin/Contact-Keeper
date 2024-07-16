@@ -20,7 +20,7 @@
 <script>
 import Navbar from '@/components/Navbar.vue'
 import SidebarAdmin from "@/components/SidebarAdmin.vue"
-import UserInfo from '../components/UserInfo.vue'
+import UserInfo from '../../components/UserInfo.vue'
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -74,6 +74,7 @@ export default {
   margin-left: 0;
   transition: margin-left 0.3s;
   margin-top: 70px;
+  background-color: $background-color;
 }
 
 .content.sidebar-open {
@@ -98,7 +99,7 @@ export default {
 }
 
 .content.sidebar-open {
-  margin-left: 250px; 
+  margin-left: 200px; 
 }
 
 .cd-user-info{
