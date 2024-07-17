@@ -5,14 +5,14 @@
     <div class="main-content">
       <div class="content">
         <Panel header="Usuarios">
-          <DataTable class="custom-datatable":value="users" selectionMode="single" @row-select="onUserSelect">
-            <Column class="ctm-name" field="name" header="Nombre" />
-            <Column field="role" header="Rol" />
-            <Column field="email" header="Email" />
+          <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
+            <Column :headerStyle="config" class="ctm-name" field="name" header="Nombre" />
+            <Column :headerStyle="config" field="role" header="Rol" />
+            <Column :headerStyle="config" field="email" header="Email" />
           </DataTable>
         </Panel>
       </div>
-      <UserInfo class="cd-user-info" :user="selectedUser" v-if="selectedUser" />
+      <UserInfo class="cd-user-info" :user="selectedUser" v-if="selectedUser" @hideUserInfo="hideUserInfo"/>
     </div>
   </div>
 </template>
@@ -45,12 +45,19 @@ export default {
         { name: 'Noé Mérida', role: 'Invitado', email: '20213tn056@utez.edu.mx' },
         { name: 'Yahir Degante', role: 'Anfitrión', email: '20213tn103@utez.edu.mx' }
       ],
-      selectedUser: null
+      selectedUser: null,
+      config: {
+        background: '#5AB9EA',
+        color: 'white',
+      }
     }
   },
   methods: {
     onUserSelect(event) {
       this.selectedUser = event.data
+    },
+    hideUserInfo() {
+      this.selectedUser = null
     },
     toggleSidebar() {
       this.sidebarVisible = !this.sidebarVisible
@@ -74,7 +81,6 @@ export default {
   margin-left: 0;
   transition: margin-left 0.3s;
   margin-top: 70px;
-  background-color: $background-color;
 }
 
 .content.sidebar-open {

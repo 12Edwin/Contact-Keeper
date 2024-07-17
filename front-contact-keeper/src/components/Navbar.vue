@@ -3,7 +3,7 @@
       <b-collapse id="nav-collapse" is-nav>
         <b-navbar-nav>
           <b-nav-item href="#" @click="$emit('toggle-sidebar')">
-            <b-icon icon="list"></b-icon>
+            <i class="pi pi-bars" :style="config"></i>
           </b-nav-item>
         </b-navbar-nav>
       </b-collapse>
@@ -12,14 +12,27 @@
   
   <script>
   export default {
-    name: 'Navbar'
+    name: 'Navbar',
+    data(){
+      return {
+        config: {
+          'fontSize': '1.1rem',
+          'color': '#737373',
+          'margin-left': '0.2rem'
+        }
+      }
+    }
   }
   </script>
   
   <style scoped lang="scss">
    @import '@/styles/colors.scss';
   .custom-navbar {
-    background-color: $primary-color 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
   </style>
   

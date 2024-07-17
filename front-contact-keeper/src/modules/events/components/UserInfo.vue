@@ -1,7 +1,10 @@
 <template>
     <Panel header="Información del usuario">
+      <template #icons>
+        <i class="pi pi-times" @click="hideInfo" style="cursor: pointer"></i>
+      </template>
       <div class="user-info">
-        <Avatar :label="user.name.charAt(0)" shape="circle" size="xlarge" />
+        <Avatar :label="user.name.charAt(0)" shape="circle" size="xlarge"/>
         <h3>{{ user.name }}</h3>
         <p><strong>Correo electrónico:</strong> {{ user.email }}</p>
         <p><strong>Número de teléfono:</strong> 7775743812</p>
@@ -20,7 +23,13 @@
       Avatar
     },
     props: {
-      user: Object
+      user: Object,
+    },
+    methods: {
+      hideInfo() {
+        this.$emit('hideUserInfo')
+      }
+
     }
   }
   </script>
