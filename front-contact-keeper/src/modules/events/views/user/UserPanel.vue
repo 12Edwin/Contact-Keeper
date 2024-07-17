@@ -13,7 +13,7 @@
           </DataTable>
         </Panel>
       </div>
-      <CreateEventModal style="margin-top: 40px;" v-if="showModal" @close="showModal = false" />
+      <CreateEventModal v-if="showModal" @close="showModal = false" />
     </div>
   </template>
   

@@ -1,30 +1,27 @@
 <template>
-  <div class="dashboard">
+  <div class="main-content">
     <Navbar @toggle-sidebar="toggleSidebar" />
     <SidebarAdmin :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
-    <div class="main-content">
-      <div class="content">
-        <Panel header="Usuarios">
-          <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
-            <Column :headerStyle="config" class="ctm-name" field="name" header="Nombre" />
-            <Column :headerStyle="config" field="role" header="Rol" />
-            <Column :headerStyle="config" field="email" header="Email" />
-          </DataTable>
-        </Panel>
-      </div>
-      <UserInfo class="cd-user-info" :user="selectedUser" v-if="selectedUser" @hideUserInfo="hideUserInfo"/>
+    <div class="content">
+      <Panel header="Usuarios">
+        <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
+          <Column :headerStyle="config" class="ctm-name" field="name" header="Nombre" />
+          <Column :headerStyle="config" field="role" header="Rol" />
+          <Column :headerStyle="config" field="email" header="Email" />
+        </DataTable>
+      </Panel>
     </div>
+    <ModalUserInfo :user="selectedUser" :visible.sync="displayModal"/>
   </div>
 </template>
 
 <script>
 import Navbar from '@/components/Navbar.vue'
 import SidebarAdmin from "@/components/SidebarAdmin.vue"
-import UserInfo from '../../components/UserInfo.vue'
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-
+import ModalUserInfo from "@/modules/events/components/ModalUserInfo.vue";
 export default {
   name: 'Dashboard',
   components: {
@@ -33,7 +30,7 @@ export default {
     Panel,
     DataTable,
     Column,
-    UserInfo
+    ModalUserInfo
   },
   data() {
     return {
@@ -49,11 +46,13 @@ export default {
       config: {
         background: '#5AB9EA',
         color: 'white',
-      }
+      },
+      displayModal: false
     }
   },
   methods: {
     onUserSelect(event) {
+      this.displayModal = true
       this.selectedUser = event.data
     },
     hideUserInfo() {
@@ -61,6 +60,9 @@ export default {
     },
     toggleSidebar() {
       this.sidebarVisible = !this.sidebarVisible
+    },
+    openModal(service) {
+
     }
   }
 }
@@ -93,10 +95,10 @@ export default {
   height: 100vh;
 }
 
-.main-content {
-  display: flex;
-  flex: 1;
-}
+ .main-content {
+   display: flex;
+   flex: 2;
+ }
 
 .content {
   flex: 1;
