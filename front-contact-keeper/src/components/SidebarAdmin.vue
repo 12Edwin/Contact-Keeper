@@ -1,7 +1,7 @@
 <template>
   <Sidebar :visible="visible" @update:visible="$emit('update:visible', $event)" :baseZIndex="1000" class="custom-sidebar">
     <div class="sidebar-header p-2">
-      <Avatar label="RD" class="p-mr-2" />
+      <Avatar label="RD" class="p-mr-2 custom-avatar" />
       <div class="user-info">
         <h2 class="user-sidebar">Raúl Domínguez</h2>
         <p class="role">Administrador</p>
@@ -109,6 +109,11 @@ div ul {
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
   cursor: pointer;
+}
+
+.custom-avatar {
+  background-color: $primary-color;
+  color: $blanco;
 }
 
 </style>

@@ -29,7 +29,8 @@ import Avatar from 'primevue/avatar'
 import Menu from 'primevue/menu'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-
+import Divider from "primevue/divider";
+import Password from "primevue/password";
 Vue.component('Button', Button)
 Vue.component('Panel', Panel)
 Vue.component('InputText', InputText)
@@ -42,7 +43,8 @@ Vue.component('Avatar', Avatar)
 Vue.component('Menu', Menu)
 Vue.component('DataTable', DataTable)
 Vue.component('Column', Column)
-
+Vue.component('Divider', Divider)
+Vue.component('Password', Password)
 // PrimeVue services
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
@@ -62,6 +64,11 @@ Vue.use(VueAxios, axios)
 import '@/styles/colors.scss'
 
 Vue.config.productionTip = false
+
+// Vue composition
+import VueCompositionAPI from '@vue/composition-api'
+Vue.use(VueCompositionAPI)
+
 
 new Vue({
     router,
