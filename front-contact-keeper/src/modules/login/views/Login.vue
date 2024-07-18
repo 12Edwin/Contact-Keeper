@@ -1,11 +1,11 @@
 <template>
     <div class="login-container">
       <div class="image-zone">
-        <img src="../../../assets/logo_sin_fondo.png" alt="Login image" class="login-image">
+        <img src="../../../assets/logo_sope.png" alt="Login image" class="login-image">
       </div>
       <div class="form-zone">
         <form @submit.prevent="login" class="login-form">
-          <h2>Agenda</h2>
+          <h2>SOPE</h2>
           <div class="input-group">
             <label for="username">Usuario:</label>
             <input type="text" id="username" v-model="username" required>
@@ -56,8 +56,8 @@
     justify-content: center;
     align-items: center;
     padding: 2rem;
-    background: rgb(90,185,234);
-    background: radial-gradient(circle, rgba(90,185,234,1) 40%, rgba(9,9,121,1) 100%);
+    background: rgb(0,0,0);
+    background: linear-gradient(90deg, rgba(0,0,0,1) 0%, rgba(255,255,255,1) 100%);
   }
   
   .login-image {
@@ -109,9 +109,9 @@
   }
   
   .login-button {
-    width: 104%;
+    width: 100%;
     padding: 0.75rem;
-    background-color: $azul-cielo;
+    background-color: $primary-color;
     color: white;
     border: none;
     border-radius: 9px;
@@ -121,7 +121,7 @@
   }
   
   .login-button:hover {
-    background-color: $rojo-brillante;
+    background-color: $gray-color;
   }
   
   @media (max-width: 768px) {

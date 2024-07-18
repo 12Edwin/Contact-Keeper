@@ -25,7 +25,7 @@ const routes = [
   },
   {
     path: '/user-panel',
-    name: 'UserPanel',
+    name: 'userPanel',
     component: UserPanel
   },
   {

@@ -44,7 +44,7 @@ export default {
       ],
       selectedUser: null,
       config: {
-        background: '#5AB9EA',
+        background: '#333',
         color: 'white',
       },
       displayModal: false
