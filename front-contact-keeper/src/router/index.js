@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue';
 import Login from '@/modules/login/views/Login.vue';
 import Dashboard from "@/modules/events/views/admin/Dashboard.vue"
 import UserPanel from "@/modules/events/views/user/UserPanel.vue"
+import Calendar from '@/modules/events/views/Calendar.vue'
 
 Vue.use(VueRouter)
 
@@ -27,6 +28,11 @@ const routes = [
     path: '/user-panel',
     name: 'userPanel',
     component: UserPanel
+  },
+  {
+    path: '/calendar',
+    name: 'calendarioEventos',
+    component: Calendar
   },
   {
     path: '/about',
