@@ -78,4 +78,15 @@ input {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
+.onLoginShowed {
+  animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
 </style>
