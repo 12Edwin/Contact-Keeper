@@ -3,15 +3,37 @@
     <Navbar @toggle-sidebar="toggleSidebar" />
     <SidebarAdmin :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
     <div class="content">
-      <Panel header="Usuarios">
-        <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
-          <Column :headerStyle="config" class="ctm-name" field="name" header="Nombre" />
-          <Column :headerStyle="config" field="role" header="Rol" />
-          <Column :headerStyle="config" field="email" header="Email" />
-        </DataTable>
+      <Panel header="Usuarios" class="shadow-lg">
+        <div class="p-1">
+          <div>
+            <b-row>
+              <b-col class="d-flex justify-content-between align-content-between mb-3">
+                <span class="p-input-icon-right">
+                  <i class="pi pi-search" />
+                  <InputText type="text"  placeholder="Buscar..." />
+                </span>
+                <Button
+                    class="button-options"
+                    label="Nuevo usuario"
+                    iconPos="right"
+                    icon="pi pi-user-plus"
+                    @click="openSaveModal"
+                />
+              </b-col>
+            </b-row>
+          </div>
+          <div>
+            <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
+              <Column :headerStyle="config" class="ctm-name" field="name" header="Nombre" />
+              <Column :headerStyle="config" field="role" header="Rol" />
+              <Column :headerStyle="config" field="email" header="Email" />
+            </DataTable>
+          </div>
+        </div>
       </Panel>
     </div>
     <ModalUserInfo :user="selectedUser" :visible.sync="displayModal"/>
+    <ModalSaveUser :visible.sync="displaySaveModal"/>
   </div>
 </template>
 
@@ -22,6 +44,7 @@ import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import ModalUserInfo from "@/modules/events/components/ModalUserInfo.vue";
+import ModalSaveUser from "@/modules/events/components/ModalSaveUser.vue";
 export default {
   name: 'Dashboard',
   components: {
@@ -30,7 +53,8 @@ export default {
     Panel,
     DataTable,
     Column,
-    ModalUserInfo
+    ModalUserInfo,
+    ModalSaveUser
   },
   data() {
     return {
@@ -46,14 +70,22 @@ export default {
       config: {
         background: '#333',
         color: 'white',
+        justifyContent: 'center',
+        alignItems: 'center'
       },
-      displayModal: false
+      displayModal: false,
+      displaySaveModal: false
     }
   },
   methods: {
     onUserSelect(event) {
       this.displayModal = true
-      this.selectedUser = event.data
+      if(event.data){
+        this.selectedUser = event.data
+      }
+    },
+    openSaveModal(){
+      this.displaySaveModal = true
     },
     hideUserInfo() {
       this.selectedUser = null
@@ -61,9 +93,6 @@ export default {
     toggleSidebar() {
       this.sidebarVisible = !this.sidebarVisible
     },
-    openModal(service) {
-
-    }
   }
 }
 </script>
@@ -117,5 +146,12 @@ export default {
 .ctm-name{
   background-color: $primary-color;
 }
+
+ .button-options {
+    background: $primary-color;
+    color: white;
+    border: none;
+    border-radius: 5px;
+ }
 
 </style>

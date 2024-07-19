@@ -28,11 +28,9 @@
   <style scoped lang="scss">
    @import '@/styles/colors.scss';
   .custom-navbar {
+    height: 8vh;
+    width: 100vw;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    height: 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
   </style>
   

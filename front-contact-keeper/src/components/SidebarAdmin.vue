@@ -46,11 +46,11 @@ export default {
   width: 250px;
   height: 100vh;
   transition: width 0.3s;
-  background-color: $blanco; 
-  color: #333; 
-  padding: 10px; 
+  background-color: $blanco;
+  color: #333;
+  padding: 10px;
   box-sizing: border-box;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1); 
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .sidebar-header {
@@ -61,8 +61,8 @@ export default {
 }
 
 .avatar {
-  background-color: #333; 
-  color: #fff; 
+  background-color: #333;
+  color: #fff;
   width: 40px;
   height: 40px;
   display: flex;
@@ -70,7 +70,7 @@ export default {
   justify-content: center;
   border-radius: 20%;
   font-weight: bold;
-  transition: transform 0.3s, margin-left 0.3s; 
+  transition: transform 0.3s, margin-left 0.3s;
 }
 
 .user-info {
@@ -89,13 +89,13 @@ export default {
 .role {
   margin: 0;
   font-size: 13px;
-  color: #555; 
+  color: #555;
 }
 
 .sidebar-icon {
-  font-size: 24px; 
+  font-size: 24px;
   transition: transform 0.3s, box-shadow 0.3s;
-  color: #333; 
+  color: #333;
 }
 
 .sidebar-text {
@@ -103,7 +103,7 @@ export default {
   font-weight: 500;
   margin-left: 15px;
   transition: opacity 0.3s;
-  color: #333; 
+  color: #333;
 }
 
 ul {
@@ -119,7 +119,7 @@ ul {
   width: 100%;
   background-color: transparent;
   border-radius: 9px;
-  color: #333; 
+  color: #333;
   margin-bottom: 10px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -148,24 +148,24 @@ ul {
   width: 40px;
   height: 50px;
   border-radius: 20%;
-  background-color: $blanco; 
-  color: #333; 
+  background-color: $blanco;
+  color: #333;
   font-size: 24px;
   padding: 24px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .custom-sidebar.closed .item:hover .sidebar-icon {
-  box-shadow: none; 
+  box-shadow: none;
 }
 
 .custom-sidebar.closed .sidebar-header {
-  justify-content: center; 
+  justify-content: center;
 }
 
 .custom-sidebar.closed .avatar {
-  transform: translateX(0); 
-  margin-left: 0; 
+  transform: translateX(0);
+  margin-left: 0;
 }
 
 .custom-sidebar.closed .user-sidebar,
