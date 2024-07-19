@@ -31,6 +31,8 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Divider from "primevue/divider";
 import Password from "primevue/password";
+import Dropdown from 'primevue/dropdown';
+
 Vue.component('Button', Button)
 Vue.component('Panel', Panel)
 Vue.component('InputText', InputText)
@@ -45,6 +47,7 @@ Vue.component('DataTable', DataTable)
 Vue.component('Column', Column)
 Vue.component('Divider', Divider)
 Vue.component('Password', Password)
+Vue.component('Dropdown', Dropdown)
 // PrimeVue services
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'

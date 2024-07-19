@@ -132,19 +132,43 @@
         <b-col cols="12">
           <h2 class="form-part" >Acceso</h2>
         </b-col>
-        <b-col class="mt-3 mb-2" lg="6">
+        <b-col class="mt-3 mb-2" cols="12" lg="12">
           <div class="field">
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-at" />
-              <InputText id="field-lastname" type="email"/>
-              <label for="field-lastname" class="form-label-required">Usuario</label>
+              <Dropdown v-model="v$.user_type.$model" :options="userTypes" optionLabel="name"  optionValue="code"/>
+              <label for="field-lastname" class="form-label-required">Tipo:</label>
             </span>
           </div>
         </b-col>
         <b-col class="mt-3 mb-2" lg="6">
           <div class="field">
             <span class="p-float-label p-input-icon-right">
-              <Password v-model="value3" toggleMask promptLabel="Elige una contraseña segura" weakLabel="Débil" mediumLabel="Medianamente segura" strongLabel="Muy segura" >
+              <i class="pi pi-at" />
+              <InputText id="field-username" type="text" v-model="v$.username.$model" :class="{ 'invalid-field-custom': v$.username.$error }"/>
+              <label for="field-username" class="form-label-required">Usuario</label>
+            </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.username.$dirty && v$.username.required.$invalid">
+                {{ v$.username.required.$message }}
+              </p>
+              <p class="error-messages"
+                 v-if="v$.username.$dirty && v$.username.onlyLetters.$invalid">
+                {{ v$.username.onlyLetters.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.username.$dirty && v$.username.minLength.$invalid">
+                {{ v$.username.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.username.$dirty && v$.username.maxLength.$invalid">
+                {{ v$.username.maxLength.$message }}
+              </p>
+            </div>
+          </div>
+        </b-col>
+        <b-col class="mt-3 mb-2" lg="6">
+          <div class="field">
+            <span class="p-float-label p-input-icon-right">
+              <Password v-model="v$.password.$model" :class="{ 'invalid-field-custom': v$.password.$error }"  toggleMask promptLabel="Elige una contraseña segura" weakLabel="Débil" mediumLabel="Medianamente segura" strongLabel="Muy segura" >
                 <template #header>
                   <h6>Escribe una contraseña</h6>
                 </template>
@@ -161,28 +185,29 @@
               </Password>
               <label for="field-password" class="form-label-required">Contraseña</label>
             </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.password.$dirty && v$.password.required.$invalid">
+                {{ v$.password.required.$message }}
+              </p>
+            </div>
           </div>
         </b-col>
       </b-row>
     </div>
     <template #footer>
-      <Button label="Guardar" icon="pi pi-check"  iconPos="right" class="button-options"/>
-      <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
+      <Button @click="saveUser()" label="Guardar" icon="pi pi-check"  iconPos="right" class="button-options"/>
+      <Button  label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
     </template>
   </Dialog>
 </template>
 
 <script>
-import Dialog from "primevue/dialog";
 import {reactive} from "@vue/composition-api";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers, maxLength, minLength, email } from '@vuelidate/validators'
 import {nameRegex, noRequiredField, phoneRegex} from "@/kernel/patterns.js";
 export default {
   name: 'ModalSaveUser',
-  Components: {
-    Dialog
-  },
   props: {
     visible: Boolean,
     required: true
@@ -190,7 +215,11 @@ export default {
   data(){
     return {
       show: false,
-      value3: ''
+      userTypes: [
+        {name: 'Administrador', code: 'admin'},
+        {name: 'Usuario', code: 'normal'}
+      ],
+      selectedUser: null
     }
   },
   setup(){
@@ -200,7 +229,9 @@ export default {
       lastname: '',
       email: '',
       phone: '',
-      password: ''
+      password: '',
+      user_type: '',
+      username: ''
     })
 
     const rules = {
@@ -231,7 +262,17 @@ export default {
       },
       password: {
         required: helpers.withMessage('La contraseña es requerida', required),
+      },
+      user_type: {
+        required: helpers.withMessage('El tipo de usuario es requerido', required),
+      },
+      username : {
+        required: helpers.withMessage('El nombre de usuario es requerido', required),
+        onlyLetters: helpers.withMessage('El nombre de usuario solo puede contener letras y numeros', (value) => nameRegex.test(value)),
+        minLength: helpers.withMessage("El nombre debe tener al menos 3 caracteres", minLength(3)),
+        maxLength: helpers.withMessage("El nombre debe tener menos de 10 caracteres", maxLength(10))
       }
+
     }
     const v$ = useVuelidate(rules, person)
     return {person, v$}
@@ -239,6 +280,10 @@ export default {
   methods: {
     closeModal(){
       this.$emit('update:visible', false);
+    },
+    saveUser(){
+      console.log('Guardando usuario')
+      console.log(this.person)
     }
   }
 }
