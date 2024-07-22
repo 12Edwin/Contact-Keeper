@@ -222,11 +222,11 @@
 
   .form-label-required::after {
     content: " *";
-    color: $rojo;
+    color: $red-color;
   }
 
   .invalid-field-custom {
-    border-color: $rojo !important;
+    border-color: $red-color !important;
     box-shadow: 0 0 3px $shadows !important;
   }
 
@@ -238,7 +238,7 @@
 
   .error-messages::before {
     content: "* ";
-    color: $rojo;
+    color: $red-color;
   }
   /*animation*/
   .onLoginShowed {

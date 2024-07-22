@@ -2,8 +2,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import Login from '@/modules/login/views/Login.vue';
-import Dashboard from "@/modules/events/views/admin/Dashboard.vue"
-import UserPanel from "@/modules/events/views/user/UserPanel.vue"
+import Dashboard from "@/modules/events/views/Dashboard.vue"
+import UserPanel from "@/modules/events/views/UserPanel.vue"
+import Calendar from '@/modules/events/views/Calendar.vue';
 
 Vue.use(VueRouter)
 
@@ -24,9 +25,14 @@ const routes = [
     component: Dashboard
   },
   {
-    path: '/user-panel',
-    name: 'userPanel',
+    path: '/Events',
+    name: 'events',
     component: UserPanel
+  },
+  {
+    path: '/calendar',
+    name: 'calendar',
+    component: Calendar
   },
   {
     path: '/about',
