@@ -1,7 +1,5 @@
 <template>
   <div class="main-content">
-    <Navbar @toggle-sidebar="toggleSidebar" />
-    <SidebarAdmin :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
     <div class="content">
       <Panel header="Usuarios" class="shadow-lg">
         <div class="p-1">
@@ -13,11 +11,11 @@
                   <InputText type="text"  placeholder="Buscar..." />
                 </span>
                 <Button
-                    class="button-options"
-                    label="Nuevo usuario"
-                    iconPos="right"
-                    icon="pi pi-user-plus"
-                    @click="openSaveModal"
+                  class="button-options"
+                  label="Nuevo usuario"
+                  iconPos="right"
+                  icon="pi pi-user-plus"
+                  @click="openSaveModal"
                 />
               </b-col>
             </b-row>
@@ -46,7 +44,7 @@ import Column from 'primevue/column'
 import ModalUserInfo from "@/modules/events/components/ModalUserInfo.vue";
 import ModalSaveUser from "@/modules/events/components/ModalSaveUser.vue";
 export default {
-  name: 'Dashboard',
+  name: 'Events',
   components: {
     Navbar,
     SidebarAdmin,
@@ -152,6 +150,15 @@ export default {
     color: white;
     border: none;
     border-radius: 5px;
+ }
+
+ .button-options:hover{
+   border-radius: 5px;
+   transform: translateY(-5px);
+   box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
+   background: $primary-color !important;
+   border: none;
+   cursor: pointer;
  }
 
 </style>

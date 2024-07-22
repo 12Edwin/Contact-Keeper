@@ -9,7 +9,9 @@
     </div>
     <div class="w-100">
       <ul>
-        <li class="item" v-for="(item, index) in menuItems" :key="index">
+        <li class="item" v-for="(item, index) in menuItems"
+            :key="index" @click="() => $router.push({ name: item.route })"
+        >
           <i :class="`${item.icon} sidebar-icon`" /> <span class="sidebar-text">{{ item.label }}</span>
         </li>
       </ul>
@@ -29,8 +31,8 @@ export default {
   data() {
     return {
       menuItems: [
-        {label: 'Usuarios', icon: 'pi pi-fw pi-users'},
-        {label: 'Eventos', icon: 'pi pi-fw pi-calendar'},
+        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users'},
+        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'events'},
         {label: 'Anuncios', icon: 'pi pi-fw pi-megaphone'},
         {label: 'Cerrar sesión', icon: 'pi pi-fw pi-power-off'}
       ]

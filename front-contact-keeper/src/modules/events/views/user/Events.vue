@@ -1,7 +1,5 @@
 <template>
   <div class="main-content">
-    <Navbar @toggle-sidebar="toggleSidebar" />
-    <SidebarUser :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
     <div class="content">
       <Panel header="Eventos">
         <div class="event-actions">
@@ -18,17 +16,13 @@
 </template>
 
 <script>
-import Navbar from '@/components/Navbar.vue'
-import SidebarUser from "@/components/SidebarUser.vue"
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import CreateEventModal from '../../components/CreateEventModal.vue'
 export default {
-  name: 'Dashboard',
+  name: 'Events',
   components: {
-    Navbar,
-    SidebarUser,
     Panel,
     DataTable,
     Column,
@@ -57,9 +51,6 @@ export default {
     },
     hideUserInfo() {
       this.selectedUser = null
-    },
-    toggleSidebar() {
-      this.sidebarVisible = !this.sidebarVisible
     },
     openModal(service) {
 

@@ -34,6 +34,7 @@ import Password from "primevue/password";
 import Dropdown from 'primevue/dropdown';
 import Checkbox from 'primevue/checkbox';
 
+
 Vue.component('Button', Button)
 Vue.component('Panel', Panel)
 Vue.component('InputText', InputText)
@@ -50,6 +51,7 @@ Vue.component('Divider', Divider)
 Vue.component('Password', Password)
 Vue.component('Dropdown', Dropdown)
 Vue.component('Checkbox', Checkbox)
+Vue.directive('tooltip', Tooltip);
 // PrimeVue services
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
