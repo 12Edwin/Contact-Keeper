@@ -44,6 +44,8 @@ import SidebarAdmin from "@/components/SidebarAdmin.vue"
 import Loader from "@/components/Loader.vue"
 import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
 import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
+import moment from 'moment';
+
 
 export default {
   components: {
@@ -59,6 +61,7 @@ export default {
       sidebarVisible: false,
       showModalEventInfo: false,
       showModalAddEvent: false,
+      events: [],
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
         initialView: 'dayGridMonth',
@@ -116,14 +119,14 @@ export default {
             el.style.color = 'black';
           });
         },
-      },
-      events: [
-        { title: 'Evento 1', start: '2024-07-18', end: '2024-08-28', description: 'Descripción del Evento 1' },
-        { title: 'Evento 2', start: '2024-07-20', end: '2024-08-28', description: 'Descripción del Evento 2' },
-        { title: 'Evento 3', start: '2024-07-22', end: '2024-08-28', description: 'Descripción del Evento 3' },
+        events: [
+        { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
+        { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
+        { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
         { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
         { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
       ],
+      },
       isLoading: false,
       selectedEvent: {},
     };
@@ -166,8 +169,8 @@ export default {
       };
       return colors[status] || 'grey';
     },
-    formatCalendarDate(pop){
-      return moment(pop).format(format12Time)
+    formatCalendarDate(date){
+      return moment(date).format('YYYY-MM-DD');
     },
   },
 }
@@ -253,7 +256,8 @@ export default {
   opacity: 0;
 }
 .fc-event {
-  border: 1px solid red !important;
+  padding: 3px;
+  border: 1px solid white !important;
 }
 
 .my-custom-event {
@@ -266,7 +270,7 @@ export default {
 .my-event-dot {
     width: 10px;
     height: 10px;
-    background-color: blue;
+    background-color: rgb(0, 0, 10);
     border-radius: 50%;
     margin-right: 5px;
 }
