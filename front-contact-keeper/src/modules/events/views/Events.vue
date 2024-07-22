@@ -62,53 +62,53 @@ export default {
 <style scoped lang="scss">
  @import '@/styles/colors';
 
-.user-management {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
+  .user-management {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
 
-.content {
-  flex: 1;
-  padding: 2rem;
-  margin-left: 0;
-  transition: margin-left 0.3s;
-  margin-top: 70px;
-}
+  .content {
+    flex: 1;
+    padding: 2rem;
+    margin-left: 0;
+    transition: margin-left 0.3s;
+    margin-top: 70px;
+  }
 
-.content.sidebar-open {
-  margin-left: 250px; 
-}
+  .content.sidebar-open {
+    margin-left: 250px;
+  }
 
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
+  .dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
 
- .main-content {
-   display: flex;
-   flex: 2;
- }
+  .main-content {
+    display: flex;
+    flex: 2;
+  }
 
-.content {
-  flex: 1;
-  padding: 1rem;
-  transition: margin-left 0.3s;
-}
+  .content {
+    flex: 1;
+    padding: 1rem;
+    transition: margin-left 0.3s;
+  }
 
-.content.sidebar-open {
-  margin-left: 200px; 
-}
+  .content.sidebar-open {
+    margin-left: 200px;
+  }
 
-.cd-user-info{
-  margin-top: 86px;
-}
+  .cd-user-info{
+    margin-top: 86px;
+  }
 
-.ctm-name{
-  background-color: $primary-color;
-}
-  
+  .ctm-name{
+    background-color: $primary-color;
+  }
+
   .event-actions {
     display: flex;
     justify-content: space-between;
