@@ -32,9 +32,10 @@ export default {
     return {
       menuItems: [
         {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users'},
-        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'events'},
+        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar'},
         {label: 'Anuncios', icon: 'pi pi-fw pi-megaphone'},
-        {label: 'Cerrar sesión', icon: 'pi pi-fw pi-power-off'}
+        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap'},
+        {label: 'Cerrar sesión', icon: 'pi pi-fw pi-power-off'},
       ]
     }
   }

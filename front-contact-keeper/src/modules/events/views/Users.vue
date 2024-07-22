@@ -96,7 +96,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
- @import '@/styles/colors.scss';
+ @import '@/styles/colors';
 
 .user-management {
   display: flex;
@@ -109,7 +109,6 @@ export default {
   padding: 2rem;
   margin-left: 0;
   transition: margin-left 0.3s;
-  margin-top: 70px;
 }
 
 .content.sidebar-open {

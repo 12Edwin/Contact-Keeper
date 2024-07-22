@@ -1,6 +1,6 @@
-import Users from "@/modules/events/views/admin/Users.vue";
-import Events from "@/modules/events/views/user/Events.vue";
-
+import Users from "@/modules/events/views/Users.vue";
+import Events from "@/modules/events/views/Events.vue";
+import Calendar from "@/modules/events/views/Calendar.vue"
 export default [
     {
         path: 'users',
@@ -26,12 +26,11 @@ export default [
         ]
     },
     {
-        path: 'events',
-        name: 'events',
-        component: Events,
+        path: 'calendar',
+        name: 'calendar',
+        component: Calendar,
         meta: {
-            title: 'Eventos'
+            title: 'Calendario',
         }
     }
-
 ]

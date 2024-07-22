@@ -37,5 +37,6 @@ export default {
   width: 100%;
   overflow: auto;
   height: 92vh;
+  margin-top: 60px;
 }
 </style>

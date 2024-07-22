@@ -19,7 +19,7 @@
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import CreateEventModal from '../../components/CreateEventModal.vue'
+import CreateEventModal from '../components/CreateEventModal.vue'
 export default {
   name: 'Events',
   components: {
@@ -60,7 +60,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
- @import '@/styles/colors.scss';
+ @import '@/styles/colors';
 
 .user-management {
   display: flex;
