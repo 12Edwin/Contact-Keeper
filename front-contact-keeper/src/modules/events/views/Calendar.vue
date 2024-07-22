@@ -13,10 +13,10 @@
           <b-col cols="12">
             <Loader v-if="isLoading" key="load" />
             <div v-else class="calendar-container">
-              <FullCalendar :options="calendarOptions" id="myCustomCalendar">
+              <FullCalendar :options="calendarOptions" :events="events" id="myCustomCalendar">
                 <template v-slot:eventContent="{ event }">
                   <div class="my-custom-event" @click="handleEventClick(event)">
-                    <span class="my-event-dot" :style="{'background-color': setDotBackground(event.extendedProps.status)}"></span>
+                    <span class="my-event-dot" :style="{ 'background-color': setDotBackground(event.extendedProps.status) }"></span>
                     <div class="my-event-info">
                       <span class="my-event-title"><b>{{ event.title }}</b></span>
                       <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
@@ -28,12 +28,11 @@
           </b-col>
         </b-row>
       </panel>
-      <!-- Modal para mostrar la información del evento -->
       <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
+      <ModalAddEvent :visible.sync="showModalAddEvent" @add-event="addEvent" />
     </div>
   </div>
 </template>
-
 
 <script>
 import FullCalendar from '@fullcalendar/vue'
@@ -44,6 +43,7 @@ import Navbar from '@/components/Navbar.vue'
 import SidebarAdmin from "@/components/SidebarAdmin.vue"
 import Loader from "@/components/Loader.vue"
 import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
+import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 
 export default {
   components: {
@@ -51,12 +51,14 @@ export default {
     Navbar,
     SidebarAdmin,
     Loader,
-    ModalEventInfo
+    ModalEventInfo,
+    ModalAddEvent
   },
   data() {
     return {
       sidebarVisible: false,
       showModalEventInfo: false,
+      showModalAddEvent: false,
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
         initialView: 'dayGridMonth',
@@ -70,7 +72,7 @@ export default {
         customButtons: {
           addEventButton: {
             text: 'Agregar Evento',
-            click: this.addEvent,
+            click: () => this.showModalAddEvent = true,
           },
         },
         views: {
@@ -100,7 +102,7 @@ export default {
         eventDidMount: function(info) {
           info.el.style.backgroundColor = '#007bff';
           info.el.style.borderColor = '#007bff';
-          info.el.style.color = 'white';
+          info.el.style.color = 'red';
         },
         viewDidMount: function(info) {
           const headerEl = info.el.querySelector('.fc-toolbar');
@@ -116,11 +118,11 @@ export default {
         },
       },
       events: [
-        { title: 'Evento 1', start: '2024-07-18', description: 'Descripción del Evento 1', status: 'success' },
-        { title: 'Evento 2', start: '2024-07-20', description: 'Descripción del Evento 2', status: 'warning' },
-        { title: 'Evento 3', start: '2024-07-22', description: 'Descripción del Evento 3', status: 'danger' },
-        { title: 'Evento 4', start: '2024-07-25', description: 'Descripción del Evento 4', status: 'primary' },
-        { title: 'Evento 5', start: '2024-07-28', description: 'Descripción del Evento 5', status: 'secondary' },
+        { title: 'Evento 1', start: '2024-07-18', end: '2024-08-28', description: 'Descripción del Evento 1' },
+        { title: 'Evento 2', start: '2024-07-20', end: '2024-08-28', description: 'Descripción del Evento 2' },
+        { title: 'Evento 3', start: '2024-07-22', end: '2024-08-28', description: 'Descripción del Evento 3' },
+        { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
+        { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
       ],
       isLoading: false,
       selectedEvent: {},
@@ -130,16 +132,19 @@ export default {
     toggleSidebar() {
       this.sidebarVisible = !this.sidebarVisible;
     },
-    addEvent() {
+
+    addEvent(eventData) {
       const newEvent = {
-        title: 'Nuevo Evento',
-        start: '2024-07-25',
-        description: 'Descripción del Nuevo Evento',
+        title: eventData.title,
+        start: eventData.startDate,
+        end: eventData.endDate,
+        description: eventData.description,
         status: 'info'
       };
       this.events.push(newEvent);
     },
     handleEventClick(event) {
+      console.log(event);
       this.selectedEvent = {
         title: event.title,
         startDate: event.start.toISOString().split('T')[0],
@@ -161,13 +166,12 @@ export default {
       };
       return colors[status] || 'grey';
     },
-    formatCalendarDate(date) {
-      return new Intl.DateTimeFormat('es-ES', { year: 'numeric', month: 'short', day: 'numeric' }).format(new Date(date));
+    formatCalendarDate(pop){
+      return moment(pop).format(format12Time)
     },
   },
 }
 </script>
-
 
 <style>
 /* Estilos globales para FullCalendar */
@@ -247,5 +251,39 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+.fc-event {
+  border: 1px solid red !important;
+}
+
+.my-custom-event {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.my-event-dot {
+    width: 10px;
+    height: 10px;
+    background-color: blue;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.my-event-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.my-event-title {
+    font-size: 14px;
+    margin-bottom: 2px;
+    color: #000;
+}
+
+.my-event-time {
+    font-size: 12px;
+    color: #000;
 }
 </style>
