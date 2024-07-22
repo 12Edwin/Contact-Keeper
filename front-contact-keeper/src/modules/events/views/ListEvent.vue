@@ -25,7 +25,7 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import CreateEventModal from '@/modules/events/components/CreateEventModal.vue'
 export default {
-  name: 'Dashboard',
+  name: 'ListEvent',
   components: {
     Navbar,
     SidebarUser,
