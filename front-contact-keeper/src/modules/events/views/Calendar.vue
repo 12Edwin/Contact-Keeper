@@ -1,7 +1,5 @@
 <template>
   <div class="main-content">
-    <Navbar @toggle-sidebar="toggleSidebar" />
-    <SidebarAdmin :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
     <div class="content">
       <panel class="fade-class">
         <template #header>
@@ -39,19 +37,17 @@ import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import timeGridPlugin from '@fullcalendar/timegrid'
-import Navbar from '@/components/Navbar.vue'
-import SidebarAdmin from "@/components/SidebarAdmin.vue"
 import Loader from "@/components/Loader.vue"
 import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
 import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 import moment from 'moment';
 
 
-export default {
+export default
+{
+  name: 'Calendar',
   components: {
     FullCalendar,
-    Navbar,
-    SidebarAdmin,
     Loader,
     ModalEventInfo,
     ModalAddEvent
@@ -120,12 +116,12 @@ export default {
           });
         },
         events: [
-        { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
-        { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
-        { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
-        { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
-        { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
-      ],
+          { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
+          { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
+          { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
+          { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
+          { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
+        ],
       },
       isLoading: false,
       selectedEvent: {},
@@ -205,19 +201,6 @@ export default {
   background-color: #f0f0f0 !important;
 }
 
-/* Estilos existentes */
-.main-content {
-  display: flex;
-}
-
-.content {
-  flex: 1;
-  padding: 2rem;
-  margin-left: 0;
-  transition: margin-left 0.3s;
-  margin-top: 70px;
-}
-
 .calendar-container {
   width: 100%;
   min-width: 800px;
@@ -226,7 +209,7 @@ export default {
 
 #myCustomCalendar {
   width: 100%;
-  max-height: 75vh;
+  max-height: 80vh;
 }
 
 .fade-class {
@@ -261,33 +244,48 @@ export default {
 }
 
 .my-custom-event {
-    display: flex;
-    align-items: center;
-    padding-left: 10px;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  cursor: pointer;
 }
 
 .my-event-dot {
-    width: 10px;
-    height: 10px;
-    background-color: rgb(0, 0, 10);
-    border-radius: 50%;
-    margin-right: 5px;
+  width: 10px;
+  height: 10px;
+  background-color: rgb(0, 0, 10);
+  border-radius: 50%;
+  margin-right: 5px;
 }
 
 .my-event-info {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .my-event-title {
-    font-size: 14px;
-    margin-bottom: 2px;
-    color: #000;
+  font-size: 14px;
+  margin-bottom: 2px;
+  color: #000;
 }
 
 .my-event-time {
-    font-size: 12px;
-    color: #000;
+  font-size: 12px;
+  color: #000;
+}
+</style>
+
+
+<style scoped>
+/* Estilos existentes */
+.main-content {
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  padding: 1rem;
+  margin-left: 0;
+  transition: margin-left 0.3s;
 }
 </style>
