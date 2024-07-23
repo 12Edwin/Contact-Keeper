@@ -49,7 +49,7 @@ export default {
   width: 250px;
   height: 100vh;
   transition: width 0.3s;
-  background-color: $blanco;
+  background-color: $white-color;
   color: #333;
   padding: 10px;
   box-sizing: border-box;
@@ -151,7 +151,7 @@ ul {
   width: 40px;
   height: 50px;
   border-radius: 20%;
-  background-color: $blanco;
+  background-color: $white-color;
   color: #333;
   font-size: 24px;
   padding: 24px;

@@ -1,12 +1,7 @@
 <template>
   <div class="main-content">
     <div class="content">
-      <panel class="fade-class">
-        <template #header>
-          <div class="d-flex justify-content-between w-100 align-items-center">
-            <p class="h5"><b>Eventos</b></p>
-          </div>
-        </template>
+      <Panel header="Eventos" class="shadow-lg">
         <b-row>
           <b-col cols="12">
             <Loader v-if="isLoading" key="load" />
@@ -25,7 +20,7 @@
             </div>
           </b-col>
         </b-row>
-      </panel>
+      </Panel>
       <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
       <ModalAddEvent :visible.sync="showModalAddEvent" @add-event="addEvent" />
     </div>
@@ -41,7 +36,7 @@ import Loader from "@/components/Loader.vue"
 import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
 import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 import moment from 'moment';
-
+import Panel from 'primevue/panel'
 
 export default
 {
@@ -50,7 +45,8 @@ export default
     FullCalendar,
     Loader,
     ModalEventInfo,
-    ModalAddEvent
+    ModalAddEvent,
+    Panel
   },
   data() {
     return {
@@ -143,8 +139,8 @@ export default
       this.events.push(newEvent);
     },
     handleEventClick(event) {
-      console.log(event);
-      this.selectedEvent = {
+      if (false) {
+        this.selectedEvent = {
         title: event.title,
         startDate: event.start.toISOString().split('T')[0],
         endDate: event.end ? event.end.toISOString().split('T')[0] : event.start.toISOString().split('T')[0],
@@ -153,6 +149,7 @@ export default
         participants: event.extendedProps.participants || 'No especificado',
       };
       this.showModalEventInfo = true;
+      }
     },
     setDotBackground(status) {
       const colors = {
