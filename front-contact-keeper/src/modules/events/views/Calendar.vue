@@ -9,7 +9,7 @@
               <FullCalendar :options="calendarOptions" :events="events" id="myCustomCalendar">
                 <template v-slot:eventContent="{ event }">
                   <div class="my-custom-event" @click="handleEventClick(event)">
-                    <span class="my-event-dot" :style="{ 'background-color': setDotBackground(event.extendedProps.status) }"></span>
+                    <span class="my-event-dot"></span>
                     <div class="my-event-info">
                       <span class="my-event-title"><b>{{ event.title }}</b></span>
                       <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
@@ -22,7 +22,7 @@
         </b-row>
       </Panel>
       <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
-      <ModalAddEvent :visible.sync="showModalAddEvent" @add-event="addEvent" />
+      <ModalAddEvent :visible.sync="showModalAddEvent" />
     </div>
   </div>
 </template>
@@ -37,6 +37,7 @@ import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
 import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 import moment from 'moment';
 import Panel from 'primevue/panel'
+import Chip from 'primevue/chip';
 
 export default
 {
@@ -46,7 +47,8 @@ export default
     Loader,
     ModalEventInfo,
     ModalAddEvent,
-    Panel
+    Panel,
+    Chip
   },
   data() {
     return {
@@ -95,9 +97,9 @@ export default
           info.el.style.color = 'black';
         },
         eventDidMount: function(info) {
-          info.el.style.backgroundColor = '#007bff';
-          info.el.style.borderColor = '#007bff';
-          info.el.style.color = 'red';
+          info.el.style.backgroundColor = '#000';
+          info.el.style.borderColor = '#000';
+          info.el.style.color = 'white';
         },
         viewDidMount: function(info) {
           const headerEl = info.el.querySelector('.fc-toolbar');
@@ -138,8 +140,8 @@ export default
       };
       this.events.push(newEvent);
     },
+
     handleEventClick(event) {
-      if (false) {
         this.selectedEvent = {
         title: event.title,
         startDate: event.start.toISOString().split('T')[0],
@@ -149,7 +151,6 @@ export default
         participants: event.extendedProps.participants || 'No especificado',
       };
       this.showModalEventInfo = true;
-      }
     },
     setDotBackground(status) {
       const colors = {
@@ -237,7 +238,6 @@ export default
 }
 .fc-event {
   padding: 3px;
-  border: 1px solid white !important;
 }
 
 .my-custom-event {
@@ -245,13 +245,13 @@ export default
   align-items: center;
   padding-left: 10px;
   cursor: pointer;
+  background-color: #000;
 }
 
 .my-event-dot {
   width: 10px;
   height: 10px;
   background-color: rgb(0, 0, 10);
-  border-radius: 50%;
   margin-right: 5px;
 }
 
@@ -263,12 +263,12 @@ export default
 .my-event-title {
   font-size: 14px;
   margin-bottom: 2px;
-  color: #000;
+  color: white;
 }
 
 .my-event-time {
   font-size: 12px;
-  color: #000;
+  color: white;
 }
 </style>
 

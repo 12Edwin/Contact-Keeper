@@ -1,70 +1,64 @@
 <template>
   <Dialog
-      header="Información del Evento"
-      :modal="true"
-      :closeOnEscape="false"
-      :closable="false"
-      :visible.sync="visible"
-      position="center"
-      :contentStyle="{ overflow: 'visible', width: '35vw' }"
-      class="custom-dialog"
-      :autoZIndex="true"
+    header="Información del Evento"
+    :modal="true"
+    :visible.sync="visible"
+    position="center"
+    :contentStyle="{ overflow: 'auto', maxWidth: '60vw' }"
+    class="custom-dialog"
+    :autoZIndex="true"
+    :baseZIndex="1000"
   >
-    <div class="user-info">
-      <Avatar :label="eventData.event.charAt(0)" shape="circle" size="xlarge" class="mb-2" />
-      <h3>{{ eventData.event }}</h3>
-    </div>
-    <div class="user-data">
-      <b-row>
-        <b-col cols="12" lg="6" md="4" sm="12" class="ml-2">
-          <div class="info-item">
-            <i class="pi pi-envelope"></i>
-            <div class="info-text">
-              <label>Fechas</label>
-              <p>{{ eventData.startDate }} - {{ eventData.endDate }}</p>
+    <div class="event-info">
+      <div class="event-header text-center">
+        <Avatar :label="getInitials(eventData.event)" shape="circle" size="xlarge" class="mb-2 mx-auto" />
+        <h2 class="event-title">{{ eventData.event }}</h2>
+      </div>
+      <div class="event-details">
+        <b-row>
+          <b-col cols="12" lg="6">
+            <div class="event-detail">
+              <i class="pi pi-calendar"></i>
+              <div class="detail-text">
+                <label>Fechas</label>
+                <p>{{ formatDates(eventData.startDate, eventData.endDate) }}</p>
+              </div>
             </div>
-          </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12" lg="6" md="4" sm="12" class="ml-2">
-          <div class="info-item">
-            <i class="pi pi-envelope"></i>
-            <div class="info-text">
-              <label>Tipo de evento</label>
-              <p>{{ eventData.type }}</p>
+          </b-col>
+          <b-col cols="12" lg="6">
+            <div class="event-detail">
+              <i class="pi pi-tag"></i>
+              <div class="detail-text">
+                <label>Tipo de evento</label>
+                <p>{{ eventData.type }}</p>
+              </div>
             </div>
-          </div>
-        </b-col>
-        <b-col cols="12" lg="6" md="4" sm="12">
-          <div class="info-item">
-            <i class="pi pi-phone"></i>
-            <div class="info-text">
-              <label>Participantes</label>
-              <p>{{ eventData.participants }}</p>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col cols="12" lg="6">
+            <div class="event-detail">
+              <i class="pi pi-users"></i>
+              <div class="detail-text">
+                <label>Participantes</label>
+                <p>{{ eventData.participants }}</p>
+              </div>
             </div>
-          </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12" lg="6" md="4" sm="12" class="ml-2">
-          <div class="info-item">
-            <i class="pi pi-envelope"></i>
-            <div class="info-text">
-              <label>Descripción</label>
-              <p>{{ eventData.description }}</p>
+          </b-col>
+          <b-col cols="12" lg="6">
+            <div class="event-detail">
+              <i class="pi pi-info-circle"></i>
+              <div class="detail-text">
+                <label>Descripción</label>
+                <p>{{ eventData.description }}</p>
+              </div>
             </div>
-          </div>
-        </b-col>
-      </b-row>
+          </b-col>
+        </b-row>
+      </div>
     </div>
     <template #footer>
-      <Button
-          label="Cerrar"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="closeModal()"
-      />
+      <Button label="Cerrar" icon="pi pi-times" style="color: gray;" class="p-button-text" @click="closeModal()" />
     </template>
   </Dialog>
 </template>
@@ -82,6 +76,16 @@ export default {
     Dialog,
     Button,
   },
+  props: {
+    event: {
+      type: Object,
+      required: true,
+    },
+    visible: {
+      type: Boolean,
+      required: true,
+    },
+  },
   data() {
     return {
       eventData: {
@@ -94,26 +98,46 @@ export default {
       },
     };
   },
-  props: {
-    event: {
-      type: Object,
-      required: true,
-    },
-    visible: {
-      type: Boolean,
-      required: true,
-    },
-  },
   methods: {
     closeModal() {
       this.$emit('update:visible', false);
+    },
+    getInitials(text) {
+      if (!text) return '';
+      return text.split(' ').map(word => word.charAt(0)).join('').toUpperCase();
+    },
+    formatDates(start, end) {
+      return `${this.formatCalendarDate(start)} - ${this.formatCalendarDate(end)}`;
+    },
+    formatCalendarDate(date) {
+      return new Date(date).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
     },
   },
   watch: {
     event: {
       handler(val) {
         if (val && Object.keys(val).length > 0) {
-          this.eventData = val;
+          this.eventData = {
+            event: val.title || '',
+            description: val.description || '',
+            startDate: val.start || '',
+            endDate: val.end || '',
+            type: val.type || '',
+            participants: val.participants || '',
+          };
+        } else {
+          this.eventData = {
+            event: '',
+            description: '',
+            startDate: '',
+            endDate: '',
+            type: '',
+            participants: '',
+          };
         }
       },
       immediate: true,
@@ -122,51 +146,59 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@import '@/styles/colors.scss';
-
-.user-info {
-  text-align: center;
+<style scoped>
+.event-info {
   padding: 1rem;
 }
 
-.user-info h3 {
-  margin: 0.2rem 0 1rem;
-}
-
-.user-info p {
-  margin: 0.25rem 0;
-}
-.user-data {
+.event-header {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin-left: 1.3rem;
-}
-
-.info-item {
-  display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  text-align: center;
 }
 
-.info-item i {
-  font-size: 20px;
-  color: $sidebar-items;
-  margin-right: 10px;
+.event-title {
+  margin-top: 0.5rem;
 }
 
-.info-text {
+.event-details {
+  margin-top: 1rem;
+}
+
+.event-detail {
   display: flex;
-  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1rem;
 }
 
-.info-text label {
+.event-detail i {
+  font-size: 2rem;
+  margin-right: 1rem;
+}
+
+.detail-text {
+  flex: 1;
+}
+
+.detail-text label {
   font-weight: bold;
-  margin: 0;
 }
 
-.info-text p {
-  margin: 0;
+.detail-text p {
+  margin: 0.5rem 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.p-button-text{
+  color: #333;
 }
 </style>

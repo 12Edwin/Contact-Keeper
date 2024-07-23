@@ -30,18 +30,18 @@
       <b-row>
         <b-col cols="12" lg="6">
           <div class="form-group">
-                <span class="p-float-label">
-            <Dropdown id="type" :options="types" v-model="eventData.type" optionLabel="label" />
-            <label for="type">Tipo</label>
-          </span>
+            <span class="p-float-label">
+              <Dropdown id="type" :options="types" v-model="eventData.type" optionLabel="label" class="full-width-dropdown" />
+              <label for="type">Tipo</label>
+            </span>
           </div>
         </b-col>
         <b-col cols="12" lg="6">
           <div class="form-group">
-                <span class="p-float-label">
-            <Dropdown id="participants" :options="invites" v-model="eventData.participants" optionLabel="label" />
-            <label for="participants">Participantes</label>
-          </span>
+            <span class="p-float-label">
+              <Dropdown id="participants" :options="invites" v-model="eventData.participants" optionLabel="label" class="full-width-dropdown" />
+              <label for="participants">Participantes</label>
+            </span>
           </div>
         </b-col>
       </b-row>
@@ -70,12 +70,14 @@
 <script>
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
 
 export default {
   name: 'ModalAddEvent',
   components: {
     Dialog,
     Button,
+    Dropdown
   },
   data() {
     return {
@@ -95,15 +97,7 @@ export default {
         { label: 'Merri Chrismas', value: 'invitado1' },
         { label: 'Isa Palacios', value: 'invitado2' },
         { label: 'Typescrips', value: 'invitado3' }
-      ],
-      users: [
-        { name: 'Usuario 1' },
-        { name: 'Usuario 2' }
-      ],
-      selectedUsers: [],
-      selectedGuests: [],
-      sourceHeader: 'Disponibles',
-      targetHeader: 'Seleccionados'
+      ]
     };
   },
   props: {
@@ -130,5 +124,8 @@ export default {
 }
 .form-group {
   margin-bottom: 1rem;
+}
+.full-width-dropdown {
+  width: 100%;
 }
 </style>
