@@ -52,6 +52,7 @@ Vue.component('Password', Password)
 Vue.component('Dropdown', Dropdown)
 Vue.component('Checkbox', Checkbox)
 Vue.directive('tooltip', Tooltip);
+Vue.component('Card', Card)
 // PrimeVue services
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
