@@ -36,18 +36,14 @@
 </template>
 
 <script>
-import Navbar from '@/components/Navbar.vue'
-import SidebarAdmin from "@/components/SidebarAdmin.vue"
 import Panel from 'primevue/panel'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import ModalUserInfo from "@/modules/events/components/ModalUserInfo.vue";
-import ModalSaveUser from "@/modules/events/components/ModalSaveUser.vue";
+import ModalUserInfo from "@/modules/users/components/ModalUserInfo.vue";
+import ModalSaveUser from "@/modules/users/components/ModalSaveUser.vue";
 export default {
   name: 'Events',
   components: {
-    Navbar,
-    SidebarAdmin,
     Panel,
     DataTable,
     Column,
@@ -84,13 +80,7 @@ export default {
     },
     openSaveModal(){
       this.displaySaveModal = true
-    },
-    hideUserInfo() {
-      this.selectedUser = null
-    },
-    toggleSidebar() {
-      this.sidebarVisible = !this.sidebarVisible
-    },
+    }
   }
 }
 </script>

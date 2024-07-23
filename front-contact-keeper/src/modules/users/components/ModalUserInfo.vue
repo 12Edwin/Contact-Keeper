@@ -96,7 +96,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/colors.scss';
+@import '@/styles/colors';
 
 .user-info {
   text-align: center;

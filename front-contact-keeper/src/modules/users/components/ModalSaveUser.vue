@@ -290,7 +290,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/styles/colors.scss';
+@import '@/styles/colors';
 .button-options {
   background: $primary-color;
   color: white;
