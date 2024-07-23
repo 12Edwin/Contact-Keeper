@@ -7,8 +7,8 @@
             <b-row>
               <b-col class="d-flex justify-content-between align-content-between mb-3">
                 <span class="p-input-icon-right">
-                  <i class="pi pi-search" />
-                  <InputText type="text"  placeholder="Buscar..." />
+                  <i class="pi pi-search custom" @click="changeSearch()"/>
+                  <InputText type="text"  :placeholder="searchBy()" />
                 </span>
                 <Button
                   class="button-options"
@@ -68,7 +68,9 @@ export default {
         alignItems: 'center'
       },
       displayModal: false,
-      displaySaveModal: false
+      displaySaveModal: false,
+      searchByName: true,
+      optionSelected: null
     }
   },
   methods: {
@@ -77,6 +79,12 @@ export default {
       if(event.data){
         this.selectedUser = event.data
       }
+    },
+    changeSearch(){
+      this.searchByName = !this.searchByName
+    },
+    searchBy(){
+      return this.searchByName ? 'Buscar por nombre...' : 'Buscar por correo..'
     },
     openSaveModal(){
       this.displaySaveModal = true
@@ -147,6 +155,10 @@ export default {
    box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
    background: $primary-color !important;
    border: none;
+   cursor: pointer;
+ }
+
+ .custom:hover{
    cursor: pointer;
  }
 
