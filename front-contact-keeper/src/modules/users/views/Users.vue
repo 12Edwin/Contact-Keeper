@@ -113,16 +113,6 @@ export default {
   margin-left: 250px; /* Ajusta este valor al ancho de tu sidebar */
 }
 
-.dashboard {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-}
-
- .main-content {
-   display: flex;
-   flex: 2;
- }
 
 .content {
   flex: 1;
@@ -130,9 +120,6 @@ export default {
   transition: margin-left 0.3s;
 }
 
-.content.sidebar-open {
-  margin-left: 200px; 
-}
 
 .cd-user-info{
   margin-top: 86px;
