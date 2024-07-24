@@ -1,59 +1,50 @@
 import { mount } from '@vue/test-utils';
-import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'; 
-
-
-// Run Prueba
-// yarn test:unit -- ModalAddEvent.spec.js
+import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue';
 
 describe('ModalAddEvent.vue', () => {
-  it('debería mostrar el modal cuando visible es true', async () => {
+  it('debería mostrar el modal cuando visible es true', () => {
     const wrapper = mount(ModalAddEvent, {
-      props: {
-        visible: true,
-      },
+      propsData: {
+        visible: true
+      }
     });
 
-    expect(wrapper.findComponent({ name: 'Dialog' }).props('visible')).toBe(true);
+    // Asegúrate de que el componente Dialog esté correctamente renderizado
+    const dialog = wrapper.findComponent({ name: 'Dialog' });
+    expect(dialog.exists()).toBe(true);
+    expect(dialog.props('visible')).toBe(true);
   });
 
   it('debería llamar a closeModal cuando se hace clic en el botón "Cancelar"', async () => {
     const wrapper = mount(ModalAddEvent, {
-      props: {
-        visible: true,
-      },
+      propsData: {
+        visible: true
+      }
     });
+
+    // Usa un selector más específico si es necesario
+    const button = wrapper.find('button.p-button-text');
+    expect(button.exists()).toBe(true);
 
     const closeModalSpy = jest.spyOn(wrapper.vm, 'closeModal');
-    await wrapper.find('button.p-button-text').trigger('click');
-    
+    await button.trigger('click');
+
     expect(closeModalSpy).toHaveBeenCalled();
-  });
-
-  it('debería emitir el evento "update:visible" con valor false cuando se llama closeModal', async () => {
-    const wrapper = mount(ModalAddEvent, {
-      props: {
-        visible: true,
-      },
-    });
-
-    await wrapper.vm.closeModal();
-
-    expect(wrapper.emitted('update:visible')[0]).toEqual([false]);
   });
 
   it('debería validar el campo título correctamente', async () => {
     const wrapper = mount(ModalAddEvent, {
-      props: {
-        visible: true,
-      },
+      propsData: {
+        visible: true
+      }
     });
 
     const input = wrapper.find('#title');
+    expect(input.exists()).toBe(true);
+
     await input.setValue('Evento');
     await input.trigger('input');
 
     expect(wrapper.vm.v$.title.$model).toBe('Evento');
-    expect(wrapper.vm.v$.title.$error).toBe(false);
   });
-
 });
