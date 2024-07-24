@@ -14,3 +14,9 @@
 
  # yarn jest --verbose
 
+ ## Documentación
+
+ # https://es.vuejs.org/v2/cookbook/unit-testing-vue-components
+
+ 
+
