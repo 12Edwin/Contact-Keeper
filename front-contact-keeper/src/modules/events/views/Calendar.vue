@@ -1,23 +1,28 @@
 <template>
   <div class="main-content">
-    <Navbar @toggle-sidebar="toggleSidebar" />
-    <SidebarAdmin :visible="sidebarVisible" @update:visible="sidebarVisible = $event" />
     <div class="content">
-      <panel class="fadeclass">
-        <template #header >
-          <div class="d-flex justify-content-between w-100 align-items-center">
-            <p class="h5"><b>Eventos</b></p>
-          </div>
-        </template>
+      <Panel header="Eventos" class="shadow-lg">
         <b-row>
           <b-col cols="12">
             <Loader v-if="isLoading" key="load" />
             <div v-else class="calendar-container">
-              <FullCalendar :options="calendarOptions" id="myCustomCalendar" />
+              <FullCalendar :options="calendarOptions" :events="events" id="myCustomCalendar">
+                <template v-slot:eventContent="{ event }">
+                  <div class="my-custom-event" @click="handleEventClick(event)">
+                    <span class="my-event-dot" :style="{ 'background-color': setDotBackground(event.extendedProps.status) }"></span>
+                    <div class="my-event-info">
+                      <span class="my-event-title"><b>{{ event.title }}</b></span>
+                      <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
+                    </div>
+                  </div>
+                </template>
+              </FullCalendar>
             </div>
           </b-col>
         </b-row>
-      </panel>
+      </Panel>
+      <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
+      <ModalAddEvent :visible.sync="showModalAddEvent" @add-event="addEvent" />
     </div>
   </div>
 </template>
@@ -26,105 +31,185 @@
 import FullCalendar from '@fullcalendar/vue'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
-import Navbar from '@/components/Navbar.vue'
-import SidebarAdmin from "@/components/SidebarAdmin.vue"
+import timeGridPlugin from '@fullcalendar/timegrid'
+import Loader from "@/components/Loader.vue"
+import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
+import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
+import moment from 'moment';
+import Panel from 'primevue/panel'
 
-export default {
-    components: {
-        FullCalendar,
-        Navbar,
-        SidebarAdmin,
+export default
+{
+  name: 'Calendar',
+  components: {
+    FullCalendar,
+    Loader,
+    ModalEventInfo,
+    ModalAddEvent,
+    Panel
+  },
+  data() {
+    return {
+      sidebarVisible: false,
+      showModalEventInfo: false,
+      showModalAddEvent: false,
+      events: [],
+      calendarOptions: {
+        plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
+        initialView: 'dayGridMonth',
+        weekends: false,
+        dayMaxEventRows: 2,
+        headerToolbar: {
+          start: 'dayGridMonth,timeGridWeek,timeGridDay today prev,next',
+          center: 'title',
+          end: 'addEventButton'
+        },
+        customButtons: {
+          addEventButton: {
+            text: 'Agregar Evento',
+            click: () => this.showModalAddEvent = true,
+          },
+        },
+        views: {
+          dayGridMonth: {
+            titleFormat: { year: 'numeric', month: 'long' }
+          }
+        },
+        themeSystem: 'bootstrap',
+        eventColor: '#007bff',
+        eventTextColor: '#FFFFFF',
+        eventBackgroundColor: '#007bff',
+        eventBorderColor: '#007bff',
+        bootstrapFontAwesome: false,
+        buttonIcons: false,
+        buttonText: {
+          today: 'Hoy',
+          month: 'Mes',
+          week: 'Semana',
+          day: 'Día',
+          prev: '<',
+          next: '>'
+        },
+        dayCellDidMount: function(info) {
+          info.el.style.backgroundColor = 'white';
+          info.el.style.color = 'black';
+        },
+        eventDidMount: function(info) {
+          info.el.style.backgroundColor = '#007bff';
+          info.el.style.borderColor = '#007bff';
+          info.el.style.color = 'red';
+        },
+        viewDidMount: function(info) {
+          const headerEl = info.el.querySelector('.fc-toolbar');
+          if (headerEl) {
+            headerEl.style.backgroundColor = 'white';
+            headerEl.style.color = 'black';
+          }
+          const dayHeaderEls = info.el.querySelectorAll('.fc-col-header-cell');
+          dayHeaderEls.forEach(el => {
+            el.style.backgroundColor = 'white';
+            el.style.color = 'black';
+          });
+        },
+        events: [
+          { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
+          { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
+          { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
+          { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
+          { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
+        ],
+      },
+      isLoading: false,
+      selectedEvent: {},
+    };
+  },
+  methods: {
+    toggleSidebar() {
+      this.sidebarVisible = !this.sidebarVisible;
     },
-    data() {
-        return {
-            sidebarVisible: false,
-            calendarOptions: {
-                plugins: [dayGridPlugin, interactionPlugin],
-                initialView: 'dayGridMonth',
-                weekends: false,
-                dayMaxEventRows: 2,
-                headerToolbar: {
-                    start: 'title',
-                    center: '',
-                    end: 'today prev,next'
-                },
-                views: {
-                    dayGridMonth: {
-                        titleFormat: { year: 'numeric', month: 'long' }
-                    }
-                },
-            },
-            events: [
-                { title: 'event 1', date: '2024-07-18' },
-                { title: 'event 2', date: '2024-07-20' }
-            ],
-            config: {
-                background: '#333',
-                color: 'white',
-            },
-            displayModal: false,
-            isLoading: false
-        }
+
+    addEvent(eventData) {
+      const newEvent = {
+        title: eventData.title,
+        start: eventData.startDate,
+        end: eventData.endDate,
+        description: eventData.description,
+        status: 'info'
+      };
+      this.events.push(newEvent);
     },
-    methods: {
-        toggleSidebar() {
-            this.sidebarVisible = !this.sidebarVisible
-        }
-    }
+    handleEventClick(event) {
+      if (false) {
+        this.selectedEvent = {
+        title: event.title,
+        startDate: event.start.toISOString().split('T')[0],
+        endDate: event.end ? event.end.toISOString().split('T')[0] : event.start.toISOString().split('T')[0],
+        description: event.extendedProps.description,
+        status: event.extendedProps.status || 'No especificado',
+        participants: event.extendedProps.participants || 'No especificado',
+      };
+      this.showModalEventInfo = true;
+      }
+    },
+    setDotBackground(status) {
+      const colors = {
+        success: 'green',
+        warning: 'orange',
+        danger: 'red',
+        primary: 'blue',
+        secondary: 'grey',
+        info: 'cyan'
+      };
+      return colors[status] || 'grey';
+    },
+    formatCalendarDate(date){
+      return moment(date).format('YYYY-MM-DD');
+    },
+  },
 }
 </script>
 
 <style>
-#myCustomCalendar .fc-button {
-  background: #333;
-  color: #fff;
-  border-color: #333;
-  border-radius: 10px;
-  box-sizing: border-box;
-  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1); 
+/* Estilos globales para FullCalendar */
+.fc {
+  background-color: white !important;
+  color: black !important;
 }
 
-#myCustomCalendar .fc-button:hover {
-  background-color:#333;
-  border-color:#333;
+.fc .fc-button-primary {
+  background-color: black !important;
+  border-color: black !important;
+  color: white !important;
 }
 
-.main-content {
-  display: flex;
+.fc .fc-button-primary:not(:disabled):active,
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: black !important;
+  border-color: black !important;
 }
 
-
-.content {
-  flex: 1;
-  padding: 2rem;
-  margin-left: 0;
-  transition: margin-left 0.3s;
-  margin-top: 70px;
+.fc .fc-col-header-cell-cushion,
+.fc .fc-daygrid-day-number,
+.fc .fc-daygrid-day-top {
+  color: black !important;
 }
 
-.content.sidebar-open {
-    margin-left: 250px;
-}
-
-.calendar-wrapper {
-    display: flex;
-    align-items: center;
-    padding: 5rem;
+.fc .fc-day-today {
+  background-color: #f0f0f0 !important;
 }
 
 .calendar-container {
   width: 100%;
-  min-width: 800px; 
-  overflow-x: auto; 
+  min-width: 800px;
+  overflow-x: auto;
 }
 
 #myCustomCalendar {
   width: 100%;
-  max-height: 75vh;
+  max-height: 80vh;
 }
 
-
-.fadeclass {
+.fade-class {
   animation-name: fade;
   animation-duration: 1s;
 }
@@ -133,21 +218,71 @@ export default {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
 }
+
 .fade-enter-active {
   transition: all 1s;
 }
 
 .fade-leave-active {
-  transition: all .1s;
+  transition: all 0.1s;
 }
 
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+.fc-event {
+  padding: 3px;
+  border: 1px solid white !important;
+}
+
+.my-custom-event {
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  cursor: pointer;
+}
+
+.my-event-dot {
+  width: 10px;
+  height: 10px;
+  background-color: rgb(0, 0, 10);
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.my-event-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.my-event-title {
+  font-size: 14px;
+  margin-bottom: 2px;
+  color: #000;
+}
+
+.my-event-time {
+  font-size: 12px;
+  color: #000;
+}
+</style>
+
+
+<style scoped>
+/* Estilos existentes */
+.main-content {
+  display: flex;
+}
+
+.content {
+  flex: 1;
+  padding: 1rem;
+  margin-left: 0;
+  transition: margin-left 0.3s;
 }
 </style>
