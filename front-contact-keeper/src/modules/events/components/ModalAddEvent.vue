@@ -158,12 +158,11 @@ export default {
 
     saveEvent() {
       console.log(this.eventData);
-      closeModal();
+      this.closeModal(); 
     }
   }
 };
 </script>
-
 
 
 <style scoped lang="scss">
