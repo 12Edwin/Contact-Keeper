@@ -3,35 +3,45 @@
     <div class="content">
       <Panel header="Grupos" class="shadow-lg">
         <div class="p-1">
-          <b-row>
-            <b-col class="d-flex justify-content-between align-content-between mb-3">
-              <span class="p-input-icon-right">
-                <i class="pi pi-search" />
-                <InputText type="text" placeholder="Buscar..." />
-              </span>
-              <Button class="button-options" label="Nuevo grupo" iconPos="right" icon="pi pi-sitemap" />
-            </b-col>
-          </b-row>
-          <b-row class="mt-2">
-            <b-col cols="12" lg="4" md="6" v-for="(group, index) in groups" :key="index">
-              <div class="card mb-4">
-                <div class="card-header">
-                  <div class="card-header-text">
-                    <h2>{{ group.name }}</h2>
-                    <p>Mayo-Agosto 2024</p>
-                    <p>Miguel Rosemberg</p>
+          <template>
+            <b-row>
+              <b-col class="d-flex justify-content-between align-content-between mb-3">
+                <span class="p-input-icon-right">
+                  <i class="pi pi-search"/>
+                  <InputText type="text" placeholder="Buscar..."/>
+                </span>
+                <Button
+                    class="button-options"
+                    label="Nuevo grupo"
+                    iconPos="right"
+                    icon="pi pi-sitemap"
+                />
+              </b-col>
+            </b-row>
+          </template>
+          <template>
+            <b-row class="mt-2">
+              <b-col  cols="12" lg="4" md="6" v-for="(group, index) in groups" :key="index">
+                <template>
+                  <div class="card mb-4">
+                    <div class="card-header">
+                      <div class="card-header-text">
+                        <h2>{{group.name}}</h2>
+                        <p>Mayo-Agosto 2024</p>
+                        <p>Miguel Rosemberg</p>
+                      </div>
+                      <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
+                    </div>
+                    <div class="card-footer">
+                      <i class="pi pi-megaphone icon-camera" v-tooltip.top="'Anuncios'" ></i>
+                      <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
+                    </div>
                   </div>
-                  <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image" />
-                </div>
-                <div class="card-footer">
-                  <i class="pi pi-megaphone icon-camera" v-tooltip.top="'Anuncios'"></i>
-                  <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'"
-                    @click="openInfoModal(group)"></i>
-                </div>
-              </div>
-            </b-col>
-          </b-row>
-          <Announcements :group="groupSelected" :visible.sync="showInfo" />
+                </template>
+              </b-col>
+            </b-row>
+          </template>
+          <Announcements :group="groupSelected" :visible.sync="showInfo"/>
         </div>
       </Panel>
     </div>
@@ -42,10 +52,9 @@
 import BadgeDirective from 'primevue/badgedirective';
 import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
-
 export default {
   name: 'Groups',
-  directives: {
+  directives:{
     'badge': BadgeDirective,
     'tooltip': Tooltip
   },
@@ -55,8 +64,7 @@ export default {
   data() {
     return {
       groups: [
-        {
-          name: 'Grupo Salud',
+        { name: 'Grupo Salud',
           description: 'Descripción del grupo 1',
           members: [
             {
@@ -73,8 +81,7 @@ export default {
             }
           ]
         },
-        {
-          name: 'Sesión',
+        { name: 'Sesión',
           description: 'Descripción del grupo 2',
           members: [
             {
@@ -87,8 +94,7 @@ export default {
             }
           ]
         },
-        {
-          name: 'Cumpleaños',
+        { name: 'Cumpleaños',
           description: 'Descripción del grupo 3',
           members: [
             {
@@ -101,8 +107,7 @@ export default {
             }
           ]
         },
-        {
-          name: 'Capacitación',
+        { name: 'Capacitación',
           description: 'Descripción del grupo 4',
           members: [
             {
@@ -149,22 +154,20 @@ export default {
     }
   },
   methods: {
-    getInitial(name) {
-      const initials = name.split(' ');
+   getInitial(name){
+     const initials = name.split(' ');
       return initials.length > 1 ? initials[0].charAt(0) + initials[1].charAt(0) : initials[0].charAt(0);
-    },
-    openInfoModal(group) {
-      this.groupSelected = { ...group };
+   },
+    openInfoModal(group){
+     this.groupSelected = JSON.parse(JSON.stringify(group));
       this.showInfo = true;
     }
   }
 }
 </script>
 
-
 <style lang="scss" scoped>
 @import '@/styles/colors';
-
 .content {
   flex: 1;
   padding: 1rem;
@@ -178,7 +181,7 @@ export default {
   border-radius: 5px;
 }
 
-.button-options:hover {
+.button-options:hover{
   border-radius: 5px;
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
@@ -195,7 +198,7 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.card:hover {
+.card:hover{
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
   cursor: pointer;
@@ -233,4 +236,5 @@ export default {
 .icon-camera {
   margin-right: 16px;
 }
+
 </style>
