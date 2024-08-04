@@ -42,7 +42,7 @@ import Column from 'primevue/column'
 import ModalUserInfo from "@/modules/users/components/ModalUserInfo.vue";
 import ModalSaveUser from "@/modules/users/components/ModalSaveUser.vue";
 export default {
-  name: 'Events',
+  name: 'Users',
   components: {
     Panel,
     DataTable,
