@@ -90,13 +90,9 @@ jobs:
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             PR_COMMITS=$(git log --format=%B ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
             JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP 'SOPE-\d+' | sort -u)
-          elif [ "${{ github.event_name }}" = "push" ]; then
-            JIRA_KEYS=$(git log -1 --format=%B | grep -oP 'SOPE-\d+')
           else
-            echo "Evento no soportado: ${{ github.event_name }}"
-            exit 1
+            JIRA_KEYS=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'SOPE-\d+')
           fi
-          
           if [ -n "$JIRA_KEYS" ]; then
             echo "JIRA_KEYS<<EOF" >> $GITHUB_OUTPUT
             echo "$JIRA_KEYS" >> $GITHUB_OUTPUT
@@ -110,7 +106,7 @@ jobs:
       - name: Debug information
         run: |
           echo "Event name: ${{ github.event_name }}"
-          echo "Commit message: $(git log -1 --format=%B)"
+          echo "Commit message: ${{ github.event.head_commit.message }}"
           echo "Has Jira keys: ${{ steps.extract_jira_keys.outputs.HAS_JIRA_KEYS }}"
           if [ "${{ steps.extract_jira_keys.outputs.HAS_JIRA_KEYS }}" = "true" ]; then
             echo "Jira keys found: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}"
