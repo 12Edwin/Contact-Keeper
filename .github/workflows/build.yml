@@ -89,9 +89,9 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             PR_COMMITS=$(git log --format=%B ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
-            JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP '^SOPE-\d+' | sort -u)
+            JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP 'SOPE-\d+' | sort -u)
           else
-            JIRA_KEYS=$(echo "${{ github.event.head_commit.message }}" | grep -oP '^SOPE-\d+')
+            JIRA_KEYS=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'SOPE-\d+')
           fi
           if [ -n "$JIRA_KEYS" ]; then
             echo "JIRA_KEYS<<EOF" >> $GITHUB_OUTPUT
@@ -99,8 +99,17 @@ jobs:
             echo "EOF" >> $GITHUB_OUTPUT
             echo "HAS_JIRA_KEYS=true" >> $GITHUB_OUTPUT
           else
-            echo "No se encontraron claves SOPE. Continuando sin actualizar Jira."
+            echo "No se encontraron claves SOPE. No se actualizará Jira para este commit."
             echo "HAS_JIRA_KEYS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Debug information
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Commit message: ${{ github.event.head_commit.message }}"
+          echo "Has Jira keys: ${{ steps.extract_jira_keys.outputs.HAS_JIRA_KEYS }}"
+          if [ "${{ steps.extract_jira_keys.outputs.HAS_JIRA_KEYS }}" = "true" ]; then
+            echo "Jira keys found: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}"
           fi
      
       - name: Update Jira
@@ -124,7 +133,7 @@ jobs:
               jira-transition "$key" "To Do"
             fi
           done
-     
+
       - name: Add Jira comment
         if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
         env:
