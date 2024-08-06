@@ -18,9 +18,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.12'
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -37,12 +37,9 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+          python-version: '3.12'
       - name: Install AWS CLI
         run: |
           sudo apt-get update
@@ -51,9 +48,13 @@ jobs:
         run: |
           pip install aws-sam-cli
       - name: Build SAM application
-        run: sam build
+        run: |
+          cd contact-Keeper
+          sam build --use-container
       - name: Deploy SAM application
-        run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name utez --capabilities CAPABILITY_IAM
+        run: |
+          cd contact-Keeper
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name utez --capabilities CAPABILITY_IAM
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
