@@ -1,11 +1,10 @@
 import datetime
-import json
 import unittest
 from unittest.mock import patch, MagicMock
 
 from events_management.commons import ErrorType
 from events_management.commons.type_response import response_400, response_500
-from events_management.read_event import lambda_handler as read_event
+from events_management.read_event.read_event import lambda_handler as read_event
 
 
 class TestReadEvent(unittest.TestCase):

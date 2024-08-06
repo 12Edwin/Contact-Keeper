@@ -1,0 +1,21 @@
+## Para ejecutar totas las pruebas ejecute el comando
+ 
+ # yarn run test:unit
+
+ ## Para ejecutar las pruebas por separado ocupa el comando
+
+ # yarn test:unit -- nombre_componente.spec.js
+
+ ## Para limpiar cache
+
+ # yarn jest --clearCache
+
+ ## Explicación detallaya de las pruebas
+
+ # yarn jest --verbose
+
+ ## Documentación
+
+ # https://es.vuejs.org/v2/cookbook/unit-testing-vue-components
+
+

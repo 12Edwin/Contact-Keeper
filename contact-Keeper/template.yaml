@@ -103,6 +103,24 @@ Resources:
                 Action:
                   - cognito-idp:AdminListGroupsForUser
                 Resource: '*'
+        - PolicyName: CognitoUserListUsers
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cognito-idp:ListUsers
+                  - cognito-idp:AdminListGroupsForUser
+                Resource: "*"
+
+  CommonsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: commons
+      Description: Common code and libraries
+      ContentUri: ./commons/
+      CompatibleRuntimes:
+        - python3.12
 
   EventsApiGateway:
     Type: AWS::Serverless::Api
@@ -114,6 +132,27 @@ Resources:
         Authorizers:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
+      DisableExecuteApiEndpoint: false
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+
+  GroupsApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: GroupApi
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt CognitoUserPool.Arn
+      DisableExecuteApiEndpoint: false
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
 
   UsersApiGateway:
     Type: AWS::Serverless::Api
@@ -126,6 +165,10 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
 
   CreateUserFunction:
     Type: AWS::Serverless::Function
@@ -133,10 +176,12 @@ Resources:
       Environment:
         Variables:
           AWS_STACK_NAME: !Ref AWS::StackName
-      CodeUri: auth_management/
-      Handler: app.create_user
+      CodeUri: auth_management/create_user
+      Handler: create_user.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
       Architectures:
         - x86_64
       Events:
@@ -155,10 +200,12 @@ Resources:
       Environment:
         Variables:
           AWS_STACK_NAME: !Ref AWS::StackName
-      CodeUri: auth_management/
-      Handler: app.confirm_password
+      CodeUri: auth_management/confirm_password
+      Handler: confirm_password.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
       Architectures:
         - x86_64
       Events:
@@ -177,10 +224,12 @@ Resources:
       Environment:
         Variables:
           AWS_STACK_NAME: !Ref AWS::StackName
-      CodeUri: auth_management/
-      Handler: app.login
+      CodeUri: auth_management/login
+      Handler: login.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
       Architectures:
         - x86_64
       Events:
@@ -193,13 +242,18 @@ Resources:
             Auth:
               Authorizer: NONE
 
-  ReadUserFunction:
+  ReadUsersFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: user_management/
-      Handler: app.read_user
+      CodeUri: user_management/read_users
+      Handler: read_users.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
       Architectures:
         - x86_64
       Events:
@@ -207,16 +261,23 @@ Resources:
           Type: Api
           Properties:
             RestApiId: !Ref UsersApiGateway
-            Path: /users/{id}
+            Path: /users
             Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
 
   UpdateUserFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: user_management/
-      Handler: app.update_user
+      CodeUri: user_management/update_user
+      Handler: update_user.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
       Architectures:
         - x86_64
       Events:
@@ -226,31 +287,45 @@ Resources:
             RestApiId: !Ref UsersApiGateway
             Path: /users/{id}
             Method: PUT
+            Auth:
+              Authorizer: CognitoAuthorizer
 
-  DeleteUserFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: user_management/
-      Handler: app.delete_user
-      Runtime: python3.12
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Architectures:
-        - x86_64
-      Events:
-        DeleteUser:
-          Type: Api
-          Properties:
-            RestApiId: !Ref UsersApiGateway
-            Path: /users/{id}
-            Method: DELETE
+#  DeleteUserFunction:
+#    Type: AWS::Serverless::Function
+#    Properties:
+#      CodeUri: user_management/
+#      Handler: app.delete_user
+#      Runtime: python3.12
+#      Role: !GetAtt LambdaExecutionRole.Arn
+#      Layers:
+#        - !Ref CommonsLayer
+#      Environment:
+#        Variables:
+#          AWS_STACK_NAME: !Ref AWS::StackName
+#      Architectures:
+#        - x86_64
+#      Events:
+#        DeleteUser:
+#          Type: Api
+#          Properties:
+#            RestApiId: !Ref UsersApiGateway
+#            Path: /users/{id}
+#            Method: DELETE
+#            Auth:
+#              Authorizer: CognitoAuthorizer
 
   CreateEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: events_management/
-      Handler: app.create_event
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/create_event_for_group
+      Handler: create_event_for_group.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
       Architectures:
         - x86_64
       Events:
@@ -260,14 +335,93 @@ Resources:
             RestApiId: !Ref EventsApiGateway
             Path: /events
             Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  CreateEventMeetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/create_event_for_meet
+      Handler: create_event_for_meet.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EventsApiGateway
+            Path: /events_meet
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  AssignPeopleEventFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/assign_people_event
+      Handler: assign_people_event.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EventsApiGateway
+            Path: /events_assign
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  UnAssignPeopleEventFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/unassign_people_event
+      Handler: unassign_people_event.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EventsApiGateway
+            Path: /events_unassign/{id_person}/{id_event}
+            Method: DELETE
+            Auth:
+              Authorizer: CognitoAuthorizer
 
   ReadEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: events_management/
-      Handler: app.read_event
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/read_event
+      Handler: read_event.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
       Architectures:
         - x86_64
       Events:
@@ -280,13 +434,66 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+  ReadEventsGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/read_events_group
+      Handler: read_events_group.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        ReadEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EventsApiGateway
+            Path: /events/group/{id}
+            Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  ReadEventsPersonFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/read_events_person
+      Handler: read_events_person.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        ReadEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EventsApiGateway
+            Path: /events/person/{id}
+            Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+
   UpdateEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: events_management/
-      Handler: app.update_event
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/update_event
+      Handler: update_event.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
       Architectures:
         - x86_64
       Events:
@@ -300,10 +507,15 @@ Resources:
   DeleteEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: events_management/
-      Handler: app.delete_event
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/delete_event
+      Handler: delete_event.lambda_handler
       Runtime: python3.12
       Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
       Architectures:
         - x86_64
       Events:
@@ -313,6 +525,150 @@ Resources:
             RestApiId: !Ref EventsApiGateway
             Path: /events/{id}
             Method: DELETE
+
+  CreateGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/create_group
+      Handler: create_group.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /groups
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  ReadGroupsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/read_groups
+      Handler: read_groups.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /groups/moderator/{moderator}
+            Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  UpdateGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/update_group
+      Handler: update_group.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /groups/{id}
+            Method: PUT
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  DeleteGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/delete_group
+      Handler: delete_group.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /groups/{id}
+            Method: DELETE
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  AssignMemberFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/assign_member
+      Handler: assign_member.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /assign_member_group
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  UnassignMemberFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/unassign_member
+      Handler: unassign_member.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /unassign_member_group/{id_person}/{id_group}
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
 
   UsersRole:
     Type: AWS::IAM::Role
@@ -398,7 +754,7 @@ Resources:
 Outputs:
   EventKeeperApi:
     Description: "API Gateway endpoint URL for Prod stage for Event Keeper functions"
-    Value: !Sub "https://${EventsApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/contacts/"
+    Value: !Sub "https://${EventsApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/events/"
   UserManagementApi:
     Description: "API Gateway endpoint URL for Prod stage for User Management functions"
     Value: !Sub "https://${UsersApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/users/"
@@ -411,15 +767,15 @@ Outputs:
   LoginFunction:
     Description: "Login Lambda Function ARN"
     Value: !GetAtt LoginFunction.Arn
-  ReadUserFunction:
+  ReadUsersFunction:
     Description: "Read User Lambda Function ARN"
-    Value: !GetAtt ReadUserFunction.Arn
+    Value: !GetAtt ReadUsersFunction.Arn
   UpdateUserFunction:
     Description: "Update User Lambda Function ARN"
     Value: !GetAtt UpdateUserFunction.Arn
-  DeleteUserFunction:
-    Description: "Delete User Lambda Function ARN"
-    Value: !GetAtt DeleteUserFunction.Arn
+#  DeleteUserFunction:
+#    Description: "Delete User Lambda Function ARN"
+#    Value: !GetAtt DeleteUserFunction.Arn
   CreateEventFunction:
     Description: "Create Event Lambda Function ARN"
     Value: !GetAtt CreateEventFunction.Arn
