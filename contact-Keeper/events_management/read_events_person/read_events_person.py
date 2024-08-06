@@ -2,6 +2,8 @@ import boto3
 import os
 import sys
 
+import pymysql
+
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
     sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
 
@@ -28,15 +30,23 @@ def read_events(parameters):
 
         connection = get_db_connection()
         with connection.cursor() as cursor:
-            query = """SELECT e.* FROM meets m LEFT JOIN events e ON e.id = m.event_id WHERE person_id = %s"""
+            query = """SELECT e.* FROM meets m JOIN events e ON e.id = m.event_id WHERE m.person_id = %s"""
             cursor.execute(query, _id)
-            row = cursor.fetchone()
-            if row is not None:
+            rows = cursor.fetchall()
+            if rows is not None:
                 column_names = [desc[0] for desc in cursor.description]
-                row_dict = dict(zip(column_names, row))
-                return row_dict
+                data = []
+                for row in rows:
+                    data.append(dict(zip(column_names, row)))
+                return data
             else:
-                return None
+                return []
+    except pymysql.MySQLError as e:
+        print(e)
+        raise RuntimeError(ErrorType.CONNECTION_ERROR)
+    except Exception as e:
+        print(e)
+        raise RuntimeError(ErrorType.INTERNAL_SERVER_ERROR)
     finally:
         if connection is not None:
             connection.close()

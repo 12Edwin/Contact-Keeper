@@ -133,6 +133,10 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
 
   GroupsApiGateway:
     Type: AWS::Serverless::Api
@@ -145,6 +149,10 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
 
   UsersApiGateway:
     Type: AWS::Serverless::Api
@@ -157,6 +165,10 @@ Resources:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
+      Cors:
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
 
   CreateUserFunction:
     Type: AWS::Serverless::Function
