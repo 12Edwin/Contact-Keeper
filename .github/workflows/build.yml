@@ -92,7 +92,7 @@ jobs:
         uses: atlassian/gajira-transition@master
         with:
           issue: ${{ steps.extract_jira_key.outputs.JIRA_KEY }}
-          transition: "${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' && 'Finalizada' || github.ref == 'refs/heads/develop' && 'En curso' || 'En revisión' }}"
+          transition: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' && 'Done' || github.ref == 'refs/heads/develop' && 'In Progress' || 'En revisión' }}
       
       - name: Add Jira comment
         if: steps.extract_jira_key.outputs.JIRA_KEY
@@ -108,4 +108,3 @@ jobs:
             Autor: ${{ github.actor }}
             Evento: ${{ github.event_name }}
             {panel}
-            
