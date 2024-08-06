@@ -12,16 +12,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+     
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
-      
+     
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-      
+          pip install -r requirements.txt  # Asegúrese de tener este archivo
+     
       - name: Run tests
         run: python -m unittest discover tests
 
@@ -33,7 +34,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      
+     
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -47,22 +48,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+     
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-      
+     
       - name: Install SAM CLI
         run: pip install aws-sam-cli
-      
+     
       - name: Build SAM application
         run: |
           cd contact-Keeper
           sam build --use-container
-      
+     
       - name: Deploy SAM application
         run: |
           cd contact-Keeper
@@ -73,38 +74,72 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
+        with:
+          fetch-depth: 0
+     
       - name: Jira Login
         uses: atlassian/gajira-login@master
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-      
-      - name: Extract Jira issue key
-        id: extract_jira_key
+     
+      - name: Extract Jira issue keys
+        id: extract_jira_keys
         run: |
-          JIRA_KEY=$(echo "${{ github.event.head_commit.message }}" | grep -o '^[A-Z]*-[0-9]*')
-          echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_OUTPUT
-      
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            PR_COMMITS=$(git log --format=%B ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
+            JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP '^SOPE-\d+' | sort -u)
+          else
+            JIRA_KEYS=$(echo "${{ github.event.head_commit.message }}" | grep -oP '^SOPE-\d+')
+          fi
+          if [ -n "$JIRA_KEYS" ]; then
+            echo "JIRA_KEYS<<EOF" >> $GITHUB_OUTPUT
+            echo "$JIRA_KEYS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "HAS_JIRA_KEYS=true" >> $GITHUB_OUTPUT
+          else
+            echo "No se encontraron claves SOPE. Continuando sin actualizar Jira."
+            echo "HAS_JIRA_KEYS=false" >> $GITHUB_OUTPUT
+          fi
+     
       - name: Update Jira
-        if: steps.extract_jira_key.outputs.JIRA_KEY
-        uses: atlassian/gajira-transition@master
-        with:
-          issue: ${{ steps.extract_jira_key.outputs.JIRA_KEY }}
-          transition: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' && 'Done' || github.ref == 'refs/heads/develop' && 'In Progress' || 'En revisión' }}
-      
+        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
+        env:
+          JIRA_KEYS: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
+        run: |
+          for key in $JIRA_KEYS
+          do
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "Transitioning $key to 'En revisión'"
+              jira-transition "$key" "En revisión"
+            elif [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
+              echo "Transitioning $key to 'Done'"
+              jira-transition "$key" "Done"
+            elif [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+              echo "Transitioning $key to 'In Progress'"
+              jira-transition "$key" "In Progress"
+            else
+              echo "Transitioning $key to 'To Do'"
+              jira-transition "$key" "To Do"
+            fi
+          done
+     
       - name: Add Jira comment
-        if: steps.extract_jira_key.outputs.JIRA_KEY
-        uses: atlassian/gajira-comment@master
-        with:
-          issue: ${{ steps.extract_jira_key.outputs.JIRA_KEY }}
-          comment: |
-            Actualización de GitHub:
-            {panel}
-            Repositorio: ${{ github.repository }}
-            Branch: ${{ github.ref }}
-            Commit: ${{ github.sha }}
-            Autor: ${{ github.actor }}
-            Evento: ${{ github.event_name }}
-            {panel}
+        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
+        env:
+          JIRA_KEYS: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
+        run: |
+          for key in $JIRA_KEYS
+          do
+            jira-comment "$key" "
+              Actualización de GitHub:
+              {panel}
+              Repositorio: ${{ github.repository }}
+              Branch: ${{ github.head_ref || github.ref }}
+              ${{ github.event_name == 'pull_request' && format('Pull Request: {0}', github.event.pull_request.html_url) || format('Commit: {0}', github.sha) }}
+              Autor: ${{ github.actor }}
+              Evento: ${{ github.event_name }}
+              {panel}
+            "
+          done
