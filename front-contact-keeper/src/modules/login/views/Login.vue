@@ -86,6 +86,9 @@
     methods: {
       login() {
         this.isLoading = true
+          //const response = await accessApi.login("credential")
+          //const {data: {idToken}} = response
+          //const toJson = JSON.parse(response)
         setTimeout(() => {
           this.isLoading = false
         }, 2000)
