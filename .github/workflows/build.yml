@@ -124,7 +124,7 @@ jobs:
         run: |
           IFS=',' read -ra JIRA_KEYS_ARRAY <<< "$JIRA_KEYS"
           for key in "${JIRA_KEYS_ARRAY[@]}"; do
-            curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" -d '{"transition":{"id":"${{ github.event_name == 'pull_request' && '10030' || '3' }}"}}'  "https://utez-team-pozole.atlassian.net/rest/api/2/issue/$key/transitions"
+            curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" -d '{"transition":{"id":"${{ github.event_name == 'pull_request' && '42' || '3' }}"}}'  "https://utez-team-pozole.atlassian.net/rest/api/2/issue/$key/transitions"
           done
       - name: Handle Jira update error
         if: failure()
