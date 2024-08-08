@@ -76,12 +76,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: Jira Login
         uses: atlassian/gajira-login@master
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
           JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
           JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+
       - name: Extract Jira issue keys
         id: extract_jira_keys
         run: |
@@ -107,6 +109,7 @@ jobs:
             echo "No se encontraron claves SOPE válidas. No se actualizará Jira."
             echo "HAS_JIRA_KEYS=false" >> $GITHUB_OUTPUT
           fi
+
       - name: Debug information
         run: |
           echo "Event name: ${{ github.event_name }}"
@@ -115,27 +118,32 @@ jobs:
           if [ "${{ steps.extract_jira_keys.outputs.HAS_JIRA_KEYS }}" = "true" ]; then
             echo "Jira keys found: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}"
           fi
+
       - name: Update Jira
         if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
-        env:
-          JIRA_KEYS: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
-          USER_EMAIL: ${{ '20213TN046@utez.edu.mx' }}
-          API_TOKEN: ${{ 'ATATT3xFfGF0_wfzXfG7hedFohdMYwPK2TDuWnmmh8kY-AO7P1LCtRJ-m22YYIAURSB6Dqd6l-Ehc3J8Eb9ZgMGRfcZ9x_ejoUFI_Q7f6yMA2y9l2dOBtPUbw1DGKVc-icBm6_ds81bUDeDudZq-ujsA9eYDNpFsJ-CDe-7pGhwIOP9FS3GVVcQ=7026BA62' }}
-        run: |
-          IFS=',' read -ra JIRA_KEYS_ARRAY <<< "$JIRA_KEYS"
-          for key in "${JIRA_KEYS_ARRAY[@]}"; do
-            curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" -d '{"transition":{"id":"${{ github.event_name == 'pull_request' && '42' || '3' }}"}}'  "https://utez-team-pozole.atlassian.net/rest/api/2/issue/SOPE-1/transitions"
-          done
+        uses: atlassian/gajira-transition@master
+        with:
+          issue: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
+          transition: ${{ github.event_name == 'pull_request' && 'En revision' || 'In Progress' }}
+        continue-on-error: true
+
       - name: Handle Jira update error
         if: failure()
         run: |
           echo "Error actualizando Jira. Continuando sin error..."
+          echo "Detalles del error: ${{ steps.update_jira.outputs.error }}"
+
       - name: Add Jira comment
-        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
-        env:
-          JIRA_KEYS: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
-        run: |
-          IFS=',' read -ra JIRA_KEYS_ARRAY <<< "$JIRA_KEYS"
-          for key in "${JIRA_KEYS_ARRAY[@]}"; do
-            curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.JIRA_API_TOKEN }}" -d '{"body":"Actualización de GitHub:\n{panel}\nRepositorio: ${{ github.repository }}\nBranch: ${{ github.head_ref || github.ref }}\n${{ github.event_name == 'pull_request' && format('Pull Request: {0}', github.event.pull_request.html_url) || format('Commit: {0}', github.sha) }}\nAutor: ${{ github.actor }}\nEvento: ${{ github.event_name }}\n{panel}"}' "${{ secrets.JIRA_BASE_URL }}/rest/api/2/issue/$key/comment"
-          done
+        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true' && steps.update_jira.outcome == 'success'
+        uses: atlassian/gajira-comment@master
+        with:
+          issue: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
+          comment: |
+            Actualización de GitHub:
+            {panel}
+            Repositorio: ${{ github.repository }}
+            Branch: ${{ github.head_ref || github.ref }}
+            ${{ github.event_name == 'pull_request' && format('Pull Request: {0}', github.event.pull_request.html_url) || format('Commit: {0}', github.sha) }}
+            Autor: ${{ github.actor }}
+            Evento: ${{ github.event_name }}
+            {panel}
