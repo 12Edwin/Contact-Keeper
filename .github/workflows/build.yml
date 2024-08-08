@@ -89,7 +89,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             PR_COMMITS=$(git log --format=%B ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
-            JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP 'SOPE-\d+' | sort -u | tr '\n' ' ')
+            JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP 'SOPE-\d+' | sort -u | tr '\n' ',')
           else
             if [ "${{ github.event.head_commit.message }}" | grep -oP 'SOPE-\d+' ]; then
               JIRA_KEYS=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'SOPE-\d+')
