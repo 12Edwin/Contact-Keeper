@@ -95,6 +95,7 @@ jobs:
               JIRA_KEYS=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'SOPE-\d+')
             else
               JIRA_KEYS=""
+            fi
           fi
           if [ -n "$JIRA_KEYS" ]; then
             echo "JIRA_KEYS<<EOF" >> $GITHUB_OUTPUT
