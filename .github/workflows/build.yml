@@ -119,13 +119,12 @@ jobs:
         if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
         env:
           JIRA_KEYS: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
-          BASE_URL: ${{ 'https://utez-team-pozole.atlassian.net' }}
           USER_EMAIL: ${{ '20213TN046@utez.edu.mx' }}
           API_TOKEN: ${{ 'ATATT3xFfGF0_wfzXfG7hedFohdMYwPK2TDuWnmmh8kY-AO7P1LCtRJ-m22YYIAURSB6Dqd6l-Ehc3J8Eb9ZgMGRfcZ9x_ejoUFI_Q7f6yMA2y9l2dOBtPUbw1DGKVc-icBm6_ds81bUDeDudZq-ujsA9eYDNpFsJ-CDe-7pGhwIOP9FS3GVVcQ=7026BA62' }}
         run: |
           IFS=',' read -ra JIRA_KEYS_ARRAY <<< "$JIRA_KEYS"
           for key in "${JIRA_KEYS_ARRAY[@]}"; do
-            curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" -d '{"transition":{"id":"${{ github.event_name == 'pull_request' && '10030' || '3' }}"}}'  "${{ secrets.BASE_URL }}/rest/api/2/issue/$key/transitions"
+            curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer ${{ secrets.API_TOKEN }}" -d '{"transition":{"id":"${{ github.event_name == 'pull_request' && '10030' || '3' }}"}}'  "https://utez-team-pozole.atlassian.net/rest/api/2/issue/$key/transitions"
           done
       - name: Handle Jira update error
         if: failure()
