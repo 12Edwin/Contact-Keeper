@@ -236,6 +236,39 @@ def exists_user(value):
         if connection is not None:
             connection.close()
 
+def exists_user_phone(value):
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            query = """SELECT id FROM people WHERE phone = %s"""
+            cursor.execute(query, value)
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                return True
+            else:
+                return False
+    finally:
+        if connection is not None:
+            connection.close()
+
+def exists_user_nick(value):
+    if value is None:
+        return False
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            query = """SELECT id FROM people WHERE nickname = %s"""
+            cursor.execute(query, value)
+            rows = cursor.fetchall()
+            if len(rows) > 0:
+                return True
+            else:
+                return False
+    finally:
+        if connection is not None:
+            connection.close()
 
 def exists_group(value):
     if value is None:

@@ -122,6 +122,55 @@ Resources:
       CompatibleRuntimes:
         - python3.12
 
+  OptionsMethodFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: prelight_method/
+      Handler: manage_options.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        OptionsMethodLogin:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsersApiGateway
+            Path: /login
+            Method: OPTIONS
+            Auth:
+              Authorizer: NONE
+        OptionsMethodUser:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsersApiGateway
+            Path: /users
+            Method: OPTIONS
+            Auth:
+              Authorizer: NONE
+        OptionsMethodConfirm:
+          Type: Api
+          Properties:
+            RestApiId: !Ref UsersApiGateway
+            Path: /confirm
+            Method: OPTIONS
+            Auth:
+              Authorizer: NONE
+
+  UsersApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: UserApi
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt CognitoUserPool.Arn
+      DisableExecuteApiEndpoint: false
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
   EventsApiGateway:
     Type: AWS::Serverless::Api
     Properties:
@@ -154,21 +203,7 @@ Resources:
         AllowHeaders: "'*'"
         AllowOrigin: "'*'"
 
-  UsersApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: UserApi
-      StageName: Prod
-      Auth:
-        DefaultAuthorizer: CognitoAuthorizer
-        Authorizers:
-          CognitoAuthorizer:
-            UserPoolArn: !GetAtt CognitoUserPool.Arn
-      DisableExecuteApiEndpoint: false
-      Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
-        AllowOrigin: "'*'"
+
 
   CreateUserFunction:
     Type: AWS::Serverless::Function

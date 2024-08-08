@@ -11,6 +11,11 @@ def datetime_handler(obj):
 def response_200(data, message="Success"):
     return {
         "statusCode": 200,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Methods': '*'
+        },
         "body": json.dumps({
             'status': 'success',
             'message': message,
@@ -22,6 +27,11 @@ def response_200(data, message="Success"):
 def response_400(message="Bad Request"):
     return {
         'statusCode': 400,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': '*'
+        },
         'body': json.dumps({
             'status': 'error',
             'message': message,
@@ -33,6 +43,11 @@ def response_400(message="Bad Request"):
 def response_401(message="Unauthorized"):
     return {
         'statusCode': 401,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': '*'
+        },
         'body': json.dumps({
             'status': 'error',
             'message': message,
@@ -44,6 +59,11 @@ def response_401(message="Unauthorized"):
 def response_403(message="Forbidden"):
     return {
         'statusCode': 403,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': '*'
+        },
         'body': json.dumps({
             'status': 'error',
             'message': message,
@@ -55,6 +75,11 @@ def response_403(message="Forbidden"):
 def response_500(message="Internal Server Error"):
     return {
         'statusCode': 500,
+        'headers': {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': '*',
+            'Access-Control-Allow-Headers': '*'
+        },
         'body': json.dumps({
             'status': 'error',
             'message': message,
