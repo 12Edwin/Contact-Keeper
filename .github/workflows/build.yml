@@ -121,10 +121,17 @@ jobs:
         uses: atlassian/gajira-transition@master
         with:
           issue: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
-          transition: ${{ github.event_name == 'pull_request' && 'En revisión' || 'In Progress' }}
+          transition: ${{ github.event_name == 'pull_request' && 'En revision' || 'In Progress' }}
+        continue-on-error: true
+
+      - name: Handle Jira update error
+        if: steps.update_jira.outcome == 'failure'
+        run: |
+          echo "Error actualizando Jira. Continuando sin error..."
+          echo "Detalles del error: ${{ steps.update_jira.outputs.error }}"
 
       - name: Add Jira comment
-        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
+        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true' && steps.update_jira.outcome == 'success'
         uses: atlassian/gajira-comment@master
         with:
           issue: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
