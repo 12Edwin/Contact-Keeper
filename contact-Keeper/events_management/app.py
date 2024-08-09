@@ -1,4 +1,0 @@
-from read_event import lambda_handler as read_event
-from update_event import lambda_handler as update_event
-from delete_event import lambda_handler as delete_event
-from create_event_for_group import lambda_handler as create_event

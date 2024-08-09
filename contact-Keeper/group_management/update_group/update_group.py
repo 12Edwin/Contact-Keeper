@@ -1,0 +1,53 @@
+import json
+import os
+import sys
+import boto3
+import pymysql
+
+if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
+
+from app import ErrorType, get_db_connection, response_200, response_400, response_500, response_403, get_cognito_ids, exists_group, validate_name, exists_user, validate_opt_name
+
+
+def lambda_handler(event, context):
+    try:
+        user_pool_id, user_pool_client_id = get_cognito_ids()
+        body = json.loads(event['body'])
+        data = update_group(body)
+        return response_200(data)
+    except ValueError as e:
+        return response_400(ErrorType.english(str(e)))
+    except RuntimeError as e:
+        return response_500(ErrorType.english(str(e)))
+
+
+def update_group(group):
+    _id = group.get('id')
+    name = group.get('name')
+    description = group.get('description')
+
+    # Validate the attributes
+    if not exists_group(_id):
+        raise ValueError(ErrorType.GROUP_NOT_FOUND)
+    if not validate_name(name):
+        raise ValueError(ErrorType.INVALID_NAME)
+    if not validate_opt_name(description):
+        raise ValueError(ErrorType.INVALID_DESCRIPTION)
+
+    connection = None
+    try:
+        connection = get_db_connection()
+        with connection.cursor() as cursor:
+            query = """
+            UPDATE `group_members` SET `name` = %s, `description` = %s WHERE `id` = %s
+            """
+            cursor.execute(query, (name, description, _id))
+            connection.commit()
+            return {'id': _id, 'name': name, 'description': description}
+    except pymysql.MySQLError as e:
+        print(e)
+        raise RuntimeError(ErrorType.CONNECTION_ERROR)
+    except Exception as e:
+        print(e)
+        raise RuntimeError(ErrorType.INTERNAL_SERVER_ERROR)
