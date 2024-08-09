@@ -203,8 +203,6 @@ Resources:
         AllowHeaders: "'*'"
         AllowOrigin: "'*'"
 
-
-
   CreateUserFunction:
     Type: AWS::Serverless::Function
     Properties:
