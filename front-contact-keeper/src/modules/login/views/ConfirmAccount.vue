@@ -2,16 +2,37 @@
     <div class="form-zone">
       <form @submit.prevent="signup" class="login-form onLoginShowed">
         <h3 class="text-center">¡Confirma tu cuenta!</h3>
-        <template>
-          <Divider/>
-            <div class="inf-text text-center">
-                <p>¡Estas a un paso de completar el registro, solo ingresa el código que te hemos enviado por correo!</p>
+        <Divider/>
+        <div class="inf-text text-center">
+            <p>Por tu seguridad, es necesario cambiar la contraseña que te enviamos a <b>{{ hideEmail() }}.</b></p>
+        </div>
+        <div class="input-group">
+          <label for="oldPassword" class="form-label-required">Contraseña:</label>
+          <input :type="getInputType()" id="oldPassword" v-model="v$.password.$model" :class="{ 'invalid-field-custom': v$.password.$error }" required>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.password.$dirty && v$.password.required.$invalid">
+                {{ v$.password.required.$message }}
+              </p>
             </div>
-          <div class="input-group">
-              <label for="code" class="form-label-required">Código:</label>
-              <input type="text" id="code" required>
-            </div>
-        </template>
+        </div>
+        <div class="input-group">
+          <label for="newPassword" class="form-label-required">Nueva contraseña:</label>
+          <input :type="getInputType()" id="newPassword" v-model="v$.new_password.$model" :class="{ 'invalid-field-custom': v$.new_password.$error }"required>
+          <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.new_password.$dirty && v$.new_password.required.$invalid">
+                {{ v$.new_password.required.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.new_password.$dirty && v$.new_password.match.$invalid">
+                {{ v$.new_password.match.$message }}
+              </p>
+          </div>
+        </div>
+        <b-row>
+            <b-col cols="12" class="d-flex justify-content-start align-items-center mb-3">
+              <Checkbox id="binary" :binary="true" v-model="showPassword" />
+              <label for="binary" style="margin-left: 5px; margin-top: 5px">Mostrar contraseña</label>
+            </b-col>
+          </b-row>
         <template>
           <b-row>
             <b-col class="d-flex justify-content-center mt-2">
@@ -26,24 +47,64 @@
   </template>
   
   <script>
+  import {reactive} from "@vue/composition-api";
+  import useVuelidate from "@vuelidate/core";
+  import { required, helpers, maxLength, minLength, email } from '@vuelidate/validators'
   export default {
     name: 'ConfirmAccount',
     data() {
       return {
         code: '',
-        isLoading: false
+        isLoading: false,
+        showPassword: false
       }
+    },
+    props: {
+      email: {
+        type: String,
+        required: true
+      }
+    },
+    setup() {
+      const confirmInfo = reactive({
+        email: '',
+        password: '',
+        new_password: ''
+      })
+
+      const rules ={
+        password: {
+          required: helpers.withMessage('La contraseña es requerida', required),
+        },
+        new_password: {
+          required: helpers.withMessage('Debes confirmar la nueva contraseña', required),
+          match: helpers.withMessage('Las contraseñas no coinciden', (value) => value === confirmInfo.password)
+        }
+      }
+      const v$ = useVuelidate(rules, confirmInfo)
+      return { confirmInfo, v$ }
     },
     methods: {
       confirm(){
         console.log('confirm')
         this.isLoading = true
-        setTimeout(() => {
-            this.$emit('showLoginForm')
-            this.isLoading = false
-        }, 5000)
+        this.confirmInfo.email = this.email
+        console.log(this.confirmInfo)
+        // setTimeout(() => {
+        //     this.$emit('showLoginForm')
+        //     this.isLoading = false
+        // }, 5000)
         
-      }
+      },
+      hideEmail(){
+        if (!this.email) return '';
+        const half = Math.floor(this.email.length / 2);
+        const regex = new RegExp(`.{${8}}(?=@)`);
+        return this.email.replace(regex, '****');
+      },
+      getInputType() {
+        return this.showPassword ? 'text' : 'password'
+      },
     }
   }
   </script>
@@ -81,7 +142,7 @@
   }
   
   .input-group {
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
   }
   
   label {

@@ -5,7 +5,7 @@ const SERVER_URL = process.env.VUE_APP_BASE_URL;
 
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
-    timeout: 3000
+    timeout: 5000
 })
 
 export const getServerUrl = () => SERVER_URL;
@@ -35,7 +35,7 @@ AxiosClient.interceptors.response.use(
     },
      (error) => {
         if(!error.response){
-            console.log('Error de conexión')
+            console.log('Error de conexión', error)
             return Promise.reject(error)
         }
         if(error.response.status){
