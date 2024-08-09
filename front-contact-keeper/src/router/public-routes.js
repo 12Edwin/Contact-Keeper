@@ -7,7 +7,7 @@ export default [
         },
         children:[
             {
-                path: 'login',
+                path: '',
                 name: 'login',
                 component: Login,
                 meta: {

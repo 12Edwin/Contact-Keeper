@@ -94,20 +94,19 @@ export default {
     async login(credentials) {
       this.isLogging = true;
       try {
-        const { data: { data: { id_token, role }, status } } = await services.login(credentials);
+        const  { data: { id_token, role }, status }  = await services.login(credentials);
 
         if (status === 'success') {
           this.isLogging = false;
-          localStorage.setItem('id_token', id_token);
+          localStorage.setItem('token', id_token);
           localStorage.setItem('role', role);
           if (role === "Administrators") {
             this.$router.push({name: 'users'})
-            
-          } else{
-            console.log("otro usuario"); // cambiar a la ruta de el usuario normal
+          } else if(role === "NormalUsers"){
+            console.log('otro usuario') // cambiar a la ruta de el usuario normal
           }
         } else {
-          console.error('Error en el login:', response.data.message);
+          console.error('Error en el login:', status);
         }
       } catch (error) {
         console.error('Error en el login:', error);

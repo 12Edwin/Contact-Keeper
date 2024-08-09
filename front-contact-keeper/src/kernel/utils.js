@@ -1,5 +1,3 @@
-UTILS:
-
 const getUserByName = (name, people) => {
   return people.some((person) => person.name === name);
 };
@@ -13,9 +11,9 @@ const getToken = () => {
 };
 
 const removeToken = () => {
-  localStorage.removeItem("token");
+  return localStorage.removeItem("token");
 };
-const getRoleNameByToken = async () => {
+const getRoleStorage= () => {
   try {
       const role = localStorage.getItem('role');
       if (!role) {
@@ -33,7 +31,7 @@ const getRoleNameByToken = async () => {
 export default {
   getToken,
   removeToken,
-  getRoleNameByToken,
+  getRoleStorage,
   getUserByEmail,
   getUserByName,
 };
