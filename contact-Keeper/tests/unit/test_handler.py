@@ -6,10 +6,10 @@ import sys
 from unittest.mock import patch, MagicMock
 
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
-    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'commons', 'python'))
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
 print(sys.path)
-from app import ErrorType
-from app import response_400, response_500
+from commons.python.ErrorType import ErrorType
+from commons.python.type_response import response_400, response_500
 from events_management.read_event.read_event import lambda_handler as read_event
 
 
