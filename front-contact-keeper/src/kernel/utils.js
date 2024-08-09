@@ -38,6 +38,10 @@ const getUserFromToke = () => {
 }
 
 
+const validAge = (birthday) => {
+  return true
+}
+
 export default {
   getToken,
   removeToken,
@@ -45,4 +49,5 @@ export default {
   getUserByEmail,
   getUserByName,
   getUserFromToke,
+  validAge
 };

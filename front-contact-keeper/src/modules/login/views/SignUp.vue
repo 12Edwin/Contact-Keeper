@@ -13,11 +13,42 @@
           <div class="input-group-row">
             <div class="input-group-cols-6">
               <label for="username" class="form-label-required">Usuario:</label>
-              <input type="text" id="username" required />
+              <input type="text" id="username"  v-model="v$.username.$model" :class="{ 'invalid-field-custom': v$.username.$error }"/>
+              <div class="text-danger text-start pt-2">
+                <p class="error-messages" v-if="v$.username.$dirty && v$.username.required.$invalid">
+                  {{ v$.username.required.$message }}
+                </p>
+                <p class="error-messages"
+                  v-if="v$.username.$dirty && v$.username.onlyLetters.$invalid">
+                  {{ v$.username.onlyLetters.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.username.$dirty && v$.username.minLength.$invalid">
+                  {{ v$.username.minLength.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.username.$dirty && v$.username.maxLength.$invalid">
+                  {{ v$.username.maxLength.$message }}
+                </p>
+              </div>
             </div>
             <div class="input-group-cols-6">
               <label for="name" class="form-label-required">Nombre:</label>
-              <input type="text" id="name" required />
+              <input type="text" id="name" required v-model="v$.name.$model"
+              :class="{ 'invalid-field-custom': v$.name.$error }"/>
+              <div class="text-danger text-start pt-2">
+                <p class="error-messages" v-if="v$.name.$dirty && v$.name.required.$invalid">
+                {{ v$.name.required.$message }}
+                </p>
+                <p class="error-messages"
+                  v-if="v$.name.$dirty && v$.name.onlyLetters.$invalid">
+                  {{ v$.name.onlyLetters.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.name.$dirty && v$.name.minLength.$invalid">
+                  {{ v$.name.minLength.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.name.$dirty && v$.name.maxLength.$invalid">
+                  {{ v$.name.maxLength.$message }}
+                </p>
+              </div>
             </div>
           </div>
           <div class="input-group-row">
@@ -25,13 +56,36 @@
               <label for="lastname" class="form-label-required"
                 >Apellido paterno:</label
               >
-              <input type="text" id="lastname" required />
+              <input type="text" id="lastname" v-model="v$.surname.$model"
+              :class="{ 'invalid-field-custom': v$.surname.$error }" required/>
+              <div class="text-danger text-start pt-2">
+                <p class="error-messages" v-if="v$.surname.$dirty && v$.surname.required.$invalid">
+                  {{ v$.surname.required.$message }}
+                </p>
+                <p class="error-messages"
+                  v-if="v$.surname.$dirty && v$.surname.onlyLetters.$invalid">
+                  {{ v$.surname.onlyLetters.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.surname.$dirty && v$.surname.minLength.$invalid">
+                  {{ v$.surname.minLength.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.surname.$dirty && v$.surname.maxLength.$invalid">
+                  {{ v$.surname.maxLength.$message }}
+                </p>
+              </div>
             </div>
             <div class="input-group-cols-6">
               <label for="surname" class="form-label-required"
                 >Apellido materno:</label
               >
-              <input type="text" id="surname" required />
+              <input type="text" id="surname" required v-model="v$.lastname.$model"
+              :class="{ 'invalid-field-custom': v$.lastname.$error }"/>
+              <div class="text-danger text-start pt-2">
+                <p class="error-messages"
+                  v-if="v$.lastname.$dirty && v$.lastname.onlyLetters.$invalid">
+                  {{ v$.lastname.onlyLetters.$message }}
+                </p>
+              </div>
             </div>
           </div>
         </template>
@@ -47,18 +101,49 @@
               <label for="birthdate" class="form-label-required"
                 >Nacimiento:</label
               >
-              <input type="date" id="birthdate" required />
+              <input type="date" id="birthdate" required  v-model="v$.birthdate.$model"
+              :class="{ 'invalid-field-custom': v$.birthdate.$error }" />
+              <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.birthdate.$dirty && v$.birthdate.required.$invalid">
+                {{ v$.birthdate.required.$message }}
+              </p>
+            </div>
             </div>
             <div class="input-group-cols-6">
               <label for="phone" class="form-label-required">Teléfono:</label>
-              <input type="tel" id="phone" required />
+              <input type="tel" id="phone" required v-model="v$.phone.$model"
+              :class="{ 'invalid-field-custom': v$.phone.$error }"/>
+              <div class="text-danger text-start pt-2">
+                <p class="error-messages" v-if="v$.phone.$dirty && v$.phone.required.$invalid">
+                  {{ v$.phone.required.$message }}
+                </p>
+                <p class="error-messages"
+                  v-if="v$.phone.$dirty && v$.phone.validPhone.$invalid">
+                  {{ v$.phone.validPhone.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.phone.$dirty && v$.phone.minLength.$invalid">
+                  {{ v$.phone.minLength.$message }}
+                </p>
+                <p class="error-messages" v-if="v$.phone.$dirty && v$.phone.maxLength.$invalid">
+                  {{ v$.phone.maxLength.$message }}
+                </p>
+              </div>
             </div>
           </div>
           <div class="input-group">
             <label for="email" class="form-label-required"
               >Correo electrónico:</label
             >
-            <input type="email" id="email" v-model="username" required />
+            <input type="email" id="email" v-model="v$.email.$model"
+            :class="{ 'invalid-field-custom': v$.email.$error }" required />
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.email.$dirty && v$.email.required.$invalid">
+                {{ v$.email.required.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.email.$dirty && v$.email.email.$invalid">
+                {{ v$.email.email.$message }}
+              </p>
+            </div>
           </div>
         </template>
         <template v-if="formPart === 3">
@@ -72,13 +157,26 @@
             <label for="password" class="form-label-required"
               >Contraseña:</label
             >
-            <input type="password" id="password" required />
+            <input type="password" id="password" required v-model="v$.password.$model" :class="{ 'invalid-field-custom': v$.password.$error }"/>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.password.$dirty && v$.password.required.$invalid">
+                {{ v$.password.required.$message }}
+              </p>
+            </div>
           </div>
           <div class="input-group">
             <label for="confirmPasswors" class="form-label-required"
               >Confirmar contraseña:</label
             >
-            <input type="password" id="confirmPasswors" required />
+            <input type="password" id="confirmPasswors" required v-model="v$.confirmPassword.$model"/>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.confirmPassword.$dirty && v$.confirmPassword.required.$invalid">
+                {{ v$.confirmPassword.required.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.confirmPassword.$dirty && v$.confirmPassword.match.$invalid">
+                {{ v$.confirmPassword.match.$message }}
+              </p>
+            </div>
           </div>
         </template>
         <template>
@@ -93,6 +191,7 @@
                 :label="formPart <= 2 ? 'Siguiente' : 'Registrate'"
                 class="login-button"
                 @click="formPart <= 2 ? nextStep() : signUp()"
+                :disabled="validFormPart()"
               />
             </b-col>
           </b-row>
@@ -108,6 +207,11 @@
 <script>
 import Calendar from "primevue/calendar";
 import ConfirmAccount from "./ConfirmAccount.vue";
+import {reactive} from "@vue/composition-api";
+import useVuelidate from "@vuelidate/core";
+import { required, helpers, maxLength, minLength, email } from '@vuelidate/validators'
+import {nameRegex, noRequiredField, phoneRegex} from "@/kernel/patterns.js";
+import moment from 'moment'
 export default {
   data() {
     return {
@@ -116,6 +220,66 @@ export default {
       formPart: 1,
       onConfirmAccount: false,
     };
+  },
+  setup(){
+    const newPerson = reactive({
+      username: '',
+      name: '',
+      lastname: '',
+      surname: '',
+      birthdate: '',
+      phone: '',
+      email: '',
+      password: '',
+      confirmPassword: ''
+    })
+
+    const rules = {
+      username : {
+        required: helpers.withMessage('El nombre de usuario es requerido', required),
+        onlyLetters: helpers.withMessage('El nombre de usuario solo puede contener letras y numeros', (value) => nameRegex.test(value)),
+        minLength: helpers.withMessage("El nombre debe tener al menos 3 caracteres", minLength(3)),
+        maxLength: helpers.withMessage("El nombre debe tener menos de 10 caracteres", maxLength(10))
+      },
+      name: {
+        required: helpers.withMessage('El nombre es requerido', required),
+        onlyLetters: helpers.withMessage('El nombre solo puede contener letras', (value) => nameRegex.test(value)),
+        minLength: helpers.withMessage("El nombre debe tener al menos 3 caracteres", minLength(3)),
+        maxLength: helpers.withMessage("El nombre debe tener menos de 50 caracteres", maxLength(60))
+      },
+      lastname: {
+        onlyLetters: helpers.withMessage('El apellido materno solo puede contener letras', (value) => noRequiredField.test(value)),
+      },
+      surname: {
+        required: helpers.withMessage('El apellido paterno es requerido', required),
+        onlyLetters: helpers.withMessage('El apellido paterno solo puede contener letras', (value) => nameRegex.test(value)),
+        minLength: helpers.withMessage("El apellido debe tener al menos 3 caracteres", minLength(3)),
+        maxLength: helpers.withMessage("El apellido debe tener menos de 50 caracteres", maxLength(60))
+      },
+      phone: {
+        required: helpers.withMessage('El teléfono es requerido', required),
+        validPhone: helpers.withMessage('El teléfono no es válido', (value) => phoneRegex.test(value)),
+        minLength: helpers.withMessage("El teléfono debe ser de 10 caracteres", minLength(10)),
+        maxLength: helpers.withMessage("El teléfono debe tener máximo 10 caracteres", maxLength(10))
+      },
+      password: {
+        required: helpers.withMessage('La contraseña es requerida', required),
+      },
+      email: {
+        required: helpers.withMessage('El correo electrónico es requerido', required),
+        email: helpers.withMessage('El correo electrónico no es válido', email),
+      },
+      confirmPassword: {
+        required: helpers.withMessage('La confirmación de la contraseña es requerida', required),
+        match: helpers.withMessage('Las contraseñas no coinciden', (value) => value === newPerson.password)
+      },
+      birthdate: {
+        required: helpers.withMessage('La fecha de nacimiento es requerida', required),
+      }
+    }
+
+    const v$ = useVuelidate(rules, newPerson)
+    return { newPerson, v$ }
   },
   components: {
     Calendar,
@@ -136,8 +300,8 @@ export default {
       }
     },
     signUp() {
-      console.log("signing up");
-      this.onReady();
+      if(this.v$.$invalid) return;
+      console.log("user creado =>",this.prepareObject())
     },
     onReady() {
       setTimeout(() => {
@@ -145,6 +309,31 @@ export default {
         this.formPart = 1;
       }, 3000);
     },
+    validFormPart(){
+      if(this.formPart === 1){
+        return this.v$.username.$invalid || this.v$.name.$invalid || this.v$.surname.$invalid || this.v$.lastname.$invalid;
+      }else if(this.formPart === 2){
+        return this.v$.phone.$invalid || this.v$.email.$invalid || this.v$.birthdate.$invalid;
+      }else if(this.formPart === 3){
+        return this.v$.password.$invalid || this.v$.confirmPassword.$invalid;
+      }
+    },
+    formmatDate(date){
+      return moment(date).format('YYYY-MM-DD')
+    },
+    prepareObject(){
+      return {
+        username: this.newPerson.username,
+        name: this.newPerson.name,
+        last_name: this.newPerson.lastname,
+        surname: this.newPerson.surname,
+        birthdate: this.formmatDate(this.newPerson.birthdate),
+        phone: this.newPerson.phone,
+        email: this.newPerson.email,
+        password: this.newPerson.password,
+        user_type: 'normal'
+      }
+    }
   },
 };
 </script>
@@ -302,7 +491,7 @@ input {
 .error-messages {
   margin-bottom: 0;
   font-weight: 350;
-  font-size: 15px;
+  font-size: 12px;
 }
 
 .error-messages::before {
