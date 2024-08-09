@@ -1,10 +1,10 @@
 <template>
-  <div :class="['custom-sidebar', { closed: !visible }]">
+  <div :class="['custom-sidebar', { closed: visible }]">
     <div class="sidebar-header">
-      <div class="avatar">IP</div>
+      <div class="avatar">{{getAvatarLetter() }}</div>
       <div class="user-info">
-        <h2 class="user-sidebar">Isa Palacios</h2>
-        <p class="role">Administrador</p>
+        <h2 class="user-sidebar">{{getName()}}</h2>
+        <p class="role">{{ getRole() }}</p>
       </div>
     </div>
     <div class="w-100">
@@ -16,10 +16,19 @@
         </li>
       </ul>
     </div>
+    <div class="w-100">
+      <ul>
+        <li class="item" @click="logOut()"
+        >
+          <i class="pi pi-fw pi-power-off sidebar-icon" /> <span class="sidebar-text">Cerrar sesión</span>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
 <script>
+import utils from "@/kernel/utils";
 export default {
   name: 'SidebarAdmin',
   props: {
@@ -34,9 +43,26 @@ export default {
         {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users'},
         {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar'},
         {label: 'Anuncios', icon: 'pi pi-fw pi-megaphone'},
-        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap'},
-        {label: 'Cerrar sesión', icon: 'pi pi-fw pi-power-off'},
+        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap'}
       ]
+    }
+  },
+  methods: {
+    logOut() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      this.$router.push({ name: 'login' });
+    },
+    getAvatarLetter(){
+      return utils.getUserFromToke().charAt(0);
+    },
+    getName(){
+      return utils.getUserFromToke();
+    },
+
+    getRole(){
+      const role = utils.getRoleStorage()
+      return role === 'Administrators' ? 'Administrador' : 'Usuario'
     }
   }
 }
@@ -61,6 +87,8 @@ export default {
   display: flex;
   align-items: center;
   margin-bottom: 12px;
+  transition: justify-content 0.3s;
+  margin-left: 16px;
 }
 
 .avatar {

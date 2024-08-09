@@ -3,10 +3,10 @@ import Events from "@/modules/events/views/Events.vue";
 import Calendar from "@/modules/events/views/Calendar.vue"
 export default [
     {
-        path: '',
+        path: 'users',
         name: 'users',
         meta: {
-            role: "administrators"
+            role: "Administrators"
         },
         component: {
             render(c){
@@ -20,7 +20,7 @@ export default [
                 component: Users,
                 meta: {
                     title: 'Usuarios',
-                    role: 'administrators'
+                    role: 'Administrators'
                 }
             }
         ]

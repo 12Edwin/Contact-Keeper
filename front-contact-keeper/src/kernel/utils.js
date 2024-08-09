@@ -1,3 +1,5 @@
+import { jwtDecode } from "jwt-decode";
+
 const getUserByName = (name, people) => {
   return people.some((person) => person.name === name);
 };
@@ -26,6 +28,14 @@ const getRoleStorage= () => {
   }
 };
 
+const getUserFromToke = () => {
+  const token = getToken();
+  if (!token) {
+    return null;
+  }
+
+  return jwtDecode(token).name;
+}
 
 
 export default {
@@ -34,4 +44,5 @@ export default {
   getRoleStorage,
   getUserByEmail,
   getUserByName,
+  getUserFromToke,
 };

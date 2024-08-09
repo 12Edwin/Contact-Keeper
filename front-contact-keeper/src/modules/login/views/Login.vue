@@ -4,8 +4,9 @@
     <div class="image-zone">
       <img src="../../../assets/logo_sope.png" alt="Login image" class="login-image">
     </div>
-    <div class="form-zone">
-      <template v-if="isLoggingIn">
+    <template v-if="isLoggingIn">
+      <div class="form-zone">
+      <template>
         <form @submit.prevent="login" class="login-form onLoginShowed">
           <h2>SOPE</h2>
           <div class="input-group">
@@ -31,6 +32,9 @@
               </p>
             </div>
           </div>
+          <div class="w-100 text-center" v-if="loginError">
+            <InlineMessage :life="3000">Error de credenciales</InlineMessage>
+          </div>
           <b-row>
             <b-col cols="12" class="d-flex justify-content-start align-items-center mb-3">
               <Checkbox id="binary" :binary="true" v-model="showPassword" />
@@ -46,10 +50,11 @@
           </div>
         </form>
       </template>
-      <template v-else>
-        <SignUp @showLoginForm="showLoginForm" />
-      </template>
-    </div>
+      </div>
+    </template>
+    <template v-else>
+      <SignUp @showLoginForm="showLoginForm" />
+    </template>
   </div>
 </template>
 
@@ -60,10 +65,12 @@ import { useVuelidate } from "@vuelidate/core";
 import services from '../services/Access'
 import { required, helpers, email } from '@vuelidate/validators'
 import { relativeTimeThreshold } from "moment";
+import InlineMessage from 'primevue/inlinemessage';
 export default {
   name: 'LoginComponent',
   components: {
-    SignUp
+    SignUp,
+    InlineMessage
   },
   setup() {
     const credentials = reactive({
@@ -87,12 +94,13 @@ export default {
     return {
       isLoggingIn: true,
       showPassword: false,
-      isLoading: false
+      isLoading: false,
+      loginError: false
     }
   },
   methods: {
     async login(credentials) {
-      this.isLogging = true;
+      this.isLoading = true;
       try {
         const  { data: { id_token, role }, status }  = await services.login(credentials);
 
@@ -103,13 +111,15 @@ export default {
           if (role === "Administrators") {
             this.$router.push({name: 'users'})
           } else if(role === "NormalUsers"){
-            console.log('otro usuario') // cambiar a la ruta de el usuario normal
+            console.log('otro usuario')
           }
-        } else {
-          console.error('Error en el login:', status);
+        }else{
+          this.loginError = true;
         }
       } catch (error) {
-        console.error('Error en el login:', error);
+        this.loginError = true;
+      }finally{
+        this.isLoading = false;
       }
     },
     showSignForm() {
@@ -125,7 +135,7 @@ export default {
 }
 </script>
 
-<style scoped lang="scss">
+<style scoped lang="scss" scoped>
 @import '@/styles/colors.scss';
 
 .login-container {
@@ -278,5 +288,10 @@ input {
   to {
     opacity: 1;
   }
+}
+
+.p-inline-message{
+  width: 80%;
+  font-weight: 350;
 }
 </style>

@@ -3,12 +3,10 @@ export default [
     {
         path: '',
         component: () => import('@/layouts/MainLayout.vue'),
-        meta:{
-            requireAuth: true
-        },
+        meta:{},
         children: [
             ...adminRoutes.map(route => {
-                route.meta.requireAuth = true
+                route.meta.requireAuth = false
                 return {...route}
             }),
         ]

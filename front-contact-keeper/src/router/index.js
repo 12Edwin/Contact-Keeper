@@ -11,23 +11,23 @@ const routes = [
     redirect: "/",
   },
   {
-    path: "/",
-    component: {
-      render(c) {
-        return c("router-view");
-      },
-    },
-    children: [
-      ...privateRoutes.map((route) => {
-        route.meta.requireAuth = true;
-        return { ...route };
-      }),
-      ...publicRoutes.map((route) => {
-        route.meta.requireAuth = false;
-        return { ...route };
-      }),
-    ],
-  },
+    path: '/',
+        component: {
+            render (c){
+                return c("router-view")
+            }
+        },
+        children: [
+            ...privateRoutes.map((route) => {
+                route.meta.requireAuth = true
+                return { ...route };
+            }),
+            ...publicRoutes.map((route) => {
+                route.meta.requireAuth = false
+                return { ...route };
+            }),
+        ],
+   },
   {
     name: "unautorized",
     path: "/unautorized",
@@ -36,17 +36,14 @@ const routes = [
 ];
 
 const router = new VueRouter({
-  mode: "history",
-  base: process.env.BASE_URL,
-  routes,
-});
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes
+})
 
-router.beforeEach(async (to, from, next) => {
-  try {
-    console.log("TO: ", to);
-    console.log("FROM: ", from);
-    
-    const publicRoutes = ["/login", "/signup"];
+
+router.beforeEach((to, from, next) => {
+    const publicRoutes = ["/login"];
     const authRequired = !publicRoutes.includes(to.path);
     const loggedIn = utils.getToken();
 
@@ -55,23 +52,10 @@ router.beforeEach(async (to, from, next) => {
     }
     if (loggedIn) {
       const role = utils.getRoleStorage();
-      console.log(role);
 
-      if (
-        role.toLowerCase() !== "administrators" &&
-        role.toLowerCase() !== "normalusers" &&
-        role !== undefined &&
-        role !== null &&
-        role !== ""
-      ) {
-        console.log("entro al if :)");
-
-        if (
-          to.meta &&
-          to.meta.role &&
-          to.meta.role.toString().toLowerCase() !==
-            role.toString().toLowerCase()
-        ) {
+      if (role) {
+        console.log("entramos al if",to.meta);
+        if (to.meta && to.meta.role && to.meta.role.toString().toLowerCase() !== role.toString().toLowerCase()) {
           return next("/unautorized");
         }
       } else {
@@ -80,14 +64,9 @@ router.beforeEach(async (to, from, next) => {
       next();
     }
     if (loggedIn && to.path.toString().toLowerCase() === "/login") {
-      console.log("entro a redirigir XD");
-
       return next("/users");
     }
     next();
-  } catch (error) {
-    console.log("ERROR: ", error);
-  }
 });
 
 export default router;
