@@ -12,19 +12,28 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-     
+    
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12'
-     
+    
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # Asegúrese de tener este archivo
-     
-      - name: Run tests
-        run: python -m unittest discover tests
+          pip install coverage
+    
+      - name: Run tests with coverage
+        run: |
+          coverage run -m unittest discover -v -s tests/unit
+          coverage xml -o coverage-reports/coverage-python.xml
+          coverage report -m
+    
+      - name: Store coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage-reports/coverage-python.xml
 
   sonarcloud:
     needs: test
@@ -89,7 +98,11 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             PR_COMMITS=$(git log --format=%B ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }})
-            JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP 'SOPE-\d+' | sort -u)
+            if [ $(echo "$PR_COMMITS" | grep -oP 'SOPE-\d+' | sort -u) ]; then
+              JIRA_KEYS=$(echo "$PR_COMMITS" | grep -oP 'SOPE-\d+' | sort -u)
+            else
+              JIRA_KEYS=""
+            fi
           else
             if [ $(echo "${{ github.event.head_commit.message }}" | grep -oP 'SOPE-\d+') ]; then
               JIRA_KEYS=$(echo "${{ github.event.head_commit.message }}" | grep -oP 'SOPE-\d+')
