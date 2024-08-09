@@ -10,7 +10,7 @@ import pymysql
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
     sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
 
-from app import get_cognito_ids, validate_nickname, validate_email, validate_user_type, validate_name, validate_birthday, validate_phone, response_200, response_400, response_500, ErrorType, get_db_connection
+from app import get_cognito_ids, validate_nickname, validate_email, validate_user_type, validate_name, validate_birthday, validate_phone, response_200, response_400, response_500, ErrorType, get_db_connection, exists_user_phone
 
 
 def lambda_handler(event, context):
@@ -40,6 +40,8 @@ def lambda_handler(event, context):
     if not validate_birthday(birthday):
         return response_400(ErrorType.english(ErrorType.INVALID_BIRTHDAY))
     if not validate_phone(phone):
+        return response_400(ErrorType.english(ErrorType.INVALID_PHONE))
+    if exists_user_phone(phone):
         return response_400(ErrorType.english(ErrorType.INVALID_PHONE))
 
     client = boto3.client('cognito-idp')
@@ -84,6 +86,8 @@ def lambda_handler(event, context):
         raise RuntimeError(ErrorType.CONNECTION_ERROR)
     except Exception as e:
         print(e)
+        if 'UsernameExistsException' in str(e):
+            return response_400(ErrorType.english(ErrorType.USER_ALREADY_EXISTS))
         raise RuntimeError(ErrorType.INTERNAL_SERVER_ERROR)
     finally:
         if connection is not None:
@@ -100,14 +104,12 @@ def generate_temporary_password(length=12):
     pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?:{}|<>]).{' + str(length) + r',}$'
 
     while True:
-        # Aseguramos al menos un carácter de cada tipo
         password = (random.choice(lowercase) +
                     random.choice(uppercase) +
                     random.choice(digits) +
                     random.choice(special_characters) +
                     ''.join(random.choices(all_characters, k=length - 4)))
 
-        # Mezclamos la contraseña
         password = ''.join(random.sample(password, len(password)))
 
         if re.match(pattern, password):

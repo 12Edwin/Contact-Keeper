@@ -11,7 +11,7 @@ export default [
                 name: 'login',
                 component: Login,
                 meta: {
-                    title: 'Login'
+                    title: 'Iniciar sesión'
                 }
             }
         ]

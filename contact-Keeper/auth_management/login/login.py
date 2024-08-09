@@ -48,5 +48,9 @@ def lambda_handler(event, context):
             "role": role
         })
     except Exception as e:
-        print(f"Error creating user: {str(e)}")
+        print(f"Error logining: {str(e)}")
+        if str(e).find("UserNotFoundException") != -1:
+            return response_400(ErrorType.english(ErrorType.USER_NOT_FOUND))
+        if str(e).find("NotAuthorizedException") != -1:
+            return response_400(ErrorType.english(ErrorType.INVALID_PASSWORD))
         return response_500()

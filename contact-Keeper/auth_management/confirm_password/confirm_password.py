@@ -50,4 +50,8 @@ def lambda_handler(event, context):
             return response_400("Error setting password: ChallengeName is not NEW_PASSWORD_REQUIRED")
     except Exception as e:
         print(f"Error setting password: {str(e)}")
+        if str(e).find("UserNotFoundException") != -1:
+            return response_400(ErrorType.english(ErrorType.USER_NOT_FOUND))
+        if str(e).find("NotAuthorizedException") != -1:
+            return response_400(ErrorType.english(ErrorType.INVALID_PASSWORD))
         return response_500()

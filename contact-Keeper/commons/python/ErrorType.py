@@ -1,6 +1,8 @@
 class ErrorType:
     INVALID_USERNAME = "Invalid username"
+    INVALID_EMAIL = "Invalid email"
     USER_NOT_FOUND = "User not found"
+    USER_ALREADY_EXISTS = "User already exists"
     INVALID_ID = "Invalid ID"
     INVALID_NAME = "Invalid name"
     INVALID_SURNAME = "Invalid surname"
@@ -25,7 +27,9 @@ class ErrorType:
     def spanish(error_type):
         translations = {
             ErrorType.INVALID_USERNAME: "Nombre de usuario inválido",
+            ErrorType.INVALID_EMAIL: "Correo invalido",
             ErrorType.USER_NOT_FOUND: "Usuario no encontrado",
+            ErrorType.USER_ALREADY_EXISTS: "Usuario ya existe",
             ErrorType.INVALID_ID: "ID inválido",
             ErrorType.INVALID_NAME: "Nombre inválido",
             ErrorType.INVALID_SURNAME: "Apellido inválido",

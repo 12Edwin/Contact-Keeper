@@ -1,7 +1,7 @@
 import router from "@/router";
 import axios from "axios";
 
-const SERVER_URL = process.env.VUE_APP_SERVER_URL;
+const SERVER_URL = process.env.VUE_APP_BASE_URL;
 
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
