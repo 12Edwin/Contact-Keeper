@@ -77,6 +77,8 @@ Vue.config.productionTip = false
 import VueCompositionAPI from '@vue/composition-api'
 Vue.use(VueCompositionAPI)
 
+import VueMoment from 'vue-moment'
+Vue.use(VueMoment)
 
 new Vue({
     router,

@@ -7,7 +7,7 @@ export default [
         path: 'users',
         name: 'users',
         meta: {
-
+            role: "Administrators"
         },
         component: {
             render(c){
@@ -21,7 +21,7 @@ export default [
                 component: Users,
                 meta: {
                     title: 'Usuarios',
-                    role: 'admin'
+                    role: 'Administrators'
                 }
             }
         ]
