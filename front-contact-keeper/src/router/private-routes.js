@@ -3,9 +3,7 @@ export default [
     {
         path: '',
         component: () => import('@/layouts/MainLayout.vue'),
-        meta:{
-            requireAuth: false
-        },
+        meta:{},
         children: [
             ...adminRoutes.map(route => {
                 route.meta.requireAuth = false
