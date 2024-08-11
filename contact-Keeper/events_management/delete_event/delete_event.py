@@ -4,7 +4,7 @@ import boto3
 import pymysql
 
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
-    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'commons', 'python'))
 
 from app import validate_id, exists_by_id, get_db_connection, response_200, response_400, response_500, ErrorType
 
@@ -20,13 +20,14 @@ def lambda_handler(event, context):
 
 
 def delete_event(parameters):
+    _id = parameters.get('id')
+    if not validate_id(_id):
+        raise ValueError(ErrorType.INVALID_ID)
+    if not exists_by_id(_id):
+        raise ValueError(ErrorType.EVENT_NOT_FOUND)
+
     connection = None
     try:
-        _id = parameters.get('id')
-        if not validate_id(_id):
-            raise ValueError(ErrorType.INVALID_ID)
-        if not exists_by_id(_id):
-            raise ValueError(ErrorType.EVENT_NOT_FOUND)
         event = read_event({'id': _id})
         status = 'canceled' if event.get('status') == 'pending' else 'pending'
         connection = get_db_connection()
@@ -48,15 +49,14 @@ def delete_event(parameters):
 
 
 def read_event(parameters):
+    _id = parameters.get('id')
+    if not validate_id(_id):
+        raise ValueError(ErrorType.INVALID_ID)
+    if not exists_by_id(_id):
+        raise ValueError(ErrorType.EVENT_NOT_FOUND)
+
     connection = None
     try:
-
-        _id = parameters.get('id')
-        if not validate_id(_id):
-            raise ValueError(ErrorType.INVALID_ID)
-        if not exists_by_id(_id):
-            raise ValueError(ErrorType.EVENT_NOT_FOUND)
-
         connection = get_db_connection()
         with connection.cursor() as cursor:
             query = """SELECT * FROM events WHERE id = %s"""

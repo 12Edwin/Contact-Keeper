@@ -5,7 +5,7 @@ import sys
 import pymysql
 
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
-    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'commons', 'python'))
 
 from app import ErrorType, get_db_connection, response_200, response_400, response_500, response_403, validate_id, exists_group, get_cognito_ids
 
@@ -25,7 +25,6 @@ def read_events(parameters):
     _id = parameters.get('id')
     if not exists_group(_id):
         raise ValueError(ErrorType.GROUP_NOT_FOUND)
-
     connection = None
     try:
         connection = get_db_connection()

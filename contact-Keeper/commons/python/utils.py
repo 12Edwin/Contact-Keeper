@@ -39,8 +39,7 @@ def validate_birthday(value):
 def validate_phone(value):
     if not isinstance(value, str):
         return False
-    pattern = r"^\d{10}$"
-    if re.match(pattern, value):
+    if len(value) == 10:
         return True
     return False
 

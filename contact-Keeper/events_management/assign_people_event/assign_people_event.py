@@ -1,11 +1,10 @@
 import json
 import os
 import sys
-import boto3
 import pymysql
 
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
-    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'commons', 'python'))
 
 from app import ErrorType, get_db_connection, response_200, response_400, response_500, response_403, validate_id, exists_by_id, get_cognito_ids, exists_group, validate_name, validate_start_date, validate_end_date, validate_event_type, exists_user, validate_opt_name, exists_event
 
@@ -53,7 +52,7 @@ def assign_people_event(event):
             return {'title': title, 'notes': notes, 'reminder': reminder, 'member': member, 'event_id': event_id, 'status': 'pending', 'role': 'member'}
     except pymysql.MySQLError as e:
         print(e)
-        raise RuntimeError(ErrorType.DATABASE_ERROR)
+        raise RuntimeError(ErrorType.CONNECTION_ERROR)
     except Exception as e:
         print(e)
         raise RuntimeError(ErrorType.INTERNAL_SERVER_ERROR)
