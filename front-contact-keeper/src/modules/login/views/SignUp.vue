@@ -287,27 +287,29 @@ export default {
     },
     async signUp() {
       try {
-        if(this.v$.$invalid) return;
-          //this.isLoading = true;
-          this.serverError = null;
-          const response = await services.signUp(this.prepareObject());
-          if(response) {
-            this.isLoading = false;
-            console.log("Hola =>",response.data.message)
-          if(response.data.status === 'success'){
+        if (this.v$.$invalid) return;
+        this.isLoading = true;
+        this.serverError = null;
+        const response = await services.signUp(this.prepareObject());
+        if (response) {
+
+          if (response.status === 'success') {
             this.email = this.newPerson.email
             this.onReady()
-          }else{
+          }
+
+          if (response.status === 'error') {
             const translate = utils.getErrorMessages(response.data.message)
-            const {field, formPart} = utils.messageError(response.data.message)
-            this.serverError = {field, formPart, translate}
-            this.v$[field].$touch(); // Activa la validación manualmente para mostrar el error
+            const { field, formPart } = utils.messageError(response.data.message)
+            this.serverError = { field, formPart, translate }
+            this.v$[field].$touch();
             this.formPart = formPart;
           }
-      };
-      
-      } catch (error) {
-        console.log("error =>", error)
+
+          this.isLoading = false;
+        };
+      } catch (error) {}
+      finally {
         this.isLoading = false;
       }
     },

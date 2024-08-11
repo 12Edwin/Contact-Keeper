@@ -80,6 +80,9 @@ Vue.use(VueCompositionAPI)
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
 
+import VueSweetalert2 from 'vue-sweetalert2';
+Vue.use(VueSweetalert2);
+
 new Vue({
     router,
     render: h => h(App)

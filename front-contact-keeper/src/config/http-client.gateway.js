@@ -1,11 +1,12 @@
 import router from "@/router";
 import axios from "axios";
-
+import { onToast } from "@/kernel/alerts";
+import utils from "@/kernel/utils";
 const SERVER_URL = process.env.VUE_APP_BASE_URL;
 
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
-    timeout: 5000
+    timeout: 20000,
 })
 
 export const getServerUrl = () => SERVER_URL;
@@ -36,15 +37,20 @@ AxiosClient.interceptors.response.use(
      (error) => {
         if(!error.response){
             console.log('Error de conexión', error)
+            onToast('Error de conexión', 'No se ha podido establecer conexión con el servidor', 'error')
             return Promise.reject(error)
         }
         if(error.response.status){
             switch(error.response.status){
+                case 400:
+                    onToast('Campo inválido',`${utils.getErrorMessages(error.response.data.message)}` , 'warning')
+                    return Promise.resolve()
                 case 401:
                     console.log("Error 401")
                     return Promise.resolve()
                 case 500:
                      console.log("Error 500")
+                     onToast('Error interno','Error interno del servidor' , 'error')
                     break;
             }
             return Promise.reject(error)
