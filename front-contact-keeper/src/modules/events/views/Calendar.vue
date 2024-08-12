@@ -1,28 +1,39 @@
 <template>
   <div class="main-content">
     <div class="content">
-      <Panel header="Eventos" class="shadow-lg">
-        <b-row>
-          <b-col cols="12">
-            <Loader v-if="isLoading" key="load" />
-            <div v-else class="calendar-container">
-              <FullCalendar :options="calendarOptions" :events="events" id="myCustomCalendar">
-                <template v-slot:eventContent="{ event }">
-                  <div class="my-custom-event" @click="handleEventClick(event)">
-                    <span class="my-event-dot"></span>
-                    <div class="my-event-info">
-                      <span class="my-event-title"><b>{{ event.title }}</b></span>
-                      <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
+      <b-row>
+        <b-col>
+          <Panel header="Eventos" class="shadow-lg">
+            <b-row>
+              <b-col cols="12">
+                <Loader v-if="isLoading" key="load" />
+                <div v-else class="calendar-container">
+                  <FullCalendar :options="calendarOptions" :events="events" id="myCustomCalendar" v-if="events.length > 0">
+                    <template v-slot:eventContent="{ event }">
+                      <div class="my-custom-event" @click="handleEventClick(event)">
+                        <span class="my-event-dot"></span>
+                        <div class="my-event-info">
+                          <span class="my-event-title"><b>{{ event.title }}</b></span>
+                          <span class="my-event-time">{{ formatCalendarDate(event.start) }} -  {{ formatCalendarDate(event.end) }}</span>
+                        </div>
+                      </div>
+                    </template>
+                  </FullCalendar>
+                  <template v-else>
+                    <div class="no-events-img">
+                      <img src="@/assets/no_events.svg" alt="No hay eventos" />
+                      <p class="no-events-text">¡Aquí verás todos tus eventos por venir!</p>
+                      <Button label="Crear evento" @click="openModalAddEvent()" class="p-button-text p-button-text mt-1 p-button-plain button-styles text" />
                     </div>
-                  </div>
-                </template>
-              </FullCalendar>
-            </div>
-          </b-col>
-        </b-row>
-      </Panel>
-      <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
-      <ModalAddEvent :visible.sync="showModalAddEvent" />
+                  </template>
+                </div>
+              </b-col>
+            </b-row>
+          </Panel>
+          <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
+          <ModalAddEvent :visible.sync="showModalAddEvent" />
+        </b-col>
+      </b-row>
     </div>
   </div>
 </template>
@@ -38,7 +49,6 @@ import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 import moment from 'moment';
 import Panel from 'primevue/panel'
 import Chip from 'primevue/chip';
-
 export default
 {
   name: 'Calendar',
@@ -69,7 +79,7 @@ export default
         customButtons: {
           addEventButton: {
             text: 'Agregar Evento',
-            click: () => this.showModalAddEvent = true,
+            click: this.openModalAddEvent(),
           },
         },
         views: {
@@ -114,11 +124,11 @@ export default
           });
         },
         events: [
-          { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
-          { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
-          { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
-          { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
-          { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
+          // { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
+          // { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
+          // { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
+          // { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
+          // { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
         ],
       },
       isLoading: false,
@@ -126,9 +136,6 @@ export default
     };
   },
   methods: {
-    toggleSidebar() {
-      this.sidebarVisible = !this.sidebarVisible;
-    },
 
     addEvent(eventData) {
       const newEvent = {
@@ -165,6 +172,10 @@ export default
     },
     formatCalendarDate(date){
       return moment(date).format('YYYY-MM-DD');
+    },
+
+    openModalAddEvent() {
+      this.showModalAddEvent = true;
     },
   },
 }
@@ -273,7 +284,8 @@ export default
 </style>
 
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/styles/colors.scss';
 /* Estilos existentes */
 .main-content {
   display: flex;
@@ -285,4 +297,39 @@ export default
   margin-left: 0;
   transition: margin-left 0.3s;
 }
+.no-events-img{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.no-events-text{
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+  
+}
+.button-styles{
+  width: 15% !important;
+  padding: 0.50rem !important;
+  background-color: black !important;
+  color: white !important;
+  border: none;
+  border-radius: 9px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  justify-content: center;
+}
+
+.button-styles:hover{
+   transform: translateY(-5px);
+   box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
+   background: $primary-color !important;
+   border: none;
+   cursor: pointer;
+ }
+
 </style>

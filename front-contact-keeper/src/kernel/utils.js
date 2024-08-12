@@ -37,6 +37,14 @@ const getUserFromToke = () => {
   return jwtDecode(token).name;
 }
 
+const getIdUserFromToke = () =>{
+  const token = getToken();
+  if (!token) {
+    return null;
+  }
+
+  return jwtDecode(token).sub;
+}
 
 const validAge = (birthday) => {
   return true
@@ -81,6 +89,7 @@ const getErrorMessages = (errorCode) => {
     "Invalid birthday": "Fecha de nacimiento inválida",
     "Invalid phone": "Teléfono inválido",
     "Invalid email": "Correo inválido",
+    "Invalid password": "Credenciales inválidas",
   }
   return errorMessages[errorCode] || 'Ocurrió un error desconocido en el servidor';
 }
@@ -94,5 +103,6 @@ export default {
   getUserFromToke,
   validAge,
   messageError,
-  getErrorMessages
+  getErrorMessages,
+  getIdUserFromToke
 };

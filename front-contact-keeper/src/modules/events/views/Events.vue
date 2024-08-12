@@ -3,7 +3,7 @@
     <div class="content">
       <Panel header="Eventos">
         <div class="event-actions">
-            <InputText v-model="search" placeholder="Buscar..." />
+            <InputText v-model="search" placeholder="Buscar..." /> 
             <Button label="Agregar evento" icon="pi pi-plus" class="p-ml-2 btn_open_modal" @click="showModal = true" />
           </div>
         <DataTable :value="events">

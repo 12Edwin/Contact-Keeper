@@ -54,7 +54,6 @@ router.beforeEach((to, from, next) => {
       const role = utils.getRoleStorage();
 
       if (role) {
-        console.log("entramos al if",to.meta);
         if (to.meta && to.meta.role && to.meta.role.toString().toLowerCase() !== role.toString().toLowerCase()) {
           return next("/unautorized");
         }
