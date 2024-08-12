@@ -33,8 +33,13 @@ import Divider from "primevue/divider";
 import Password from "primevue/password";
 import Dropdown from 'primevue/dropdown';
 import Checkbox from 'primevue/checkbox';
-
-
+import Textarea from 'primevue/textarea';
+import TabView from 'primevue/tabview';
+import TabPanel from 'primevue/tabpanel';
+import ScrollPanel from 'primevue/scrollpanel';
+import Accordion from 'primevue/accordion';
+import AccordionTab from 'primevue/accordiontab';
+import Calendar from 'primevue/calendar';
 Vue.component('Button', Button)
 Vue.component('Panel', Panel)
 Vue.component('InputText', InputText)
@@ -53,6 +58,13 @@ Vue.component('Dropdown', Dropdown)
 Vue.component('Checkbox', Checkbox)
 Vue.directive('tooltip', Tooltip);
 Vue.component('Card', Card)
+Vue.component('Textarea', Textarea)
+Vue.component('TabView', TabView)
+Vue.component('TabPanel', TabPanel)
+Vue.component('ScrollPanel', ScrollPanel)
+Vue.component('Accordion', Accordion)
+Vue.component('AccordionTab', AccordionTab)
+Vue.component('Calendar', Calendar)
 // PrimeVue services
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'
@@ -79,6 +91,9 @@ Vue.use(VueCompositionAPI)
 
 import VueMoment from 'vue-moment'
 Vue.use(VueMoment)
+
+import VueSweetalert2 from 'vue-sweetalert2';
+Vue.use(VueSweetalert2);
 
 new Vue({
     router,

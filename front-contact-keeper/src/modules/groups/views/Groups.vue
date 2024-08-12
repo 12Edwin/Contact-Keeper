@@ -71,7 +71,7 @@ export default {
     }
   },
   mounted() {
-    this.getAllGroups();
+    //this.getAllGroups();
   },
   methods: {
     getInitial(name){

@@ -38,3 +38,25 @@ export const onSuccess = async (title, text) => {
         text: text
     })
 }
+
+
+
+export const onToast = (title, text, icon) => {
+    const Toast = SweetAlert.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = SweetAlert.stopTimer;
+          toast.onmouseleave = SweetAlert.resumeTimer;
+        }
+      });
+    Toast.fire({
+        icon,
+        title,
+        text
+    });
+      
+}

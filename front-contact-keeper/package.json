@@ -28,9 +28,10 @@
     "sweetalert2": "^11.10.7",
     "vue": "^2.6.14",
     "vue-axios": "^3.5.2",
+    "vue-moment": "^4.1.0",
     "vue-router": "^3.5.1",
-    "vuelidate": "^0.7.7",
-    "vue-moment": "^4.1.0"
+    "vue-sweetalert2": "^5.0.11",
+    "vuelidate": "^0.7.7"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",
