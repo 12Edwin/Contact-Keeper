@@ -53,4 +53,6 @@ def lambda_handler(event, context):
             return response_400(ErrorType.english(ErrorType.USER_NOT_FOUND))
         if str(e).find("NotAuthorizedException") != -1:
             return response_400(ErrorType.english(ErrorType.INVALID_PASSWORD))
+        if 'AuthenticationResult' in str(e):
+            return response_400(ErrorType.english(ErrorType.INVALID_PASSWORD))
         return response_500()
