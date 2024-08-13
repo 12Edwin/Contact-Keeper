@@ -154,6 +154,14 @@ Resources:
             Method: OPTIONS
             Auth:
               Authorizer: NONE
+        OptionsMethodGroups:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /{proxy+}
+            Method: OPTIONS
+            Auth:
+              Authorizer: NONE
 
   UsersApiGateway:
     Type: AWS::Serverless::Api
