@@ -28,8 +28,8 @@
                     <div class="card-header">
                       <div class="card-header-text">
                         <h2>{{group.name}}</h2>
-                        <p>Mayo-Agosto 2024</p>
-                        <p>Miguel Rosemberg</p>
+                        <p>{{ group.title }}</p>
+                        <p>{{ group.created_at }}</p>
                       </div>
                       <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
                     </div>
@@ -39,6 +39,19 @@
                     </div>
                   </div>
                 </template>
+              </b-col>
+               <!-- Skeleton loading -->
+               <b-col cols="12" lg="4" md="6" v-if="isLoading" v-for="n in 3" :key="n">
+                <div class="card skeleton mb-4">
+                  <div class="card-header">
+                    <div class="card-header-text">
+                      <div class="skeleton-text skeleton-title"></div>
+                      <div class="skeleton-text skeleton-subtitle"></div>
+                      <div class="skeleton-text skeleton-subtitle"></div>
+                    </div>
+                    <div class="skeleton-image"></div>
+                  </div>
+                </div>
               </b-col>
             </b-row>
           </template>
@@ -71,6 +84,7 @@ export default {
     return {
       groups: [],
       showInfo: false,
+      isLoading: true,
       groupSelected: {},
       showModalSave: false,
       showModalEdit: false
@@ -93,11 +107,18 @@ export default {
     },
     async getGroups() {
         try {
-          const response = await getGroupsByUserId("74784438-8021-7044-a032-4ad6841754fa");
-          console.log("data: ", response);
+          const response = await getGroupsByUserId();
           this.groups = response.data;
         } catch (error) {
           console.error(error);
+      }
+    },
+    async deleteGroup(group){
+      try {
+        await deleteGroup(group.id);
+        this.getGroups();
+      } catch (error) {
+        console.error(error);
       }
     }
   }
@@ -173,6 +194,35 @@ export default {
 
 .icon-camera {
   margin-right: 16px;
+}
+.skeleton {
+  background: #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: none;
+}
+
+.skeleton-text {
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 70%;
+}
+
+.skeleton-subtitle {
+  height: 16px;
+  width: 50%;
+}
+
+.skeleton-image {
+  background-color: #e0e0e0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
 }
 
 </style>

@@ -16,22 +16,27 @@
       <b-row>
         <b-col cols="12" class="mb-3">
           <div class="user-list-header">
-            <h5>Integrantes</h5>
+            <h5>Título</h5>
           </div>
         </b-col>
-        <b-col cols="12" v-for="(member, userIndex) in selectedGroup.members" :key="userIndex" class="mb-2">
-          <div class="user-list d-flex justify-content-between align-items-center">
-            <div class="user-info-container d-flex align-items-center">
-              <Avatar :label="member.name.charAt(0)" shape="circle" size="small"/>
-              <div class="user-info">
-                <label class="username">{{ member.name }}</label>
-                <p class="role">{{ member.role }}</p>
-              </div>
-            </div>
-            <div class="icon-container">
-              <i class="pi pi-minus-circle icon-styles" v-tooltip.right="'Expulsar'"></i>
-            </div>
+        <b-col cols="12" class="mb-3">
+          <p>{{selectedGroup.title}}</p>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <div class="user-list-header">
+            <h5>Descripción</h5>
           </div>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <p>{{selectedGroup.description}}</p>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <div class="user-list-header">
+            <h5>Notas</h5>
+          </div>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <p>{{selectedGroup.notes}}</p>
         </b-col>
       </b-row>
     </template>
@@ -63,12 +68,9 @@ export default {
       selectedGroup :{
         name: '',
         description: '',
-        members: [
-          {
-            name: '',
-            role: ''
-          }
-        ]
+        title: '',
+        status: '',
+        notes: '',
       }
     }
   },

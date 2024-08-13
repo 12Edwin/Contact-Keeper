@@ -79,7 +79,7 @@
         </b-row>
       </div>
       <template #footer>
-        <Button @click="saveGroup" label="Guardar" icon="pi pi-check" iconPos="right" class="button-options"/>
+        <Button @click="saveGroupForMember" label="Guardar" icon="pi pi-check" iconPos="right" class="button-options" :disabled="isLoading" />
         <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-plain" iconPos="right" @click="closeModal"/>
       </template>
     </Dialog>
@@ -90,6 +90,8 @@
   import { useVuelidate } from '@vuelidate/core';
   import { required, maxLength } from '@vuelidate/validators';
   import { helpers } from '@vuelidate/validators';
+  import { saveGroup } from '../services/groups-services';
+  import { onToast } from '@/kernel/alerts';
   
   export default defineComponent({
     name: 'ModalCreateGroup',
@@ -101,6 +103,11 @@
     },
     components: {
     },
+    data() {
+      return {
+        isLoading: false
+      };
+    },
     setup(props, { emit }) {
       // Initial form data
       const group = reactive({
@@ -109,6 +116,7 @@
         title: '',
         notes: ''
       });
+
   
       // Validation rules
       const rules = {
@@ -117,13 +125,15 @@
           maxLength: helpers.withMessage("El nombre del grupo debe tener menos de 50 caracteres", maxLength(50))
         },
         title: {
-          maxLength: helpers.withMessage("El título debe tener menos de 50 caracteres", maxLength(50))
+          required: helpers.withMessage('El título es requerido', required),
+          maxLength: helpers.withMessage("El título debe tener menos de 20 caracteres", maxLength(50))
         },
         description: {
-          maxLength: helpers.withMessage("La descripción debe tener menos de 200 caracteres", maxLength(200))
+          required: helpers.withMessage('La descripción es requerida', required),
+          maxLength: helpers.withMessage("La descripción debe tener menos de 50 caracteres", maxLength(50))
         },
         notes: {
-          maxLength: helpers.withMessage("Las notas deben tener menos de 200 caracteres", maxLength(200))
+          maxLength: helpers.withMessage("Las notas deben tener menos de 70 caracteres", maxLength(70))
         }
       };
   
@@ -135,25 +145,31 @@
         emit('update:visible', false);
       };
   
-      // Function to save group data
-      const saveGroup = () => {
-        v$.value.$touch(); // Touch all fields to trigger validation messages
+      const saveGroupForMember = async () => {
+        this.isLoading = true;
+        v$.value.$touch(); 
         if (v$.value.$invalid) {
-          console.log('Formulario inválido');
           return;
         }
-        console.log('Guardando grupo');
-        console.log(group);
-        // Aquí puedes emitir un evento o hacer algo con los datos del grupo
-        closeModal();
+
+        try {
+          const response = await saveGroup(group);
+          if (response.status === 200 || response.status === 201 || response.status === "success") {
+            onToast('success', 'Grupo creado correctamente', 'success');  
+          }
+          this.isLoading = false;
+          closeModal();
+        } catch (error) {
+          this.isLoading = false;
+          closeModal();
+        }
       };
   
-      // Return data and methods
       return {
         group,
         v$,
         closeModal,
-        saveGroup
+        saveGroupForMember,
       };
     }
   });
