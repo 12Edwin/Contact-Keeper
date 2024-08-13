@@ -1,3 +1,9 @@
 .idea
 .idea/*
 yarn.lock
+contact-Keeper/events_management/read_events_person/__pycache__/*
+contact-Keeper/events_management/unassign_people_event/__pycache__/*
+contact-Keeper/events_management/update_event/__pycache__/*
+contact-Keeper/tests/__pycache__/*
+contact-Keeper/tests/unit/__pycache__/__init__.cpython-312.pyc
+contact-Keeper/tests/__pycache__/__init__.cpython-312.pyc

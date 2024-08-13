@@ -1,68 +1,132 @@
 <template>
   <Dialog
-    header="Agregar Nuevo Evento"
+    header="Nuevo Evento"
     :modal="true"
     :closeOnEscape="false"
     :closable="false"
     :visible.sync="visible"
     position="center"
-    :contentStyle="{ overflow: 'visible', width: '35vw' }"
+    :contentStyle="{ overflow: 'visible', width: '50vw' }"
     class="custom-dialog"
     :autoZIndex="true"
   >
-    <div class="event-form">
+    <div class="p-fluid grid">
       <b-row>
-        <b-col cols="12">
-          <div class="form-group">
-            <label for="title">Título</label>
-            <InputText v-model="v$.title.$model" type="text" class="form-control" id="title" placeholder="Título del Evento" @input="v$.title.$touch"/>
-            <small class="p-error" v-if="v$.title.$error">{{ v$.title.$errors[0].$message }}</small>
-          </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12">
-          <div class="form-group">
-            <label for="description">Descripción</label>
-            <textarea v-model="v$.description.$model" class="form-control" id="description" placeholder="Descripción del Evento" @input="v$.description.$touch"></textarea>
-            <small class="p-error" v-if="v$.description.$error">{{ v$.description.$errors[0].$message }}</small>
-          </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <span class="p-float-label">
-              <Dropdown id="type" :options="types" v-model="v$.type.$model" optionLabel="label" class="full-width-dropdown" @change="v$.type.$touch"/>
-              <label for="type">Tipo</label>
+        <b-col cols="6">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-bookmark"/>
+              <InputText id="field-event-title" v-model="v$.title.$model" :class="{ 'invalid-field-custom': v$.title.$error }" />
+              <label for="field-event-title" class="form-label-required">Título</label>
             </span>
-            <small class="p-error" v-if="v$.type.$error">{{ v$.type.$errors[0].$message }}</small>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.required.$invalid">
+                {{ v$.title.required.$message }}
+              </p>
+              <p class="error-messages"
+                 v-if="v$.title.$dirty && v$.title.onlyLetters.$invalid">
+                {{ v$.title.onlyLetters.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.minLength.$invalid">
+                {{ v$.title.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.maxLength.$invalid">
+                {{ v$.title.maxLength.$message }}
+              </p>
+            </div>
           </div>
         </b-col>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <span class="p-float-label">
-              <Dropdown id="participants" :options="invites" v-model="v$.participants.$model" optionLabel="label" class="full-width-dropdown" @change="v$.participants.$touch"/>
-              <label for="participants">Participantes</label>
+        <b-col cols="6">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <Dropdown id="field-event-type" v-model="v$.type.$model" :options="types" optionLabel="label"  optionValue="value"/>
+              <label for="field-event-type" class="form-label-required">Tipo:</label>
             </span>
-            <small class="p-error" v-if="v$.participants.$error">{{ v$.participants.$errors[0].$message }}</small>
           </div>
         </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <label for="start">Fecha de Inicio</label>
-            <input v-model="v$.startDate.$model" type="date" class="form-control" id="start" :min="today" @input="v$.startDate.$touch">
-            <small class="p-error" v-if="v$.startDate.$error">{{ v$.startDate.$errors[0].$message }}</small>
+        <b-col cols="12" class="mt-2">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <Textarea id="field-event-description" rows="3" cols="30" v-model="v$.description.$model" :class="{ 'invalid-field-custom': v$.description.$error }" />
+              <label for="field-event-description" class="form-label-required">Descripción</label>
+            </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.required.$invalid">
+                {{ v$.description.required.$message }}
+              </p>
+              <p class="error-messages"
+                 v-if="v$.description.$dirty && v$.description.onlyLetters.$invalid">
+                {{ v$.description.onlyLetters.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.minLength.$invalid">
+                {{ v$.description.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.maxLength.$invalid">
+                {{ v$.description.maxLength.$message }}
+              </p>
+            </div>
           </div>
         </b-col>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <label for="end">Fecha de Fin</label>
-            <input v-model="v$.endDate.$model" type="date" class="form-control" id="end" :min="v$.startDate.$model" @input="v$.endDate.$touch">
-            <small class="p-error" v-if="v$.endDate.$error">{{ v$.endDate.$errors[0].$message }}</small>
+        <b-col cols="12">
+          <div>
+            <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-calendar"/>
+              <Calendar v-model="v$.dates.$model" selectionMode="range" />
+              <label for="field-event-dates" class="form-label-required">Duración</label>
+            </span>
           </div>
+        </b-col>
+        <b-col cols="12" class="mt-3">
+          <TabView >
+            <TabPanel header="Usuarios">
+              <ScrollPanel style="width: 100%; height: 160px">
+                <template v-if="invites.length > 0">
+                  <div class="user-list d-flex justify-content-between align-items-center" v-for="(member, userIndex) in invites" :key="userIndex">
+                    <div class="user-info-container d-flex align-items-center mb-2">
+                      <Avatar :label="member.name.charAt(0)" shape="circle" size="small"/>
+                      <div class="user-info">
+                        <label class="username">{{ member.name }}</label>
+                        <p class="role">{{ member.email }}</p>
+                      </div>
+                    </div>
+                    <div class="icon-container">
+                      <Checkbox :binary="true" />
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="no-events-img">
+                    <img src="@/assets/User_empty.svg" alt="Sin usuarios" style="width: 120px; height: 120px;"/>
+                      <p class="no-events-text">Sin usuarios</p>
+                  </div>
+                </template>
+              </ScrollPanel>
+            </TabPanel>
+            <TabPanel header="Grupos">
+              <ScrollPanel style="width: 100%; height: 160px;">
+                <template v-if="groups.length > 0">
+                  <div class="user-list d-flex justify-content-between align-items-center" v-for="(group, userIndex) in groups" :key="userIndex">
+                    <div class="user-info-container d-flex align-items-center mb-2">
+                      <Avatar :label="group.name.charAt(0)" shape="circle" size="small"/>
+                      <div class="user-info">
+                        <label class="username">{{ group.name }}</label>
+                        <p class="role">{{ eventStatus(group.status) }}</p>
+                      </div>
+                    </div>
+                    <div class="icon-container">
+                      <Checkbox :binary="true" />
+                    </div>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="no-events-img">
+                    <img src="@/assets/inbox_empty.svg" alt="Sin usuarios" style="width: 120px; height: 120px;"/>
+                      <p class="no-events-text">Sin grupos</p>
+                  </div>
+                </template>
+              </ScrollPanel>
+            </TabPanel>
+          </TabView>
         </b-col>
       </b-row>
     </div>
@@ -82,7 +146,10 @@ import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import {phraseRegex} from "@/kernel/patterns.js";
-
+import Textarea from 'primevue/textarea/Textarea';
+import ScrollPanel from 'primevue/scrollpanel/ScrollPanel';
+import groupService from '@/modules/groups/services/groups-services';
+import utils from '@/kernel/utils';
 export default {
   name: 'ModalAddEvent',
   components: {
@@ -100,13 +167,20 @@ export default {
   data() {
     return {
       types: [
-        { label: 'Cumpleaños', value: 'tipo1' },
-        { label: 'Tipo 2', value: 'tipo2' }
+        { label: 'Reunión', value: 'meeting' },
+        { label: 'Sesión', value: 'session' },
+        {label: 'Cumpleaños', value: 'birthday'},
+        {label: 'Otro', value: 'other'}
       ],
       invites: [
-        { label: 'Merri Chrismas', value: 'invitado1' },
-        { label: 'Isa Palacios', value: 'invitado2' },
-        { label: 'Typescrips', value: 'invitado3' }
+        // { name: 'Merri Chrismas', email: '20213tn103@utez.edu.mx' },
+        // { name: 'Isa Palacios', email: '20213tn103@utez.edu.mx' },
+        // { name: 'Typescrips', email: '20203tn103@utez.edu.mx' }
+      ],
+      groups: [
+        // { name: 'Grupo 1', status: 'active' },
+        // { name: 'Grupo 2', status: 'pending' },
+        // { name: 'Grupo 3', status: 'active' }
       ],
       today: new Date().toISOString().split('T')[0]
     };
@@ -115,8 +189,7 @@ export default {
     const eventData = reactive({
       title: '',
       description: '',
-      startDate: '',
-      endDate: '',
+      dates: null,
       type: null,
       participants: null
     });
@@ -134,17 +207,17 @@ export default {
         minLength: helpers.withMessage("La descripción debe tener al menos 3 caracteres", minLength(3)),
         maxLength: helpers.withMessage("La descripción debe tener máximo 70 caracteres", maxLength(70))
       },
-      startDate: {
+      dates: {
         required: helpers.withMessage('La fecha de inicio del evento es requerida', required),
-      },
-      endDate: {
-        required: helpers.withMessage('La fecha de fin del evento es requerida', required),
       },
       type: {
         required: helpers.withMessage('El tipo de evento es requerido', required),
       },
       participants: {
         required: helpers.withMessage('El tipo de evento es requerido', required),
+      },
+      dates: {
+        required: helpers.withMessage('La fecha de inicio y de fin son requeridos', required),
       }
     };
 
@@ -159,7 +232,22 @@ export default {
     saveEvent() {
       console.log(this.eventData);
       this.closeModal(); 
+    },
+    eventStatus(status){
+      return status=== 'pending' ? 'Pendiente' : 'Activo';
+    },
+    async getUsergroups(){
+      const id = utils.getIdUserFromToke()
+      const response = await groupService.getGroupsByUserId(id)
+      if(response){
+        if(response.status === "success"){
+          this.groups = response.data
+        }
+      }
     }
+  },
+  mounted(){
+    this.getUsergroups()
   }
 };
 </script>
@@ -167,22 +255,78 @@ export default {
 
 <style scoped lang="scss">
  @import '@/styles/colors';
- .field {
-    margin-bottom: 1rem;
-  }
+
+ .no-events-img{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.no-events-text{
+  margin-top: 0.2rem;
+  font-size: 1.0rem;
+  color: #333;
+  
+}
+
+ .fields {
+    margin-bottom: 1.3rem !important;
+ }
   .full-width-dropdown {
     width: 100%;
   }
-  .event-form {
-    margin: 1rem;
-  }
-  .form-group {
-    margin-bottom: 1rem;
-  }
-  .invalid-field-custom {
-    border-color: $red-color;
-  }
-  .p-error {
-    color: $red-color;
-  }
+  .form-label-required::after {
+  content: " *";
+  color: $red-color;
+}
+
+.invalid-field-custom {
+  border-color: $red-color !important;
+  box-shadow: 0 0 3px $shadows !important;
+}
+
+.error-messages {
+  margin-bottom: 0;
+  font-weight: 350;
+  font-size: 15px;
+}
+
+.error-messages::before {
+  content: "* ";
+  color: $red-color;
+}
+
+.user-list {
+  border-bottom: solid 1px #dddddd;
+  display: flex;
+  align-items: center;
+  padding: 0.2rem;
+  width: 100%;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.role {
+  margin: 0;
+  font-size: 12px;
+  color: #808080;
+}
+
+.icon-container {
+  background: transparent;
+  margin-right: 15px;
+}
+
 </style>

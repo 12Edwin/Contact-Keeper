@@ -52,6 +52,8 @@
 import BadgeDirective from 'primevue/badgedirective';
 import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
+import groupService from '../services/groups-services';
+
 export default {
   name: 'Groups',
   directives:{
@@ -63,104 +65,31 @@ export default {
   },
   data() {
     return {
-      groups: [
-        { name: 'Grupo Salud',
-          description: 'Descripción del grupo 1',
-          members: [
-            {
-              name: 'Raúl Domínguez Bravo',
-              role: 'Moderador'
-            },
-            {
-              name: 'Josafat Muñoz',
-              role: 'Invitado'
-            },
-            {
-              name: 'Obed Hurtado',
-              role: 'Invitado'
-            }
-          ]
-        },
-        { name: 'Sesión',
-          description: 'Descripción del grupo 2',
-          members: [
-            {
-              name: 'Edwin Barragán',
-              role: 'Invitado'
-            },
-            {
-              name: 'Carlos González',
-              role: 'Moderador'
-            }
-          ]
-        },
-        { name: 'Cumpleaños',
-          description: 'Descripción del grupo 3',
-          members: [
-            {
-              name: 'Noe Martinez',
-              role: 'Invitado'
-            },
-            {
-              name: 'Nohemi Aragón',
-              role: 'Moderador'
-            }
-          ]
-        },
-        { name: 'Capacitación',
-          description: 'Descripción del grupo 4',
-          members: [
-            {
-              name: 'José Narváez Figueroa',
-              role: 'Moderador'
-            },
-            {
-              name: 'Nathaly Escalona',
-              role: 'Invitado'
-            }
-          ]
-        },
-        {
-          name: 'Reunión',
-          description: 'Descripción del grupo 5',
-          members: [
-            {
-              name: 'Yahir Degante',
-              role: 'Invitado'
-            },
-            {
-              name: 'Noé Mérida',
-              role: 'Moderador'
-            }
-          ]
-        },
-        {
-          name: 'Clase',
-          description: 'Descripción del grupo 6',
-          members: [
-            {
-              name: 'Erick Mireles',
-              role: 'Moderador'
-            },
-            {
-              name: 'Mónica Sotelo',
-              role: 'Invitado'
-            }
-          ]
-        },
-      ],
+      groups: [],
       showInfo: false,
       groupSelected: {}
     }
   },
+  mounted() {
+    //this.getAllGroups();
+  },
   methods: {
-   getInitial(name){
-     const initials = name.split(' ');
+    getInitial(name){
+      const initials = name.split(' ');
       return initials.length > 1 ? initials[0].charAt(0) + initials[1].charAt(0) : initials[0].charAt(0);
-   },
+    },
     openInfoModal(group){
-     this.groupSelected = JSON.parse(JSON.stringify(group));
+      this.groupSelected = JSON.parse(JSON.stringify(group));
       this.showInfo = true;
+    },
+    getAllGroups() {
+      groupService.getAllGroups()
+        .then(response => {
+          this.groups = response.data;
+        })
+        .catch(error => {
+          console.error('Error al obtener grupos:', error);
+        });
     }
   }
 }

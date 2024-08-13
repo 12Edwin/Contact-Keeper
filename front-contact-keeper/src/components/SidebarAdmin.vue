@@ -43,7 +43,7 @@ export default {
         {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users'},
         {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar'},
         {label: 'Anuncios', icon: 'pi pi-fw pi-megaphone'},
-        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap'}
+        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups'}
       ]
     }
   },
