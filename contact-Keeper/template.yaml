@@ -183,8 +183,8 @@ Resources:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
       Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
 
   GroupsApiGateway:
@@ -199,8 +199,8 @@ Resources:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
       Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
 
   CreateUserFunction:
