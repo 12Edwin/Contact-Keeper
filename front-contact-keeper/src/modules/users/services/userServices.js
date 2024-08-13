@@ -2,7 +2,7 @@ import api from "@/config/http-client.gateway";
 
 const get_users = async () => {
   try {
-    const response = await api.doGet("/users");
+    const response = await api.axiosClientApi.doGet("/users");
     return response.data;
   } catch (error) {
     return error.response;
@@ -11,11 +11,7 @@ const get_users = async () => {
 
 const save_user = async (person) => {
   try {
-    const response = await api.doPost("/users", person,{
-      headers: {
-        "Content-Type": "text/plain"
-      }
-    });
+    const response = await api.axiosClientApi.doPost("/users", person);
     return response.data
   } catch (error) {
     return error.response;

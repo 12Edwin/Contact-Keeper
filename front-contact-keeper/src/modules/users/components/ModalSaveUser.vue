@@ -57,17 +57,37 @@
           <div class="field">
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-user" />
-              <InputText id="field-lastname" v-model="v$.lastname.$model"
-                :class="{ 'invalid-field-custom': v$.lastname.$error }" />
-              <label for="field-lastname">Apellido materno</label>
+              <InputText id="field-last_name" v-model="v$.last_name.$model"
+                :class="{ 'invalid-field-custom': v$.last_name.$error }" />
+              <label for="field-last_name">Apellido materno</label>
             </span>
             <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.lastname.$dirty && v$.lastname.onlyLetters.$invalid">
-                {{ v$.lastname.onlyLetters.$message }}
+              <p class="error-messages" v-if="v$.last_name.$dirty && v$.last_name.onlyLetters.$invalid">
+                {{ v$.last_name.onlyLetters.$message }}
               </p>
             </div>
           </div>
         </b-col>
+        <b-col class="mt-3 mb-3" lg="4">
+          <div class="field">
+            <div class="input-group-row">
+              <div class="input-group-cols-6">
+                <label for="birthday" class="form-label-required">Nacimiento:</label>
+                <input type="date" id="birthday" required v-model="v$.birthday.$model"
+                  :class="{ 'invalid-field-custom': v$.birthday.$error }" />
+                <div class="text-danger text-start pt-2">
+                  <p class="error-messages" v-if="v$.birthday.$dirty && v$.birthday.required.$invalid">
+                    {{ v$.birthday.required.$message }}
+                  </p>
+                  <p class="error-messages" v-if="serverError && serverError.field === 'birthday'">
+                    {{ serverError.translate }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </b-col>
+
       </b-row>
       <b-row>
         <b-col cols="12">
@@ -209,8 +229,8 @@ export default {
     return {
       show: false,
       userTypes: [
-        { name: 'Administrador', code: 'Administrators' },
-        { name: 'Usuario', code: 'NormalUsers' }
+        { name: 'Administrador', code: 'admin' },
+        { name: 'Usuario', code: 'normal' }
       ],
       selectedUser: null
     }
@@ -219,12 +239,13 @@ export default {
     const person = reactive({
       name: '',
       surname: '',
-      lastname: '',
+      last_name: '',
       email: '',
       phone: '',
       password: '',
       user_type: '',
-      username: ''
+      username: '',
+      birthday: ''
     })
 
     const rules = {
@@ -240,7 +261,7 @@ export default {
         minLength: helpers.withMessage("El apellido debe tener al menos 3 caracteres", minLength(3)),
         maxLength: helpers.withMessage("El apellido debe tener menos de 50 caracteres", maxLength(60))
       },
-      lastname: {
+      last_name: {
         onlyLetters: helpers.withMessage('El apellido materno solo puede contener letras', (value) => noRequiredField.test(value)),
       },
       email: {
@@ -264,6 +285,9 @@ export default {
         onlyLetters: helpers.withMessage('El nombre de usuario solo puede contener letras y numeros', (value) => nameRegex.test(value)),
         minLength: helpers.withMessage("El nombre debe tener al menos 3 caracteres", minLength(3)),
         maxLength: helpers.withMessage("El nombre debe tener menos de 10 caracteres", maxLength(10))
+      },
+      birthday: {
+        required: helpers.withMessage('La fecha de nacimiento es requerida', required),
       }
 
     }
@@ -279,11 +303,12 @@ export default {
         this.isLoading = true
 
         try {
-          const { status } = await service.save_user(this.prepareObject());
+          const { status, message } = await service.save_user(this.person);
           if (status === "success") {
             onSuccess("¡Éxito!", "¡Usuario guardado correctamente!");
+            this.closeModal()
           } else {
-            console.log(error);
+            console.log(message);
             console.log(this.person.user_type);
           }
         } catch (error) {
@@ -294,13 +319,17 @@ export default {
         onError("¡Error!", "¡Debes completar los campos correctamente!");
       }
     },
+    formmatDate(date) {
+      return moment(date).format('YYYY-MM-DD')
+    },
     prepareObject() {
       return {
         username: this.person.username,
         name: this.person.name,
-        last_name: this.person.lastname,
+        last_name: this.person.last_name,
         surname: this.person.surname,
         phone: this.person.phone,
+        birthday: this.formmatDate(this.person.birthday),
         email: this.person.email,
         password: this.person.password,
         user_type: this.person.user_type
@@ -346,5 +375,16 @@ export default {
 .error-messages::before {
   content: "* ";
   color: $red-color;
+}
+
+.input-group-cols-6 {
+  width: 48%;
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.input-group-row {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

@@ -17,7 +17,7 @@
           </div>
           <div>
             <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
-              <Column :headerStyle="config" class="ctm-name" field="name" header="Nombre" />
+              <Column :headerStyle="config" class="ctm-name" :field="formatName"  header="Nombre"/>
               <Column :headerStyle="config" field="phone" header="Numero de Telefono" />
               <Column :headerStyle="config" field="email" header="Correo Electronico" />
             </DataTable>
@@ -83,12 +83,13 @@ export default {
       const { data, status } = await services.get_users()
       if (status === "success") {
         this.users = data;
-        console.log(this.users  );
-        
       } else {
         onError('Error', 'Ha ocurrido un error inesperado').then(() => { })
       }
       this.isLoading = false
+    },
+    formatName(users) {
+      return `${users.name} ${users.last_name}`;
     }
   },
   mounted(){
