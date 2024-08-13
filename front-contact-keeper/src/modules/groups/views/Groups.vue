@@ -15,6 +15,7 @@
                     label="Nuevo grupo"
                     iconPos="right"
                     icon="pi pi-sitemap"
+                    @click="openSaveModal"
                 />
               </b-col>
             </b-row>
@@ -42,6 +43,7 @@
             </b-row>
           </template>
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
+          <ModalCreateGroup :visible.sync="showModalSave"/>
         </div>
       </Panel>
     </div>
@@ -52,7 +54,8 @@
 import BadgeDirective from 'primevue/badgedirective';
 import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
-import groupService from '../services/groups-services';
+import ModalCreateGroup from '../components/ModalSaveGroup.vue';
+import {getGroupsByUserId } from '../services/groups-services';
 
 export default {
   name: 'Groups',
@@ -61,17 +64,20 @@ export default {
     'tooltip': Tooltip
   },
   components: {
-    Announcements
+    Announcements,
+    ModalCreateGroup
   },
   data() {
     return {
       groups: [],
       showInfo: false,
-      groupSelected: {}
+      groupSelected: {},
+      showModalSave: false,
+      showModalEdit: false
     }
   },
   mounted() {
-    //this.getAllGroups();
+    this.getGroups();
   },
   methods: {
     getInitial(name){
@@ -82,14 +88,17 @@ export default {
       this.groupSelected = JSON.parse(JSON.stringify(group));
       this.showInfo = true;
     },
-    getAllGroups() {
-      groupService.getAllGroups()
-        .then(response => {
+    openSaveModal(){
+      this.showModalSave = true;
+    },
+    async getGroups() {
+        try {
+          const response = await getGroupsByUserId("74784438-8021-7044-a032-4ad6841754fa");
+          console.log("data: ", response);
           this.groups = response.data;
-        })
-        .catch(error => {
-          console.error('Error al obtener grupos:', error);
-        });
+        } catch (error) {
+          console.error(error);
+      }
     }
   }
 }

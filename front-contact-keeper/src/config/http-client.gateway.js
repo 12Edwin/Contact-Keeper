@@ -4,6 +4,7 @@ import { onToast } from "@/kernel/alerts";
 import utils from "@/kernel/utils";
 const SERVER_URL = process.env.VUE_APP_BASE_URL;
 const SERVER_URL_EVENT = process.env.VUE_APP_EVENTS_URL;
+const VUE_APP_GROUPS_URL = process.env.VUE_APP_GROUPS_URL;
 
 console.log("ola",SERVER_URL_EVENT)
 
@@ -14,6 +15,11 @@ const AxiosClient = axios.create({
 
 const EventAxiosClient = axios.create({
     baseURL: SERVER_URL_EVENT,
+    timeout: 20000,
+})
+
+const GroupsAxiosClient = axios.create({
+    baseURL: VUE_APP_GROUPS_URL,
     timeout: 20000,
 })
 
@@ -72,6 +78,7 @@ const setUpInterceptors = (client) => {
 
 setUpInterceptors(AxiosClient)
 setUpInterceptors(EventAxiosClient)
+setUpInterceptors(GroupsAxiosClient)
 
 
 const axiosClientApi = {
@@ -104,7 +111,23 @@ const axiosClientEvent = {
     },
 }
 
+const axiosClientGroups = {
+    doGet(endPoint, config){
+        return GroupsAxiosClient.get(endPoint, config)
+    },
+    doPost(endPoint, object, config){
+        return GroupsAxiosClient.post(endPoint, object, config || {});
+    },
+    doPut(endPoint, object, config){
+        return GroupsAxiosClient.put(endPoint, object, config || {})
+    },
+    doDelete(endPoint, object, config){
+        return GroupsAxiosClient.put(endPoint, object, config || {});
+    },
+}
+
 export default {
     axiosClientApi,
-    axiosClientEvent
+    axiosClientEvent,
+    axiosClientGroups
 }
