@@ -127,6 +127,10 @@ Resources:
     Properties:
       Name: UserApi
       StageName: Prod
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
@@ -138,6 +142,10 @@ Resources:
     Properties:
       Name: EventApi
       StageName: Prod
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
@@ -149,6 +157,10 @@ Resources:
     Properties:
       Name: GroupApi
       StageName: Prod
+      Auth:
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
       Cors:
         AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
@@ -224,8 +236,6 @@ Resources:
             RestApiId: !Ref UsersApiGateway
             Path: /login
             Method: POST
-            Auth:
-              Authorizer: NONE
 
   ReadUsersFunction:
     Type: AWS::Serverless::Function
