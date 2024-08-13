@@ -188,8 +188,7 @@ Resources:
             RestApiId: !Ref UsersApiGateway
             Path: /users
             Method: POST
-            Auth:
-              Authorizer: NONE
+
 
   ConfirmUserFunction:
     Type: AWS::Serverless::Function
@@ -212,8 +211,7 @@ Resources:
             RestApiId: !Ref UsersApiGateway
             Path: /confirm
             Method: POST
-            Auth:
-              Authorizer: NONE
+            
 
   LoginFunction:
     Type: AWS::Serverless::Function
