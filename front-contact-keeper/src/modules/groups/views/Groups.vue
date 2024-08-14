@@ -20,6 +20,22 @@
               </b-col>
             </b-row>
           </template>
+          <template v-if="isLoading">
+            <b-row>
+              <b-col cols="12" lg="4" md="6" v-for="n in 3" :key="n">
+                <div class="card skeleton mb-4">
+                  <div class="card-header">
+                    <div class="card-header-text">
+                      <div class="skeleton-text skeleton-title"></div>
+                      <div class="skeleton-text skeleton-subtitle"></div>
+                      <div class="skeleton-text skeleton-subtitle"></div>
+                    </div>
+                    <div class="skeleton-image"></div>
+                  </div>
+                </div>
+              </b-col>
+            </b-row>
+          </template>
           <template>
             <b-row class="mt-2">
               <b-col  cols="12" lg="4" md="6" v-for="(group, index) in groups" :key="index">
@@ -34,25 +50,15 @@
                       <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
                     </div>
                     <div class="card-footer">
-                      <i class="pi pi-megaphone icon-camera" v-tooltip.top="'Anuncios'" ></i>
+                      <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
+                      <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" ></i>
+                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" ></i>
                       <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                     </div>
                   </div>
                 </template>
               </b-col>
                <!-- Skeleton loading -->
-               <b-col cols="12" lg="4" md="6" v-if="isLoading" v-for="n in 3" :key="n">
-                <div class="card skeleton mb-4">
-                  <div class="card-header">
-                    <div class="card-header-text">
-                      <div class="skeleton-text skeleton-title"></div>
-                      <div class="skeleton-text skeleton-subtitle"></div>
-                      <div class="skeleton-text skeleton-subtitle"></div>
-                    </div>
-                    <div class="skeleton-image"></div>
-                  </div>
-                </div>
-              </b-col>
             </b-row>
           </template>
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
@@ -68,7 +74,8 @@ import BadgeDirective from 'primevue/badgedirective';
 import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
 import ModalCreateGroup from '../components/ModalSaveGroup.vue';
-import {getGroupsByUserId } from '../services/groups-services';
+import {getGroupsByUserId, deleteGroup } from '../services/groups-services';
+import { onQuestion } from '@/kernel/alerts';
 
 export default {
   name: 'Groups',
@@ -106,16 +113,21 @@ export default {
       this.showModalSave = true;
     },
     async getGroups() {
+      this.isLoading = true;
         try {
           const response = await getGroupsByUserId();
           this.groups = response.data;
+          this.isLoading = false;
         } catch (error) {
+          this.isLoading = false;
           console.error(error);
       }
     },
     async deleteGroup(group){
       try {
-        await deleteGroup(group.id);
+        await onQuestion('¿Estás seguro de eliminar este grupo?');
+        const respose = await deleteGroup(group.id);
+        console.log("respuesta =>",respose);
         this.getGroups();
       } catch (error) {
         console.error(error);
@@ -190,20 +202,51 @@ export default {
   font-size: 20px;
   cursor: pointer;
   margin-top: 5px;
+  margin-right: 10px;
+}
+
+.icon-folder-end {
+  font-size: 20px;
+  cursor: pointer;
+  margin-top: 5px;
+  margin-right: 10px;
+  float: left;
 }
 
 .icon-camera {
   margin-right: 16px;
 }
+
 .skeleton {
-  background: #f0f0f0;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: none;
+  background-color: #faf9f9;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(245, 245, 245, 0.8) 25%, rgba(220, 220, 220, 0.8) 50%, rgba(245, 245, 245, 0.8) 75%);
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .skeleton-text {
-  background-color: #e0e0e0;
+  background-color: #faf9f9;
   border-radius: 4px;
   margin-bottom: 10px;
 }
@@ -213,6 +256,9 @@ export default {
   width: 70%;
 }
 
+.skeleton-text {
+  animation: skeletonAnimation 1s infinite;
+}
 .skeleton-subtitle {
   height: 16px;
   width: 50%;
