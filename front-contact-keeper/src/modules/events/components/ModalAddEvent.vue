@@ -230,7 +230,7 @@
                         </div>
                       </div>
                       <div class="icon-container">
-                        <b-form-checkbox :binary="true" @change="onCheckboxGroupChange(member)" :checked="ifGroupSelected(group)"/>
+                        <b-form-checkbox :binary="true" @change="onCheckboxGroupChange(group)" :checked="ifGroupSelected(group)"/>
                       </div>
                     </div>
                   </template>
@@ -302,6 +302,7 @@ import groupService from '@/modules/groups/services/groups-services';
 import userServices from '@/modules/users/services/userServices';
 import utils from '@/kernel/utils';
 import Calendar from '../views/Calendar.vue';
+import eventServices from '../services/event-services';
 export default {
   name: 'ModalAddEvent',
   components: {
@@ -370,7 +371,7 @@ export default {
         required: helpers.withMessage('La descripción es requerida', required),
         onlyLetters: helpers.withMessage('La descripción solo puede contener letras y números', (value) => phraseRegex.test(value)),
         minLength: helpers.withMessage("La descripción debe tener al menos 3 caracteres", minLength(3)),
-        maxLength: helpers.withMessage("La descripción debe tener máximo 70 caracteres", maxLength(70))
+        maxLength: helpers.withMessage("La descripción debe tener máximo 70 caracteres", maxLength(100))
       },
       dates: {
         required: helpers.withMessage('La fecha de inicio del evento es requerida', required),
@@ -408,8 +409,29 @@ export default {
       this.$emit('update:visible', false);
     },
 
-    saveEvent() {
-      console.log(this.prepareObject())
+    async saveEvent() {
+      const event = this.prepareObject()
+      console.log("desde el save event", event)
+      const {id_group_member} = event
+      try {
+        if(id_group_member){
+          const response = await eventServices.saveGroupEvent(event)
+          if(response){
+            if(response.status === "success"){
+              console.log("Evento guardado")
+            }
+          }
+        }else{
+          const response = await eventServices.saveMeetingEvent(event)
+          if(response){
+            if(response.status === "success"){
+              console.log("Evento de tipo reunion guardado")
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
     },
     eventStatus(status){
       return status=== 'pending' ? 'Pendiente' : 'Activo';
@@ -439,13 +461,21 @@ export default {
         this.isLoading = false
       }
     },
-    onCheckboxUserChange(userSelected){
-      this.eventData.participants = userSelected.id
-      this.id_group_member = null
+    onCheckboxUserChange(userSelected) {
+      if (this.eventData.participants === userSelected.id) {
+        this.eventData.participants = null;
+      } else {
+        this.eventData.participants = userSelected.id;
+      }
+      this.eventData.id_group_member = null;
     },
-    onCheckboxGroupChange(groupSelected){
-      this.eventData.participants = null
-      this.id_group_member = groupSelected.id
+    onCheckboxGroupChange(groupSelected) {
+      if (this.eventData.id_group_member === groupSelected.id) {
+        this.eventData.id_group_member = null;
+      } else {
+        this.eventData.id_group_member = groupSelected.id;
+      }
+      this.eventData.participants = null;
     },
     ifUserSelected(userSelected){
       return this.eventData.participants === userSelected.id
@@ -454,31 +484,32 @@ export default {
       return this.eventData.id_group_member === groupSelected.id
     },
     prepareObject(){
+      console.log("desde el prepare object start", this.eventData.dates[1])
       const startHour = this.eventData.startHour
       const endHour = this.eventData.endHour
-      const {startDate, endDate} = utils.formatDate(this.eventData.dates[0], this.eventData.dates[1], startHour, endHour)
+      const {start_date, end_date} = utils.formatDate(this.eventData.dates[0], startHour, this.eventData.dates[1], endHour)
       const event = {
         title: this.eventData.title,
         description: this.eventData.description,
-        start_date: startDate,
-        end_date: endDate,
+        start_date,
+        end_date,
         type: this.eventData.type,
         location: this.eventData.location,
         name: this.eventData.name,
         reminder: "",
         notes: "",
       }
-
-      if(this.eventData.participants){
-        event.moderator = this.eventData.participants
-      }
-      const userLogged = utils.getIdUserFromToke()
-      if(!this.eventData.participants){
-        event.moderator = userLogged
-      }
-
-      if(this.eventData.id_group_member){
-        event.id_group_member = this.eventData.id_group_member
+      if (this.eventData.id_group_member) {
+        event.id_group_member = this.eventData.id_group_member;
+      } else {
+        // Si no hay un grupo seleccionado
+        if (this.eventData.participants) {
+          event.moderator = this.eventData.participants;
+        } else {
+          // Si no hay un usuario seleccionado, tomar el ID del usuario del localStorage
+          const userLogged = utils.getIdUserFromToke();
+          event.moderator = userLogged;
+        }
       }
       return event
     }

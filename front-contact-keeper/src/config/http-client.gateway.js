@@ -4,7 +4,7 @@ import { onToast } from "@/kernel/alerts";
 import utils from "@/kernel/utils";
 const SERVER_URL = process.env.VUE_APP_BASE_URL;
 const SERVER_URL_EVENT = process.env.VUE_APP_EVENTS_URL;
-
+const SERVER_URL_EVENT_MANAGEMENT = process.env.VUE_APP_EVENTS_MANAGEMENT
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
     timeout: 20000,
@@ -12,6 +12,12 @@ const AxiosClient = axios.create({
 
 const EventAxiosClient = axios.create({
     baseURL: SERVER_URL_EVENT,
+    timeout: 20000,
+})
+
+
+const EventManagementClient = axios.create({
+    baseURL: SERVER_URL_EVENT_MANAGEMENT,
     timeout: 20000,
 })
 
@@ -70,7 +76,7 @@ const setUpInterceptors = (client) => {
 
 setUpInterceptors(AxiosClient)
 setUpInterceptors(EventAxiosClient)
-
+setUpInterceptors(EventManagementClient)
 
 const axiosClientApi = {
     doGet(url){
@@ -102,7 +108,22 @@ const axiosClientEvent = {
     },
 }
 
+const axiosClientEventManagement = {
+    doGet(endPoint, config){
+        return EventManagementClient.get(endPoint, config)
+    },
+    doPost(endPoint, object, config){
+        return EventManagementClient.post(endPoint, object, config || {});
+    },
+    doPut(endPoint, object, config){
+        return EventManagementClient.put(endPoint, object, config || {})
+    },
+    doDelete(endPoint, object, config){
+        return EventManagementClient.put(endPoint, object, config || {});
+    },
+}
 export default {
     axiosClientApi,
-    axiosClientEvent
+    axiosClientEvent,
+    axiosClientEventManagement
 }

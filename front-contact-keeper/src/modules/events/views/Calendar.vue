@@ -49,6 +49,8 @@ import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 import moment from 'moment';
 import Panel from 'primevue/panel'
 import Chip from 'primevue/chip';
+import utils from '@/kernel/utils'
+import eventServices from '../services/event-services'
 export default
 {
   name: 'Calendar',
@@ -173,11 +175,24 @@ export default
     formatCalendarDate(date){
       return moment(date).format('YYYY-MM-DD');
     },
-
     openModalAddEvent() {
       this.showModalAddEvent = true;
     },
+    async getEvents(){
+      try {
+        const userLogged = utils.getIdUserFromToke()
+        const response = await eventServices.getEvents(userLogged)
+        if(response.status === "success"){
+          this.events = response.data
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
   },
+  mounted() {
+    this.getEvents()
+  }
 }
 </script>
 

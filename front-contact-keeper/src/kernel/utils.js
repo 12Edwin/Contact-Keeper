@@ -90,6 +90,8 @@ const getErrorMessages = (errorCode) => {
     "Invalid phone": "Teléfono inválido",
     "Invalid email": "Correo inválido",
     "Invalid password": "Credenciales inválidas",
+    "Invalid end date": "Fecha de fin inválida",
+    "Invalid start date": "Fecha de inicio inválida",
   }
   return errorMessages[errorCode] || 'Ocurrió un error desconocido en el servidor';
 }
@@ -124,10 +126,10 @@ const formatDate = (startDate, startHour, endDate, endHour) => {
   const momentEnd = moment(endDate).format('YYYY-MM-DD');
   const momentStartHour = moment(startHour, 'HH:mm').format('HH:mm:ss'); 
   const momentEndHour = moment(endHour, 'HH:mm').format('HH:mm:ss');
-
+  console.log("inicio",momentStartHour,"fin", momentEndHour)
   return {
-    startDate: `${momentStart} ${momentStartHour}`,
-    endDate: `${momentEnd} ${momentEndHour}`
+    start_date: `${momentStart} ${momentStartHour}`,
+    end_date: `${momentEnd} ${momentEndHour}`
   };
 };
 
