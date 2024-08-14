@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-
+import moment from "moment";
 const getUserByName = (name, people) => {
   return people.some((person) => person.name === name);
 };
@@ -94,6 +94,44 @@ const getErrorMessages = (errorCode) => {
   return errorMessages[errorCode] || 'Ocurrió un error desconocido en el servidor';
 }
 
+const startAfterEnd = (startHour, endHour) => {
+  if (!endHour) {
+    return true;
+  }
+  const momentHour = moment(startHour, 'HH:mm');
+  const momentEndHour = moment(endHour, 'HH:mm');
+
+  return momentHour.isBefore(momentEndHour, 'minute');
+};
+
+const endBeforeStart = (startHour, endHour) => {
+  const momentHour = moment(startHour, 'HH:mm');
+  const momentEndHour = moment(endHour, 'HH:mm');
+
+  return momentEndHour.isAfter(momentHour, 'minute');
+};
+
+const isSameDate = (startHour, endHour) => {
+  const momentHour = moment(startHour, 'HH:mm');
+  const momentEndHour = moment(endHour, 'HH:mm');
+
+  return momentHour.isSame(momentEndHour, 'minute');
+};
+
+
+const formatDate = (startDate, startHour, endDate, endHour) => {
+  const momentStart = moment(startDate).format('YYYY-MM-DD');
+  const momentEnd = moment(endDate).format('YYYY-MM-DD');
+  const momentStartHour = moment(startHour, 'HH:mm').format('HH:mm:ss'); 
+  const momentEndHour = moment(endHour, 'HH:mm').format('HH:mm:ss');
+
+  return {
+    startDate: `${momentStart} ${momentStartHour}`,
+    endDate: `${momentEnd} ${momentEndHour}`
+  };
+};
+
+
 export default {
   getToken,
   removeToken,
@@ -104,5 +142,9 @@ export default {
   validAge,
   messageError,
   getErrorMessages,
-  getIdUserFromToke
+  getIdUserFromToke,
+  startAfterEnd,
+  endBeforeStart,
+  isSameDate,
+  formatDate
 };

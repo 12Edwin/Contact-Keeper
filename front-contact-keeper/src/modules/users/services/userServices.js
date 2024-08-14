@@ -2,7 +2,7 @@ import api from "@/config/http-client.gateway";
 
 const get_users = async () => {
   try {
-    const response = await api.doGet("/users");
+    const response = await api.axiosClientApi.doGet("/users");
     return response.data;
   } catch (error) {
     return error.response;

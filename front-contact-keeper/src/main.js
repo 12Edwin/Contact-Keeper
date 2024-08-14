@@ -40,6 +40,8 @@ import ScrollPanel from 'primevue/scrollpanel';
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
 import Calendar from 'primevue/calendar';
+import Skeleton from 'primevue/skeleton';
+
 Vue.component('Button', Button)
 Vue.component('Panel', Panel)
 Vue.component('InputText', InputText)
@@ -65,6 +67,7 @@ Vue.component('ScrollPanel', ScrollPanel)
 Vue.component('Accordion', Accordion)
 Vue.component('AccordionTab', AccordionTab)
 Vue.component('Calendar', Calendar)
+Vue.component('Skeleton', Skeleton)
 // PrimeVue services
 import ConfirmationService from 'primevue/confirmationservice'
 import ToastService from 'primevue/toastservice'

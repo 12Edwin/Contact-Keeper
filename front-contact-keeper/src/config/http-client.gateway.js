@@ -5,8 +5,6 @@ import utils from "@/kernel/utils";
 const SERVER_URL = process.env.VUE_APP_BASE_URL;
 const SERVER_URL_EVENT = process.env.VUE_APP_EVENTS_URL;
 
-console.log("ola",SERVER_URL_EVENT)
-
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
     timeout: 20000,
