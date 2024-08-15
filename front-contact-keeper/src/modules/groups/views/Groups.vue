@@ -55,7 +55,7 @@
                     </div>
                     <div class="card-footer">
                       <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
-                      <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" ></i>
+                      <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
                       <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" ></i>
                       <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                     </div>
@@ -66,6 +66,7 @@
           </template>
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
           <ModalCreateGroup :visible.sync="showModalSave"/>
+          <ModalEditGroup :visible.sync="showModalEdit" :groupData="groupSelected"/>
         </div>
       </Panel>
     </div>
@@ -77,6 +78,7 @@ import BadgeDirective from 'primevue/badgedirective';
 import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
 import ModalCreateGroup from '../components/ModalSaveGroup.vue';
+import ModalEditGroup from '../components/ModalEditGroup.vue';
 import {getGroupsByUserId, deleteGroup } from '../services/groups-services';
 import { onQuestion } from '@/kernel/alerts';
 
@@ -88,7 +90,8 @@ export default {
   },
   components: {
     Announcements,
-    ModalCreateGroup
+    ModalCreateGroup,
+    ModalEditGroup
   },
   data() {
     return {
@@ -113,16 +116,15 @@ export default {
       };
     },
     getBadgeClass(status) {
-      // Map statuses to custom badge classes
       switch (status.toLowerCase()) {
         case 'pending':
-          return 'badge-secondary'; // Custom class for 'pending'
+          return 'badge-secondary'; 
         case 'approved':
-          return 'badge-success'; // Custom class for 'approved'
+          return 'badge-success'; 
         case 'rejected':
-          return 'badge-danger'; // Custom class for 'rejected'
+          return 'badge-danger'; 
         default:
-          return 'badge-primary'; // Default class if status is unknown
+          return 'badge-primary';
       }
     },
     translateStatus(status) {
@@ -131,7 +133,7 @@ export default {
         approved: 'Aprobado',
         rejected: 'Rechazado'
       };
-      return translations[status.toLowerCase()] || 'Desconocido'; // Default to 'Desconocido' if status is unknown
+      return translations[status.toLowerCase()] || 'Desconocido'; 
     },
     openInfoModal(group){
       this.groupSelected = JSON.parse(JSON.stringify(group));
@@ -139,6 +141,10 @@ export default {
     },
     openSaveModal(){
       this.showModalSave = true;
+    },
+    openEditModal(group){
+      this.groupSelected = JSON.parse(JSON.stringify(group));
+      this.showModalEdit = true;
     },
     async getGroups() {
       this.isLoading = true;
