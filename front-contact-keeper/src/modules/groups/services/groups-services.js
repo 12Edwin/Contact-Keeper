@@ -17,7 +17,6 @@ export const getGroupsByUserId = async () => {
         const token = localStorage.getItem("token");
         const payload = decodeJwtPayload(token);
         const userId = payload.sub;
-
         const response = await api.axiosClientEvent.doGet(`/groups/moderator/${userId}`);
         return response.data;
     } catch (error) {

@@ -45,7 +45,11 @@
                       <div class="card-header-text">
                         <h2>{{group.name}}</h2>
                         <p>{{ group.title }}</p>
-                        <p>{{ group.created_at }}</p>
+                        <p>
+                          <span :class="['custom-badge', getBadgeClass(group.status)]">
+                            {{ translateStatus(group.status) }}
+                          </span>
+                        </p>
                       </div>
                       <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
                     </div>
@@ -58,7 +62,6 @@
                   </div>
                 </template>
               </b-col>
-               <!-- Skeleton loading -->
             </b-row>
           </template>
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
@@ -102,8 +105,33 @@ export default {
   },
   methods: {
     getInitial(name){
-      const initials = name.split(' ');
-      return initials.length > 1 ? initials[0].charAt(0) + initials[1].charAt(0) : initials[0].charAt(0);
+      if(!name){
+        return ''
+      }else{
+        const initials = name.split(' ');
+        return initials.length > 1 ? initials[0].charAt(0) + initials[1].charAt(0) : initials[0].charAt(0);
+      };
+    },
+    getBadgeClass(status) {
+      // Map statuses to custom badge classes
+      switch (status.toLowerCase()) {
+        case 'pending':
+          return 'badge-secondary'; // Custom class for 'pending'
+        case 'approved':
+          return 'badge-success'; // Custom class for 'approved'
+        case 'rejected':
+          return 'badge-danger'; // Custom class for 'rejected'
+        default:
+          return 'badge-primary'; // Default class if status is unknown
+      }
+    },
+    translateStatus(status) {
+      const translations = {
+        pending: 'Pendiente',
+        approved: 'Aprobado',
+        rejected: 'Rechazado'
+      };
+      return translations[status.toLowerCase()] || 'Desconocido'; // Default to 'Desconocido' if status is unknown
     },
     openInfoModal(group){
       this.groupSelected = JSON.parse(JSON.stringify(group));
@@ -195,6 +223,7 @@ export default {
   display: flex;
   justify-content: right;
   margin-top: 16px;
+  gap: 5px;
 }
 
 .icon-camera,
@@ -202,14 +231,13 @@ export default {
   font-size: 20px;
   cursor: pointer;
   margin-top: 5px;
-  margin-right: 10px;
 }
 
 .icon-folder-end {
   font-size: 20px;
   cursor: pointer;
   margin-top: 5px;
-  margin-right: 10px;
+  margin-right: 18px;
   float: left;
 }
 
@@ -269,6 +297,35 @@ export default {
   width: 48px;
   height: 48px;
   border-radius: 50%;
+}
+
+.custom-badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  color: #fff; /* Default text color */
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+}
+
+.badge-success {
+  background-color: #28a745;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+}
+
+.badge-primary {
+  background-color: #007bff;
 }
 
 </style>
