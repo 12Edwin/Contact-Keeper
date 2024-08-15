@@ -122,7 +122,7 @@ const axiosClientGroups = {
         return GroupsAxiosClient.put(endPoint, object, config || {})
     },
     doDelete(endPoint, object, config){
-        return GroupsAxiosClient.put(endPoint, object, config || {});
+        return GroupsAxiosClient.delete(endPoint, object, config || {});
     },
 }
 

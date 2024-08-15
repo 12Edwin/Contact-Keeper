@@ -17,7 +17,7 @@ export const getGroupsByUserId = async () => {
         const token = localStorage.getItem("token");
         const payload = decodeJwtPayload(token);
         const userId = payload.sub;
-        const response = await api.axiosClientEvent.doGet(`/groups/moderator/${userId}`);
+        const response = await api.axiosClientGroups.doGet(`/groups/moderator/${userId}`);
         return response.data;
     } catch (error) {
         return error.response;
@@ -30,7 +30,7 @@ export const saveGroup = async (groupData) => {
         const payload = decodeJwtPayload(token);
         const userId = payload.sub;
         groupData = { ...groupData, moderator: userId };   
-        const response = await api.axiosClientEvent.doPost('/groups', groupData);
+        const response = await api.axiosClientGroups.doPost('/groups', groupData);
         return response.data;
     } catch (error) {
         return error.response;
@@ -39,7 +39,7 @@ export const saveGroup = async (groupData) => {
 
 export const updateGroup = async (groupId, groupData) => {
     try {
-        const response = await api.axiosClientEvent.doPut(`/groups/${groupId}`, groupData);
+        const response = await api.axiosClientGroups.doPut(`/groups/${groupId}`, groupData);
         return response.data;
     } catch (error) {
         return error.response;
@@ -48,21 +48,21 @@ export const updateGroup = async (groupId, groupData) => {
 
 export const deleteGroup = async (groupId) => {
     try {
-        const response = await api.axiosClientEvent.doDelete(`/groups/${groupId}`);
+        const response = await api.axiosClientGroups.doDelete(`/groups/${groupId}`);
         return response.data;
     } catch (error) {
         return error.response;
     }
 }
 
-export const getEventsbyGroup = async (groupId) => {
-    try {
-        const response = await api.axiosClientEvent.doGet(`/events/group/${groupId}`);
-        return response.data;
-    } catch (error) {
-        return error.response;
-    }
-}
+// export const getEventsbyGroup = async (groupId) => {
+//     try {
+//         const response = await api.axiosClientEvent.doGet(`/events/group/${groupId}`);
+//         return response.data;
+//     } catch (error) {
+//         return error.response;
+//     }
+// }
 
 
 

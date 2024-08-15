@@ -56,7 +56,7 @@
                     <div class="card-footer">
                       <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
                       <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
-                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" ></i>
+                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" @click="getEventsbyGroup(group)" ></i>
                       <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                     </div>
                   </div>
@@ -79,7 +79,7 @@ import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
 import ModalCreateGroup from '../components/ModalSaveGroup.vue';
 import ModalEditGroup from '../components/ModalEditGroup.vue';
-import {getGroupsByUserId, deleteGroup } from '../services/groups-services';
+import {getGroupsByUserId, deleteGroup, getEventsbyGroup } from '../services/groups-services';
 import { onQuestion } from '@/kernel/alerts';
 
 export default {
@@ -154,7 +154,7 @@ export default {
           this.isLoading = false;
         } catch (error) {
           this.isLoading = false;
-          console.error(error);
+          console.error("get=>",error);
       }
     },
     async deleteGroup(group){
@@ -164,8 +164,11 @@ export default {
         console.log("respuesta =>",respose);
         this.getGroups();
       } catch (error) {
-        console.error(error);
+        console.error("delete error =>", error);
       }
+    },
+    async getEventsbyGroup(group){
+      console.log("group =>", group);
     }
   }
 }

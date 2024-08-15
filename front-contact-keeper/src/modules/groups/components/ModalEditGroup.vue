@@ -50,7 +50,7 @@
           <div class="field">
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-pencil" />
-              <InputTextarea id="field-description" v-model="group.description" rows="5"
+              <b-form-textarea id="field-description" v-model="group.description" rows="2"
                              :class="{ 'invalid-field-custom': v$.description.$error }"/>
               <label for="field-description">Descripción</label>
             </span>
@@ -65,7 +65,7 @@
           <div class="field">
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-note" />
-              <InputTextarea id="field-notes" v-model="group.notes" rows="5"
+              <b-form-textarea id="field-notes" v-model="group.notes" rows="3"
                              :class="{ 'invalid-field-custom': v$.notes.$error }"/>
               <label for="field-notes">Notas</label>
             </span>
