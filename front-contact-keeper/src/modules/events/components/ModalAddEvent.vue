@@ -160,11 +160,11 @@
           <TabView >
             <TabPanel header="Usuarios">
               <ScrollPanel style="width: 100%; height: 160px">
-                <template v-if="!isLoading">
+                <template v-if="!onGettingUsers">
                   <template v-if="invites.length > 0">
                     <div class="user-list d-flex justify-content-between align-items-center" v-for="(member, userIndex) in invites" :key="userIndex">
                       <div class="user-info-container d-flex align-items-center mb-2">
-                        <Avatar :label="member.name.charAt(0)" shape="circle" size="small"/>
+                        <Avatar :label="member.name.charAt(0)"  shape="circle" size="small"/>
                         <div class="user-info">
                           <label class="username">{{ member.name }} {{ member.surname }} {{ member.last_name }}</label>
                           <p class="role">{{ member.email }}</p>
@@ -175,17 +175,17 @@
                       </div>
                     </div>
                   </template>
-                <template v-else>
-                  <div class="no-events-img">
-                    <img src="@/assets/User_empty.svg" alt="Sin usuarios" style="width: 120px; height: 120px;"/>
-                      <p class="no-events-text">Sin usuarios</p>
-                  </div>
-                </template>
+                  <template v-else>
+                    <div class="no-events-img">
+                      <img src="@/assets/User_empty.svg" alt="Sin usuarios" style="width: 120px; height: 120px;"/>
+                        <p class="no-events-text">Sin usuarios</p>
+                    </div>
+                  </template>
                 </template>
                 <template v-else>
                   <div class="custom-skeleton">
                     <ul class="m-0 p-0">
-                      <li class="mb-3">
+                      <li class="mb-3" v-for="i in 3">
                         <div class="flex">
                           <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
                           <div style="flex: 1">
@@ -194,24 +194,6 @@
                           </div>
                         </div>
                       </li>
-                      <li class="mb-3">
-                        <div class="flex">
-                          <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
-                          <div style="flex: 1">
-                            <Skeleton width="100%" class="mb-2"></Skeleton>
-                            <Skeleton width="75%"></Skeleton>
-                          </div>
-                        </div>
-                      </li>
-                      <li class="mb-3">
-                        <div class="flex">
-                          <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
-                          <div style="flex: 1">
-                            <Skeleton width="100%" class="mb-2"></Skeleton>
-                            <Skeleton width="75%"></Skeleton>
-                          </div>
-                        </div>
-					            </li>
                     </ul>
                   </div>
                 </template>
@@ -219,11 +201,11 @@
             </TabPanel>
             <TabPanel header="Grupos">
               <ScrollPanel style="width: 100%; height: 160px;">
-                <template v-if="!isLoading">
+                <template v-if="!onGettingGroups">
                   <template v-if="groups.length > 0">
                     <div class="user-list d-flex justify-content-between align-items-center" v-for="(group, userIndex) in groups" :key="userIndex">
                       <div class="user-info-container d-flex align-items-center mb-2">
-                        <Avatar :label="group.name.charAt(0)" shape="circle" size="small"/>
+                        <Avatar :label="getLetter(group.name)" shape="circle" size="small"/>
                         <div class="user-info">
                           <label class="username">{{ group.name }}</label>
                           <p class="role">{{ eventStatus(group.status) }}</p>
@@ -236,7 +218,7 @@
                   </template>
                   <template v-else>
                     <div class="no-events-img">
-                      <img src="@/assets/inbox_empty.svg" alt="Sin usuarios" style="width: 120px; height: 120px;"/>
+                      <img src="@/assets/inbox_empty.svg" alt="Sin grupos" style="width: 120px; height: 120px;"/>
                         <p class="no-events-text">Sin grupos</p>
                     </div>
                   </template>
@@ -281,8 +263,8 @@
       </b-row>
     </div>
     <template #footer>
-      <Button label="Guardar" icon="pi pi-check" style="background-color: black; color: white;" class="p-button-text" @click="saveEvent" />
-      <Button label="Cancelar" icon="pi pi-times" style="color: gray;" class="p-button-text" @click="closeModal" />
+      <Button label="Guardar" icon="pi pi-check" style="background-color: black; color: white;" class="p-button-text" @click="saveEvent()" />
+      <Button label="Cancelar" icon="pi pi-times" style="color: gray;" class="p-button-text" @click="closeModal()" />
     </template>
   </Dialog>
 </template>
@@ -336,7 +318,8 @@ export default {
         // { name: 'Grupo 2', status: 'pending' },
         // { name: 'Grupo 3', status: 'active' }
       ],
-      isLoading: false,
+      onGettingUsers: false,
+      onGettingGroups: false,
       today: new Date().toISOString().split('T')[0]
     };
   },
@@ -408,7 +391,6 @@ export default {
     closeModal(){
       this.$emit('update:visible', false);
     },
-
     async saveEvent() {
       const event = this.prepareObject()
       console.log("desde el save event", event)
@@ -437,28 +419,36 @@ export default {
       return status=== 'pending' ? 'Pendiente' : 'Activo';
     },
     async getUsergroups(){
-      const id = utils.getIdUserFromToke()
-      const response = await groupService.getGroupsByUserId(id)
-      if(response){
-        if(response.status === "success"){
-          this.groups = response.data
+      try {
+        this.onGettingGroups = true
+        const id = utils.getIdUserFromToke()
+        const response = await groupService.getGroupsByUserId(id)
+        if(response){
+          if(response.status === "success"){
+            this.groups = response.data
+          }
         }
+        this.onGettingGroups = false
+      } catch (error) {
+        console.log(error)
+      }finally{
+        this.onGettingGroups = false
       }
     },
     async getUsers(){
       try {
-        this.isLoading = true
+        this.onGettingUsers = true
         const response = await userServices.get_users()
         if(response){
           if(response.status === "success"){
             this.invites = response.data
           }
         }
-      this.isLoading = false
+      this.onGettingUsers = false
       } catch (error) {
         console.log(error)
       }finally{
-        this.isLoading = false
+        this.onGettingUsers = false
       }
     },
     onCheckboxUserChange(userSelected) {
@@ -484,7 +474,6 @@ export default {
       return this.eventData.id_group_member === groupSelected.id
     },
     prepareObject(){
-      console.log("desde el prepare object start", this.eventData.dates[1])
       const startHour = this.eventData.startHour
       const endHour = this.eventData.endHour
       const {start_date, end_date} = utils.formatDate(this.eventData.dates[0], startHour, this.eventData.dates[1], endHour)
@@ -512,6 +501,11 @@ export default {
         }
       }
       return event
+    },
+    getLetter(name){
+      if(name){
+        return name.charAt(0)
+      }
     }
   },
   mounted(){

@@ -6,24 +6,33 @@
           <Panel header="Eventos" class="shadow-lg">
             <b-row>
               <b-col cols="12">
-                <Loader v-if="isLoading" key="load" />
-                <div v-else class="calendar-container">
-                  <FullCalendar :options="calendarOptions" :events="events" id="myCustomCalendar" v-if="events.length > 0">
-                    <template v-slot:eventContent="{ event }">
-                      <div class="my-custom-event" @click="handleEventClick(event)">
-                        <span class="my-event-dot"></span>
-                        <div class="my-event-info">
-                          <span class="my-event-title"><b>{{ event.title }}</b></span>
-                          <span class="my-event-time">{{ formatCalendarDate(event.start) }} -  {{ formatCalendarDate(event.end) }}</span>
+                <div class="calendar-container">
+                  <template v-if="!isLoading">
+                    <template v-if="items.length > 0">
+                    <FullCalendar :options="calendarOptions" id="myCustomCalendar">
+                      <template v-slot:eventContent='{ event }'>
+                        <div class="my-custom-event" @click="handleEventClick(event)">
+                          <span class="my-event-dot" :v-tooltip.top="eventType(event.extendedProps.type)"  :style="{'background-color': setDotBackgrund(event.extendedProps.type)}"></span>
+                          <div class="my-event-info">
+                            <span class="my-event-title"><b>{{ event.extendedProps.title ? event.extendedProps.title : event.extendedProps.name}}</b></span>
+                            <span class="my-event-location">{{ event.extendedProps.location }}</span>
+                            <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
+                          </div>
                         </div>
-                      </div>
+                      </template>
+                    </FullCalendar>
                     </template>
-                  </FullCalendar>
+                    <template v-else>
+                        <div class="no-events-img">
+                          <img src="@/assets/no_events.svg" alt="No hay eventos" />
+                          <p class="no-events-text">¡Aquí verás todos tus eventos por venir!</p>
+                          <Button label="Crear evento" @click="openModalAddEvent()" class="p-button-text p-button-text mt-1 p-button-plain button-styles text" />
+                        </div>
+                    </template>
+                  </template>
                   <template v-else>
-                    <div class="no-events-img">
-                      <img src="@/assets/no_events.svg" alt="No hay eventos" />
-                      <p class="no-events-text">¡Aquí verás todos tus eventos por venir!</p>
-                      <Button label="Crear evento" @click="openModalAddEvent()" class="p-button-text p-button-text mt-1 p-button-plain button-styles text" />
+                    <div class="content">
+                      <CalendarSkeleton />
                     </div>
                   </template>
                 </div>
@@ -48,9 +57,12 @@ import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
 import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 import moment from 'moment';
 import Panel from 'primevue/panel'
+import esLocale from '@fullcalendar/core/locales/es';
 import Chip from 'primevue/chip';
 import utils from '@/kernel/utils'
 import eventServices from '../services/event-services'
+import CalendarSkeleton from '@/components/CalendarSkeleton.vue'
+import Tooltip from 'primevue/tooltip';
 export default
 {
   name: 'Calendar',
@@ -60,19 +72,25 @@ export default
     ModalEventInfo,
     ModalAddEvent,
     Panel,
-    Chip
+    Chip,
+    CalendarSkeleton
   },
+  directives: {
+    'tooltip': Tooltip
+},
   data() {
     return {
       sidebarVisible: false,
       showModalEventInfo: false,
       showModalAddEvent: false,
-      events: [],
+      items: [],
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
         initialView: 'dayGridMonth',
+        locale: esLocale,
         weekends: false,
         dayMaxEventRows: 2,
+        events: this.items,
         headerToolbar: {
           start: 'dayGridMonth,timeGridWeek,timeGridDay today prev,next',
           center: 'title',
@@ -81,7 +99,7 @@ export default
         customButtons: {
           addEventButton: {
             text: 'Agregar Evento',
-            click: this.openModalAddEvent(),
+            click: () => this.openModalAddEvent(),
           },
         },
         views: {
@@ -125,13 +143,6 @@ export default
             el.style.color = 'black';
           });
         },
-        events: [
-          // { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
-          // { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
-          // { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
-          // { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
-          // { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
-        ],
       },
       isLoading: false,
       selectedEvent: {},
@@ -149,47 +160,81 @@ export default
       };
       this.events.push(newEvent);
     },
-
     handleEventClick(event) {
-        this.selectedEvent = {
-        title: event.title,
-        startDate: event.start.toISOString().split('T')[0],
-        endDate: event.end ? event.end.toISOString().split('T')[0] : event.start.toISOString().split('T')[0],
-        description: event.extendedProps.description,
-        status: event.extendedProps.status || 'No especificado',
-        participants: event.extendedProps.participants || 'No especificado',
-      };
+      this.selectedEvent = event.extendedProps.event;
       this.showModalEventInfo = true;
     },
-    setDotBackground(status) {
-      const colors = {
-        success: 'green',
-        warning: 'orange',
-        danger: 'red',
-        primary: 'blue',
-        secondary: 'grey',
-        info: 'cyan'
-      };
-      return colors[status] || 'grey';
+    setDotBackgrund(status) {
+      let color = '';
+      switch (status) {
+        case 'meeting':
+          color = '#007bff';
+          break;
+        case 'session':
+          color = '#28a745';
+          break;
+        case 'event':
+          color = '#ffc107';
+          break;
+        default:
+          color = '#dc3545';
+          break;
+      }
+      return color;
     },
-    formatCalendarDate(date){
-      return moment(date).format('YYYY-MM-DD');
+    formatCalendarDate(pop){
+      return moment(pop).format("YYYY-MM-DD")
     },
     openModalAddEvent() {
+      console.log('openModalAddEvent')
       this.showModalAddEvent = true;
+    },
+    eventType(type){
+      if(type === 'meeting'){
+        return 'Reunión'
+      } else if(type === "session"){
+        return 'Sesión'
+      } else if(type === "event"){
+        return 'Evento'
+      }else{
+        return 'Otro'
+      }
     },
     async getEvents(){
       try {
+        this.isLoading = true
         const userLogged = utils.getIdUserFromToke()
         const response = await eventServices.getEvents(userLogged)
         if(response.status === "success"){
-          this.events = response.data
+          this.isLoading = false
+          response.data.forEach((event) => {
+            this.items.push({
+              title: event.title,
+              start: new Date(event.start_date).toISOString(),
+              end: new Date(event.end_date).toISOString(),
+              location: event.location,
+              name: event.name,
+              event
+            })
+          })
+          // this.items = response.data
+          // this.calendarOptions.events = this.items;
+          // console.log(this.items)
         }
+        this.isLoading = false
       } catch (error) {
         console.log(error)
       }
     }
   },
+  watch: {
+  items: {
+    handler(newEvents) {
+      this.calendarOptions = { ...this.calendarOptions, events: newEvents };
+    },
+    deep: true
+  }
+},
   mounted() {
     this.getEvents()
   }
@@ -301,7 +346,33 @@ export default
 
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
+
 /* Estilos existentes */
+.my-event-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.my-custom-event {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+}
+
+.my-event-location {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.my-event-title {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+.my-event-time {
+    font-size: 10px;
+}
 .main-content {
   display: flex;
 }
@@ -347,4 +418,8 @@ export default
    cursor: pointer;
  }
 
+
+.p-panel{
+ width: 100% !important;
+}
 </style>

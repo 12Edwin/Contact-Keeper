@@ -50,9 +50,12 @@ const setUpInterceptors = (client) => {
         },
          (error) => {
             if(!error.response){
-                console.log('Error de conexión', error)
                 onToast('Error de conexión', 'No se ha podido establecer conexión con el servidor', 'error')
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                this.$router.push({ name: 'login' });
                 return Promise.reject(error)
+
             }
             if(error.response.status){
                 switch(error.response.status){
@@ -63,7 +66,6 @@ const setUpInterceptors = (client) => {
                         console.log("Error 401")
                         return Promise.resolve()
                     case 500:
-                         console.log("Error 500")
                          onToast('Error interno','Error interno del servidor' , 'error')
                         break;
                 }
