@@ -68,7 +68,7 @@ def read_users():
                 for row in rows:
                     row_dict = dict(zip(column_names, row))
                     data.append(row_dict)
-                return {user['id']: user for user in data}
+                return data
             else:
                 return {}
     finally:
@@ -80,8 +80,17 @@ def compare_users(cognito_users, db_users):
     matched_users = []
 
     for username, cognito_user in cognito_users.items():
-        if username in db_users:
-            id, name, surname, last_name, birthday, phone = db_users[username]
-            matched_users.append({'email': cognito_user['Attributes'][0]['Value'], 'id': id, 'name': name, 'surname': surname, 'last_name': last_name, 'birthday': birthday, 'phone': phone})
+        for db_user in db_users:
+            if db_user.get('id') == username:
+                matched_users.append({
+                    'email': cognito_user['Attributes'][0]['Value'],
+                    'id': db_user.get('id'),
+                    'name': db_user.get('name'),
+                    'surname': db_user.get('surname'),
+                    'last_name': db_user.get('last_name'),
+                    'birthday': db_user.get('birthday'),
+                    'phone': db_user.get('phone')
+                })
+                break
 
     return matched_users

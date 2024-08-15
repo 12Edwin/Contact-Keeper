@@ -4,6 +4,7 @@ import { onToast } from "@/kernel/alerts";
 import utils from "@/kernel/utils";
 const SERVER_URL = process.env.VUE_APP_BASE_URL;
 const SERVER_URL_EVENT = process.env.VUE_APP_EVENTS_URL;
+const VUE_APP_GROUPS_URL = process.env.VUE_APP_GROUPS_URL;
 const SERVER_URL_EVENT_MANAGEMENT = process.env.VUE_APP_EVENTS_MANAGEMENT
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
@@ -18,6 +19,11 @@ const EventAxiosClient = axios.create({
 
 const EventManagementClient = axios.create({
     baseURL: SERVER_URL_EVENT_MANAGEMENT,
+    timeout: 20000,
+})
+
+const GroupsAxiosClient = axios.create({
+    baseURL: VUE_APP_GROUPS_URL,
     timeout: 20000,
 })
 
@@ -78,6 +84,7 @@ const setUpInterceptors = (client) => {
 
 setUpInterceptors(AxiosClient)
 setUpInterceptors(EventAxiosClient)
+setUpInterceptors(GroupsAxiosClient)
 setUpInterceptors(EventManagementClient)
 
 const axiosClientApi = {
@@ -110,22 +117,24 @@ const axiosClientEvent = {
     },
 }
 
-const axiosClientEventManagement = {
+const axiosClientGroups = {
     doGet(endPoint, config){
-        return EventManagementClient.get(endPoint, config)
+        return GroupsAxiosClient.get(endPoint, config)
     },
     doPost(endPoint, object, config){
-        return EventManagementClient.post(endPoint, object, config || {});
+        return GroupsAxiosClient.post(endPoint, object, config || {});
     },
     doPut(endPoint, object, config){
-        return EventManagementClient.put(endPoint, object, config || {})
+        return GroupsAxiosClient.put(endPoint, object, config || {})
     },
     doDelete(endPoint, object, config){
-        return EventManagementClient.put(endPoint, object, config || {});
+        return GroupsAxiosClient.put(endPoint, object, config || {});
     },
 }
+
 export default {
     axiosClientApi,
     axiosClientEvent,
+    axiosClientGroups,
     axiosClientEventManagement
 }

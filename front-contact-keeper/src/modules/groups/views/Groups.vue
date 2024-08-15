@@ -15,7 +15,24 @@
                     label="Nuevo grupo"
                     iconPos="right"
                     icon="pi pi-sitemap"
+                    @click="openSaveModal"
                 />
+              </b-col>
+            </b-row>
+          </template>
+          <template v-if="isLoading">
+            <b-row>
+              <b-col cols="12" lg="4" md="6" v-for="n in 3" :key="n">
+                <div class="card skeleton mb-4">
+                  <div class="card-header">
+                    <div class="card-header-text">
+                      <div class="skeleton-text skeleton-title"></div>
+                      <div class="skeleton-text skeleton-subtitle"></div>
+                      <div class="skeleton-text skeleton-subtitle"></div>
+                    </div>
+                    <div class="skeleton-image"></div>
+                  </div>
+                </div>
               </b-col>
             </b-row>
           </template>
@@ -27,13 +44,19 @@
                     <div class="card-header">
                       <div class="card-header-text">
                         <h2>{{group.name}}</h2>
-                        <p>Mayo-Agosto 2024</p>
-                        <p>Miguel Rosemberg</p>
+                        <p>{{ group.title }}</p>
+                        <p>
+                          <span :class="['custom-badge', getBadgeClass(group.status)]">
+                            {{ translateStatus(group.status) }}
+                          </span>
+                        </p>
                       </div>
                       <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
                     </div>
                     <div class="card-footer">
-                      <i class="pi pi-megaphone icon-camera" v-tooltip.top="'Anuncios'" ></i>
+                      <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
+                      <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
+                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" ></i>
                       <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                     </div>
                   </div>
@@ -42,6 +65,8 @@
             </b-row>
           </template>
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
+          <ModalCreateGroup :visible.sync="showModalSave"/>
+          <ModalEditGroup :visible.sync="showModalEdit" :groupData="groupSelected"/>
         </div>
       </Panel>
     </div>
@@ -52,7 +77,10 @@
 import BadgeDirective from 'primevue/badgedirective';
 import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
-import groupService from '../services/groups-services';
+import ModalCreateGroup from '../components/ModalSaveGroup.vue';
+import ModalEditGroup from '../components/ModalEditGroup.vue';
+import {getGroupsByUserId, deleteGroup } from '../services/groups-services';
+import { onQuestion } from '@/kernel/alerts';
 
 export default {
   name: 'Groups',
@@ -61,35 +89,83 @@ export default {
     'tooltip': Tooltip
   },
   components: {
-    Announcements
+    Announcements,
+    ModalCreateGroup,
+    ModalEditGroup
   },
   data() {
     return {
       groups: [],
       showInfo: false,
-      groupSelected: {}
+      isLoading: true,
+      groupSelected: {},
+      showModalSave: false,
+      showModalEdit: false
     }
   },
   mounted() {
-    //this.getAllGroups();
+    this.getGroups();
   },
   methods: {
     getInitial(name){
-      const initials = name.split(' ');
-      return initials.length > 1 ? initials[0].charAt(0) + initials[1].charAt(0) : initials[0].charAt(0);
+      if(!name){
+        return ''
+      }else{
+        const initials = name.split(' ');
+        return initials.length > 1 ? initials[0].charAt(0) + initials[1].charAt(0) : initials[0].charAt(0);
+      };
+    },
+    getBadgeClass(status) {
+      switch (status.toLowerCase()) {
+        case 'pending':
+          return 'badge-secondary'; 
+        case 'approved':
+          return 'badge-success'; 
+        case 'rejected':
+          return 'badge-danger'; 
+        default:
+          return 'badge-primary';
+      }
+    },
+    translateStatus(status) {
+      const translations = {
+        pending: 'Pendiente',
+        approved: 'Aprobado',
+        rejected: 'Rechazado'
+      };
+      return translations[status.toLowerCase()] || 'Desconocido'; 
     },
     openInfoModal(group){
       this.groupSelected = JSON.parse(JSON.stringify(group));
       this.showInfo = true;
     },
-    getAllGroups() {
-      groupService.getAllGroups()
-        .then(response => {
+    openSaveModal(){
+      this.showModalSave = true;
+    },
+    openEditModal(group){
+      this.groupSelected = JSON.parse(JSON.stringify(group));
+      this.showModalEdit = true;
+    },
+    async getGroups() {
+      this.isLoading = true;
+        try {
+          const response = await getGroupsByUserId();
           this.groups = response.data;
-        })
-        .catch(error => {
-          console.error('Error al obtener grupos:', error);
-        });
+          this.isLoading = false;
+        } catch (error) {
+          this.isLoading = false;
+          console.error(error);
+      }
+    },
+    async deleteGroup(group){
+      try {
+        await onQuestion('¿Estás seguro de eliminar este grupo?');
+        const respose = await deleteGroup(group.id);
+        console.log("respuesta =>",respose);
+        this.getGroups();
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 }
@@ -153,6 +229,7 @@ export default {
   display: flex;
   justify-content: right;
   margin-top: 16px;
+  gap: 5px;
 }
 
 .icon-camera,
@@ -162,8 +239,99 @@ export default {
   margin-top: 5px;
 }
 
+.icon-folder-end {
+  font-size: 20px;
+  cursor: pointer;
+  margin-top: 5px;
+  margin-right: 18px;
+  float: left;
+}
+
 .icon-camera {
   margin-right: 16px;
+}
+
+.skeleton {
+  background-color: #faf9f9;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(245, 245, 245, 0.8) 25%, rgba(220, 220, 220, 0.8) 50%, rgba(245, 245, 245, 0.8) 75%);
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.skeleton-text {
+  background-color: #faf9f9;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.skeleton-title {
+  height: 24px;
+  width: 70%;
+}
+
+.skeleton-text {
+  animation: skeletonAnimation 1s infinite;
+}
+.skeleton-subtitle {
+  height: 16px;
+  width: 50%;
+}
+
+.skeleton-image {
+  background-color: #e0e0e0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.custom-badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+  color: #fff; /* Default text color */
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+}
+
+.badge-success {
+  background-color: #28a745;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+}
+
+.badge-primary {
+  background-color: #007bff;
 }
 
 </style>
