@@ -687,6 +687,30 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+  CreateMessageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/create_message
+      Handler: create_message.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /message
+            Method: POST
+            Auth:
+              Authorizer: CognitoAuthorizer
+
   UsersRole:
     Type: AWS::IAM::Role
     Properties:
