@@ -134,14 +134,21 @@ def validate_location(value):
     return False
 
 
-def validate_status_meeting(value):
+def validate_status_event(value):
     if not isinstance(value, str):
         return False
-    allowed_status = ['pending', 'rejected', 'accepted']
+    allowed_status = ['pending', 'canceled', 'completed', 'in course', 'rescheduled']
     if value not in allowed_status:
         return False
     return True
 
+def validate_event_status(value):
+    if not isinstance(value, str):
+        return False
+    allowed_status = ['active', 'inactive']
+    if value not in allowed_status:
+        return False
+    return True
 
 def validate_role_meeting(value):
     if not isinstance(value, str):
