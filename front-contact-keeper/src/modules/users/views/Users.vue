@@ -89,7 +89,7 @@ export default {
       this.isLoading = false
     },
     formatName(users) {
-      return `${users.name} ${users.last_name}`;
+      return `${users.name} ${users.surname}`;
     }
   },
   mounted(){
