@@ -286,6 +286,7 @@ import utils from '@/kernel/utils';
 import Calendar from '../views/Calendar.vue';
 import eventServices from '../services/event-services';
 import {getGroupsByUserId } from '@/modules/groups/services/groups-services';
+import { onToast} from '@/kernel/alerts';
 export default {
   name: 'ModalAddEvent',
   components: {
@@ -394,26 +395,29 @@ export default {
     },
     async saveEvent() {
       const event = this.prepareObject()
-      console.log("desde el save event", event)
       const {id_group_member} = event
       try {
         if(id_group_member){
           const response = await eventServices.saveGroupEvent(event)
           if(response){
             if(response.status === "success"){
-              console.log("Evento guardado")
+              onToast('¡Evento programado con éxito!', 'Puedes visualizar tus eventos en el calendario' , 'success')
+              this.closeModal()
+              this.$emit("getEvents")
             }
           }
         }else{
           const response = await eventServices.saveMeetingEvent(event)
           if(response){
             if(response.status === "success"){
-              console.log("Evento de tipo reunion guardado")
+              onToast('¡Evento programado con éxito!', 'Puedes visualizar tus eventos en el calendario' , 'success')
+              this.closeModal()
+              this.$emit("getEvents")
             }
           }
         }
       } catch (error) {
-        console.log(error)
+        onToast('¡Error al programar el evento!', 'Inténtalo de nuevo' , 'error')
       }
     },
     eventStatus(status){

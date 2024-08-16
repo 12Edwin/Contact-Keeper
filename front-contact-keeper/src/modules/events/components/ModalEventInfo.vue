@@ -2,61 +2,51 @@
   <Dialog
     header="Información del Evento"
     :modal="true"
+    :closeOnEscape="false"
+    :closable="false"
     :visible.sync="visible"
     position="center"
-    :contentStyle="{ overflow: 'auto', maxWidth: '60vw' }"
+    :contentStyle="{ overflow: 'auto', maxWidth: '35vw' }"
     class="custom-dialog"
     :autoZIndex="true"
     :baseZIndex="1000"
   >
-    <div class="event-info">
-      <div class="event-header text-center">
-        <Avatar :label="getInitials(eventData.name)" shape="circle" size="xlarge" class="mb-2 mx-auto" />
-        <h2 class="event-title">{{ eventData.event }}</h2>
-      </div>
-      <div class="event-details">
-        <b-row>
-          <b-col cols="12" lg="6">
-            <div class="event-detail">
-              <i class="pi pi-calendar"></i>
-              <div class="detail-text">
-                <label>Fechas</label>
-                <p>{{ formatDates(eventData.startDate, eventData.endDate) }}</p>
-              </div>
-            </div>
-          </b-col>
-          <b-col cols="12" lg="6">
-            <div class="event-detail">
-              <i class="pi pi-tag"></i>
-              <div class="detail-text">
-                <label>Tipo de evento</label>
-                <p>{{ eventData.type }}</p>
-              </div>
-            </div>
-          </b-col>
-        </b-row>
-        <b-row>
-          <b-col cols="12" lg="6">
-            <div class="event-detail">
-              <i class="pi pi-users"></i>
-              <div class="detail-text">
-                <label>Participantes</label>
-                <p>{{ eventData.participants }}</p>
-              </div>
-            </div>
-          </b-col>
-          <b-col cols="12" lg="6">
-            <div class="event-detail">
-              <i class="pi pi-info-circle"></i>
-              <div class="detail-text">
-                <label>Descripción</label>
-                <p>{{ eventData.description }}</p>
-              </div>
-            </div>
-          </b-col>
-        </b-row>
-      </div>
-    </div>
+  <template v-slot:header>
+      <h4>{{event.name}}</h4>
+    </template>
+    <template>
+      <b-row>
+        <b-col cols="12" class="mb-3">
+          <div class="event-header">
+            <h5>Título</h5>
+          </div>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <p>{{event.title ? event.title : 'Sin título'}}</p>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <div class="event-header">
+            <h5>Información</h5>
+          </div>
+        </b-col>
+        <b-col cols="12" class="mb-2">
+          <p>{{event.description}}</p>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <p>{{splitDate(event.start_date).date}} - {{ splitDate(event.end_date).date }}</p>
+          <p>{{ splitDate(event.start_date).time }} - {{ splitDate(event.end_date).time }}</p>
+          <p>{{eventType(event.type)}}</p>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <div class="event-header">
+            <h5>Ubicación</h5>
+          </div>
+        </b-col>
+        <b-col cols="12" class="mb-3">
+          <p>{{event.location}}</p>
+        </b-col>
+      </b-row>
+    </template>
     <template #footer>
       <Button label="Cerrar" icon="pi pi-times" style="color: gray;" class="p-button-text" @click="closeModal()" />
     </template>
@@ -68,6 +58,7 @@ import Avatar from 'primevue/avatar';
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import 'primeicons/primeicons.css';
+import utils from '@/kernel/utils';
 
 export default {
   name: 'ModalEventInfo',
@@ -88,19 +79,15 @@ export default {
   },
   data() {
     return {
-      eventData: {
-        event: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        type: '',
-        participants: '',
-      },
+      eventData: {},
     };
   },
   methods: {
     closeModal() {
       this.$emit('update:visible', false);
+    },
+    splitDate(date){
+      return utils.splitDateTime(date);
     },
     getInitials(text) {
       if (!text) return '';
@@ -116,6 +103,17 @@ export default {
         day: 'numeric',
       });
     },
+    eventType(type){
+      if(type === 'meeting'){
+        return 'Reunión'
+      } else if(type === "session"){
+        return 'Sesión'
+      } else if(type === "event"){
+        return 'Evento'
+      }else{
+        return 'Otro'
+      }
+    }
   },
   watch: {
     event: {
@@ -152,10 +150,8 @@ export default {
 }
 
 .event-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  padding: 0.2rem;
+  border-bottom: solid 1px #dddddd;
 }
 
 .event-title {
