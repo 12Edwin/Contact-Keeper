@@ -1,6 +1,5 @@
 import api from "@/config/http-client.gateway"
 
-
 const saveGroupEvent = async (dataEvent) =>{
     try {
         const response = await api.axiosClientEventManagement.doPost("/events", dataEvent);

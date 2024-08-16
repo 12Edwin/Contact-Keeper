@@ -6,6 +6,8 @@ const SERVER_URL = process.env.VUE_APP_BASE_URL;
 const SERVER_URL_EVENT = process.env.VUE_APP_EVENTS_URL;
 const VUE_APP_GROUPS_URL = process.env.VUE_APP_GROUPS_URL;
 const SERVER_URL_EVENT_MANAGEMENT = process.env.VUE_APP_EVENTS_MANAGEMENT
+
+
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
     timeout: 20000,
@@ -57,9 +59,9 @@ const setUpInterceptors = (client) => {
          (error) => {
             if(!error.response){
                 onToast('Error de conexión', 'No se ha podido establecer conexión con el servidor', 'error')
-                localStorage.removeItem('token');
-                localStorage.removeItem('role');
-                this.$router.push({ name: 'login' });
+                // localStorage.removeItem('token');
+                // localStorage.removeItem('role');
+                // this.$router.push({ name: 'login' });
                 return Promise.reject(error)
 
             }
@@ -129,6 +131,21 @@ const axiosClientGroups = {
     },
     doDelete(endPoint, object, config){
         return GroupsAxiosClient.put(endPoint, object, config || {});
+    },
+}
+
+const axiosClientEventManagement = {
+    doGet(endPoint, config){
+        return EventManagementClient.get(endPoint, config)
+    },
+    doPost(endPoint, object, config){
+        return EventManagementClient.post(endPoint, object, config || {});
+    },
+    doPut(endPoint, object, config){
+        return EventManagementClient.put(endPoint, object, config || {})
+    },
+    doDelete(endPoint, object, config){
+        return EventManagementClient.put(endPoint, object, config || {});
     },
 }
 
