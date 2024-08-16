@@ -819,6 +819,9 @@ Resources:
         - ALLOW_USER_SRP_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
       PreventUserExistenceErrors: ENABLED
+      AccessTokenValidity: 5
+      TokenValidityUnits:
+        AccessToken: 'hours
 
   AdminGroup:
     Type: AWS::Cognito::UserPoolGroup
