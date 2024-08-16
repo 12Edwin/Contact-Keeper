@@ -218,7 +218,7 @@ import useVuelidate from "@vuelidate/core";
 import { required, helpers, maxLength, minLength, email } from '@vuelidate/validators'
 import { nameRegex, noRequiredField, phoneRegex } from "@/kernel/patterns.js";
 import service from '../services/userServices'
-import { onError, onSuccess } from "@/kernel/alerts";
+import { onError, onSuccess, onToast } from "@/kernel/alerts";
 export default {
   name: 'ModalSaveUser',
   props: {
@@ -297,6 +297,16 @@ export default {
   methods: {
     closeModal() {
       this.$emit('update:visible', false);
+      this.v$.name.$model = '',
+      this.v$.surname.$model = '',
+      this.v$.last_name.$model = '',
+      this.v$.email.$model = '',
+      this.v$.phone.$model = '',
+      this.v$.password.$model = '',
+      this.v$.user_type.$model = '',
+      this.v$.username.$model = '',
+      this.v$.birthday.$model = '',
+      this.v$.$reset()
     },
     async saveUser() {
       if (!this.v$.$invalid) {
@@ -305,11 +315,11 @@ export default {
         try {
           const { status, message } = await service.save_user(this.person);
           if (status === "success") {
-            onSuccess("¡Éxito!", "¡Usuario guardado correctamente!");
+            onToast("¡Éxito!", "¡Usuario guardado correctamente!");
             this.closeModal()
+            this.$emit("getUsers")
           } else {
-            console.log(message);
-            console.log(this.person.user_type);
+            onToast("¡Error!", "¡No se pudo guardar al usuario!");
           }
         } catch (error) {
 
@@ -318,6 +328,7 @@ export default {
       } else {
         onError("¡Error!", "¡Debes completar los campos correctamente!");
       }
+      this.isLoading = false
     },
     formmatDate(date) {
       return moment(date).format('YYYY-MM-DD')

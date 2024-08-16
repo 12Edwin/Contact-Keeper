@@ -17,16 +17,19 @@
           </div>
           <div>
             <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
-              <Column :headerStyle="config" class="ctm-name" :field="formatName"  header="Nombre"/>
+              <Column :headerStyle="config" class="ctm-name" :field="formatName" header="Nombre" />
               <Column :headerStyle="config" field="phone" header="Numero de Telefono" />
               <Column :headerStyle="config" field="email" header="Correo Electronico" />
             </DataTable>
           </div>
+          <div class="content">
+              <UsersSkeleton/>
+            </div>
         </div>
       </Panel>
     </div>
     <ModalUserInfo :user="selectedUser" :visible.sync="displayModal" />
-    <ModalSaveUser :visible.sync="displaySaveModal" />
+    <ModalSaveUser :visible.sync="displaySaveModal" @getUsers="getUsers" />
   </div>
 </template>
 
@@ -36,7 +39,8 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import ModalUserInfo from "@/modules/users/components/ModalUserInfo.vue";
 import ModalSaveUser from "@/modules/users/components/ModalSaveUser.vue";
-import services from '../services/userServices'
+import services from '../services/userServices';
+import UsersSkeleton from '@/components/UsersSkeleton.vue';
 export default {
   name: 'Events',
   components: {
@@ -44,6 +48,7 @@ export default {
     DataTable,
     Column,
     ModalUserInfo,
+    UsersSkeleton,
     ModalSaveUser
   },
   data() {
@@ -83,6 +88,7 @@ export default {
       const { data, status } = await services.get_users()
       if (status === "success") {
         this.users = data;
+
       } else {
         onError('Error', 'Ha ocurrido un error inesperado').then(() => { })
       }
@@ -92,7 +98,7 @@ export default {
       return `${users.name} ${users.surname}`;
     }
   },
-  mounted(){
+  mounted() {
     this.getUsers()
   }
 }
