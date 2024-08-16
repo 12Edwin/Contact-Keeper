@@ -205,6 +205,7 @@ export default defineComponent({
       await onQuestion('¿Estás seguro de que deseas actualizar este grupo?');
       try {
         const response = await updateGroup(props.groupData.id, {
+          id: props.groupData.id,
           name: group.name,
           description: group.description,
           title: group.title,
