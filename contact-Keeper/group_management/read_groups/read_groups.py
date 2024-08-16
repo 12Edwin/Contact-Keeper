@@ -33,7 +33,7 @@ def read_groups(data):
         connection = get_db_connection()
         with connection.cursor() as cursor:
             query = """
-            SELECT m.role, m.title, m.notes, m.created_at, m.status, g.name, g.description, g.id FROM `meets` m LEFT JOIN `group_members` g ON m.group_id = g.id WHERE m.person_id = %s
+            SELECT m.role, m.title, m.notes, m.created_at, m.status, g.name, g.description, g.id FROM `group_members` g LEFT JOIN `meets` m  ON m.group_id = g.id WHERE m.person_id = %s
             """
             cursor.execute(query, id_member)
             rows = cursor.fetchall()
