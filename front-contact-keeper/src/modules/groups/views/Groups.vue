@@ -56,7 +56,7 @@
                     <div class="card-footer">
                       <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
                       <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
-                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" @click="getEventsbyGroup(group)" ></i>
+                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'"  ></i>
                       <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                     </div>
                   </div>

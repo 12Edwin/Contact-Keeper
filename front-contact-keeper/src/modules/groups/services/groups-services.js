@@ -1,4 +1,5 @@
 import api from "@/config/http-client.gateway"
+import { getToken } from "@/kernel/utils";
 
 // Función para decodificar el payload de un JWT
 const decodeJwtPayload = (token) => {
@@ -14,10 +15,12 @@ const decodeJwtPayload = (token) => {
 
 export const getGroupsByUserId = async () => {
     try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         const payload = decodeJwtPayload(token);
         const userId = payload.sub;
         const response = await api.axiosClientGroups.doGet(`/groups/moderator/${userId}`);
+        console.log("response get gr =>", response);
+        
         return response.data;
     } catch (error) {
         return error.response;
@@ -26,7 +29,7 @@ export const getGroupsByUserId = async () => {
 
 export const saveGroup = async (groupData) => {
     try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         const payload = decodeJwtPayload(token);
         const userId = payload.sub;
         groupData = { ...groupData, moderator: userId };   
