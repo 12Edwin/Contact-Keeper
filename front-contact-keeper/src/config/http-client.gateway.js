@@ -5,9 +5,7 @@ import utils from "@/kernel/utils";
 const SERVER_URL = process.env.VUE_APP_BASE_URL;
 const SERVER_URL_EVENT = process.env.VUE_APP_EVENTS_URL;
 const VUE_APP_GROUPS_URL = process.env.VUE_APP_GROUPS_URL;
-
-console.log("ola",SERVER_URL_EVENT)
-
+const SERVER_URL_EVENT_MANAGEMENT = process.env.VUE_APP_EVENTS_MANAGEMENT
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
     timeout: 20000,
@@ -20,6 +18,11 @@ const EventAxiosClient = axios.create({
 
 const GroupsAxiosClient = axios.create({
     baseURL: VUE_APP_GROUPS_URL,
+    timeout: 20000,
+})
+
+const EventManagementClient = axios.create({
+    baseURL: SERVER_URL_EVENT_MANAGEMENT,
     timeout: 20000,
 })
 
@@ -52,9 +55,12 @@ const setUpInterceptors = (client) => {
         },
          (error) => {
             if(!error.response){
-                console.log('Error de conexión', error)
                 onToast('Error de conexión', 'No se ha podido establecer conexión con el servidor', 'error')
+                localStorage.removeItem('token');
+                localStorage.removeItem('role');
+                this.$router.push({ name: 'login' });
                 return Promise.reject(error)
+
             }
             if(error.response.status){
                 switch(error.response.status){
@@ -65,7 +71,6 @@ const setUpInterceptors = (client) => {
                         console.log("Error 401")
                         return Promise.resolve()
                     case 500:
-                         console.log("Error 500")
                          onToast('Error interno','Error interno del servidor' , 'error')
                         break;
                 }
@@ -79,7 +84,7 @@ const setUpInterceptors = (client) => {
 setUpInterceptors(AxiosClient)
 setUpInterceptors(EventAxiosClient)
 setUpInterceptors(GroupsAxiosClient)
-
+setUpInterceptors(EventManagementClient)
 
 const axiosClientApi = {
     doGet(url){
@@ -126,8 +131,22 @@ const axiosClientGroups = {
     },
 }
 
+const axiosClientEventManagement = {
+    doGet(endPoint, config){
+        return EventManagementClient.get(endPoint, config)
+    },
+    doPost(endPoint, object, config){
+        return EventManagementClient.post(endPoint, object, config || {});
+    },
+    doPut(endPoint, object, config){
+        return EventManagementClient.put(endPoint, object, config || {})
+    },
+    doDelete(endPoint, object, config){
+        return EventManagementClient.put(endPoint, object, config || {});
+    },
+}
 export default {
     axiosClientApi,
     axiosClientEvent,
-    axiosClientGroups
+    axiosClientEventManagement
 }
