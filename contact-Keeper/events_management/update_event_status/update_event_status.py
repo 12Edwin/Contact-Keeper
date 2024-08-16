@@ -6,7 +6,7 @@ import pymysql
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
     sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'commons', 'python'))
 
-from app import validate_name, validate_start_date, validate_end_date, validate_event_type, exists_group, validate_id, exists_by_id, get_db_connection, response_200, response_400, response_500, ErrorType, validate_status_event
+from app import validate_name, validate_start_date, exists_event, validate_end_date, validate_event_type, exists_group, validate_id, exists_by_id, get_db_connection, response_200, response_400, response_500, ErrorType, validate_status_event
 
 
 def lambda_handler(event, context):
@@ -25,7 +25,7 @@ def update_event(event):
     status = event.get('status')
 
     # Validate the attributes
-    if not validate_id(id_event):
+    if not exists_event(id_event):
         raise ValueError(ErrorType.INVALID_ID)
     if not validate_status_event(status):
         raise ValueError(ErrorType.INVALID_EVENT_STATUS)
