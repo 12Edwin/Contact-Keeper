@@ -28,6 +28,12 @@
               <p class="error-messages" v-if="v$.name.$dirty && v$.name.maxLength.$invalid">
                 {{ v$.name.maxLength.$message }}
               </p>
+              <p class="error-messages" v-if="v$.name.$dirty && v$.name.minLength.$invalid">
+                {{ v$.name.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.name.$dirty && v$.name.format.$invalid">
+                {{ v$.name.format.$message }}
+              </p>
             </div>
           </div>
         </b-col>
@@ -40,8 +46,17 @@
               <label for="field-title">Título</label>
             </span>
             <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.required.$invalid">
+                {{ v$.title.required.$message }}
+              </p>
               <p class="error-messages" v-if="v$.title.$dirty && v$.title.maxLength.$invalid">
                 {{ v$.title.maxLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.minLength.$invalid">
+                {{ v$.title.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.format.$invalid">
+                {{ v$.title.format.$message }}
               </p>
             </div>
           </div>
@@ -55,8 +70,17 @@
               <label for="field-description">Descripción</label>
             </span>
             <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.required.$invalid">
+                {{ v$.description.required.$message }}
+              </p>
               <p class="error-messages" v-if="v$.description.$dirty && v$.description.maxLength.$invalid">
                 {{ v$.description.maxLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.minLength.$invalid">
+                {{ v$.description.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.format.$invalid">
+                {{ v$.description.format.$message }}
               </p>
             </div>
           </div>
@@ -73,28 +97,54 @@
               <p class="error-messages" v-if="v$.notes.$dirty && v$.notes.maxLength.$invalid">
                 {{ v$.notes.maxLength.$message }}
               </p>
+              <p class="error-messages" v-if="v$.notes.$dirty && v$.notes.format.$invalid">
+                {{ v$.notes.format.$message }}
+              </p>
             </div>
           </div>
         </b-col>
       </b-row>
     </div>
     <template #footer>
-      <Button @click="saveGroup" label="Guardar" icon="pi pi-check" iconPos="right" class="button-options"/>
-      <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal"/>
+      <Button 
+        @click="updateGroupFunction" 
+        label="Guardar" 
+        icon="pi pi-check" 
+        iconPos="right" 
+        class="button-options" 
+        :disabled="isLoading || !isFormValid"
+      />
+      <Button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        class="p-button-text p-button-plain" 
+        iconPos="right" 
+        @click="closeModal"
+      />
     </template>
   </Dialog>
 </template>
 
 <script>
-import { reactive, watch } from 'vue';
-import useVuelidate from '@vuelidate/core';
-import { required, maxLength, helpers } from '@vuelidate/validators';
+import { defineComponent, reactive, computed, ref, watch } from 'vue';
+import { useVuelidate } from '@vuelidate/core';
+import { required, maxLength, minLength } from '@vuelidate/validators';
+import { helpers } from '@vuelidate/validators';
+import { onQuestion } from '@/kernel/alerts';
+import { updateGroup } from '../services/groups-services';
+import { nameRegex, phraseRegex } from '@/kernel/patterns';
 
-export default {
-  name: 'ModalSaveGroup',
+export default defineComponent({
+  name: 'ModalPutGroup',
   props: {
-    visible: Boolean,
-    groupData: Object
+    visible: {
+      type: Boolean,
+      required: true
+    },
+    groupData: {
+      type: Object,
+      required: true
+    }
   },
   setup(props, { emit }) {
     const group = reactive({
@@ -114,38 +164,73 @@ export default {
     const rules = {
       name: {
         required: helpers.withMessage('El nombre del grupo es requerido', required),
-        maxLength: helpers.withMessage("El nombre del grupo debe tener menos de 50 caracteres", maxLength(50))
+        maxLength: helpers.withMessage("El nombre del grupo debe tener menos de 50 caracteres", maxLength(50)),
+        minLength: helpers.withMessage("El nombre del grupo debe tener al menos 3 caracteres", minLength(3)),
+        format: helpers.withMessage("El nombre del grupo solo puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
       title: {
-        maxLength: helpers.withMessage("El título debe tener menos de 50 caracteres", maxLength(50))
+        required: helpers.withMessage('El título es requerido', required),
+        maxLength: helpers.withMessage("El título debe tener menos de 50 caracteres", maxLength(50)),
+        minLength: helpers.withMessage("El título debe tener al menos 3 caracteres", minLength(3)),
+        format: helpers.withMessage("El título solo puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
       description: {
-        maxLength: helpers.withMessage("La descripción debe tener menos de 200 caracteres", maxLength(200))
+        required: helpers.withMessage('La descripción es requerida', required),
+        maxLength: helpers.withMessage("La descripción debe tener menos de 50 caracteres", maxLength(50)),
+        minLength: helpers.withMessage("La descripción debe tener al menos 3 caracteres", minLength(3)),
+        format: helpers.withMessage("La descripción puede contener letras, números, espacios, puntos y comas", helpers.regex(phraseRegex))
       },
       notes: {
-        maxLength: helpers.withMessage("Las notas deben tener menos de 200 caracteres", maxLength(200))
+        maxLength: helpers.withMessage("Las notas deben tener menos de 70 caracteres", maxLength(70)),
+        format: helpers.withMessage("Las notas pueden contener letras, números, espacios, puntos y comas", helpers.regex(phraseRegex))
       }
     };
 
     const v$ = useVuelidate(rules, group);
+    const isLoading = ref(false);
+    const isFormValid = computed(() => !v$.value.$pending && !v$.value.$invalid);
 
     const closeModal = () => {
       emit('update:visible', false);
     };
 
-    const saveGroup = () => {
-      console.log('Guardando grupo');
-      console.log(group);
+    const updateGroupFunction = async () => {  
+      isLoading.value = true;
+      v$.value.$touch();
+      if (v$.value.$invalid) {
+        isLoading.value = false;
+        return;
+      }
+
+      await onQuestion('¿Estás seguro de que deseas actualizar este grupo?');
+      try {
+        const response = await updateGroup(props.groupData.id, {
+          name: group.name,
+          description: group.description,
+          title: group.title,
+          notes: group.notes
+        });
+        if (response.status === 200 || response.status === 201 || response.status === "success") {
+          emit('update-data');
+          closeModal();
+        }
+      } catch (error) {
+        console.error('Error al actualizar el grupo:', error);
+      } finally {
+        isLoading.value = false;
+      }
     };
 
     return {
       group,
       v$,
       closeModal,
-      saveGroup
+      updateGroupFunction,
+      isLoading,
+      isFormValid
     };
   }
-}
+});
 </script>
 
 <style lang="scss" scoped>

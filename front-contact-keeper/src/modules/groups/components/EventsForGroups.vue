@@ -1,153 +1,171 @@
 <template>
-    <Dialog
-        :modal="true"
-        :closeOnEscape="false"
-        :closable="false"
-        :visible.sync="visible"
-        position="center"
-        :contentStyle="{overflow: 'visible', width: '35vw'}"
-        class="custom-dialog"
-        :autoZIndex="true"
-    >
-      <template v-slot:header>
-        <h4>{{selectedGroup.name}}</h4>
-      </template>
-      <template>
-        <b-row>
-          <b-col cols="12" class="mb-3">
-            <div class="user-list-header">
+  <Dialog
+    :modal="true"
+    :closeOnEscape="false"
+    :closable="false"
+    :visible.sync="visible"
+    position="center"
+    :contentStyle="{overflow: 'auto', width: '35vw'}"
+    class="custom-dialog"
+    :autoZIndex="true"
+  >
+    <template v-slot:header>
+      <h4>Eventos</h4>
+    </template>
+    
+    <template v-if="events.length === 0">
+      <div class="skeleton-container">
+        <div class="skeleton-item" v-for="index in 6" :key="index"></div>
+      </div>
+    </template>
+    
+    <template v-else>
+      <b-row>
+        <b-col v-for="event in events" :key="event.id" cols="12" class="mb-3">
+          <div class="event-container">
+            <div class="event-header">
               <h5>Título</h5>
             </div>
-          </b-col>
-          <b-col cols="12" class="mb-3">
-            <p>{{selectedGroup.title}}</p>
-          </b-col>
-          <b-col cols="12" class="mb-3">
-            <div class="user-list-header">
-              <h5>Descripción</h5>
+            <p>{{ event.name }}</p>
+          </div>
+          <div class="event-container">
+            <div class="event-header">
+              <h5>Localización</h5>
             </div>
-          </b-col>
-          <b-col cols="12" class="mb-3">
-            <p>{{selectedGroup.description}}</p>
-          </b-col>
-          <b-col cols="12" class="mb-3">
-            <div class="user-list-header">
-              <h5>Notas</h5>
+            <p>{{ event.location }}</p>
+          </div>
+          <div class="event-container">
+            <div class="event-header">
+              <h5>Tipo</h5>
             </div>
-          </b-col>
-          <b-col cols="12" class="mb-3">
-            <p>{{selectedGroup.notes}}</p>
-          </b-col>
-        </b-row>
-      </template>
-      <template #footer>
-        <Button  label="Guardar" icon="pi pi-check"  iconPos="right" class="button-options"/>
-        <Button  label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
-      </template>
-    </Dialog>
-  </template>
+            <p>{{ event.type }}</p>
+          </div>
+          <div class="event-container">
+            <div class="event-header">
+              <h5>Fechas</h5>
+            </div>
+            <p>{{ event.start_date }} - {{ event.end_date }}</p>
+          </div>
+        </b-col>
+      </b-row>
+    </template>
+
+    <template #footer>
+      <Button label="Guardar" icon="pi pi-check" iconPos="right" class="button-options"/>
+      <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
+    </template>
+  </Dialog>
+</template>
+
+
   
-  <script>
-  import Tooltip from 'primevue/tooltip';
-  export default {
-    name: 'Announcements',
-    directives:{
-      'tooltip': Tooltip
+<script>
+import Tooltip from 'primevue/tooltip';
+import { getEventsbyGroup } from '../services/groups-services';
+
+export default {
+  name: 'Announcements',
+  directives: {
+    'tooltip': Tooltip
+  },
+  props: {
+    visible: {
+      type: Boolean,
     },
-    props: {
-      visible: {
-        type: Boolean,
-      },
-      group: {
-        type: Object,
-        required: true
-      }
+    group: {
+      type: Object,
+      required: true
+    }
+  },
+  data() {
+    return {
+      events: [],
+    };
+  },
+  mounted() {
+    this.getEvents();
+  },
+  methods: {
+    closeModal() {
+      this.$emit('update:visible', false);
     },
-    data(){
-      return {
-        selectedGroup :{
-          name: '',
-          description: '',
-          title: '',
-          status: '',
-          notes: '',
-        }
-      }
-    },
-    methods: {
-      closeModal(){
-        this.$emit('update:visible', false);
-      }
-    },
-    watch: {
-      group: {
-        handler: function (val) {
-          if(val && Object.keys(val).length > 0){
-            this.selectedGroup = val;
-          }
-        },
-        immediate: true
+    async getEvents() {
+      try {
+        const response = await getEventsbyGroup(this.group.id);
+        this.events = response.data;
+        console.log(this.events);
+      } catch (error) {
+        console.error(error);
       }
     }
+  },
+  watch: {
+    group: {
+      handler(val) {
+        if (val && Object.keys(val).length > 0) {
+          this.selectedGroup = val;
+        }
+      },
+      immediate: true
+    }
   }
-  </script>
-  
-  <style lang="scss" scoped>
-  @import '@/styles/colors';
-  .info-group {
-    text-align: center;
-    padding: 1rem;
-  }
-  
-  .user-list-header {
-    padding: 0.2rem;
-    border-bottom: solid 1px #dddddd;
-  }
-  
-  .user-list {
-    border-bottom: solid 1px #dddddd;
-    display: flex;
-    align-items: center;
-    padding: 0.2rem;
-    width: 100%;
-  }
-  
-  .user-info-container {
-    display: flex;
-    align-items: center;
-    width: 100%;
+};
+</script>
+
+<style lang="scss" scoped>
+@import '@/styles/colors';
+
+.custom-dialog {
+  .p-dialog {
+    transition: opacity 0.3s ease, transform 0.3s ease;
   }
   
-  .user-info {
+  .p-dialog-enter-active,
+  .p-dialog-leave-active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .p-dialog-enter, .p-dialog-leave-to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  .skeleton-container {
     display: flex;
     flex-direction: column;
-    margin-left: 10px;
+    gap: 0.5rem;
   }
   
-  .username {
-    font-size: 16px;
-    font-weight: 500;
-    color: #333;
-    margin: 0;
+  .skeleton-item {
+    height: 1.5rem;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    animation: pulse 1.5s infinite ease-in-out;
   }
   
-  .role {
-    margin: 0;
-    font-size: 13px;
-    color: #555;
+  @keyframes pulse {
+    0% {
+      background-color: #e0e0e0;
+    }
+    50% {
+      background-color: #c0c0c0;
+    }
+    100% {
+      background-color: #e0e0e0;
+    }
+  }
+
+  .event-container {
+    margin-bottom: 1rem;
+    border-bottom: solid 1px #dddddd;
+    padding-bottom: 0.5rem;
   }
   
-  .icon-container {
-    background: transparent;
-    margin-right: 15px;
+  .event-header {
+    padding: 0.2rem;
+    border-bottom: solid 1px #dddddd;
   }
-  
-  .pi-minus-circle {
-    font-size: 16px;
-    color: #555;
-    cursor: pointer;
-  }
-  
+
   .button-options {
     background: $primary-color;
     color: white;
@@ -155,13 +173,12 @@
     border-radius: 5px;
   }
   
-  .button-options:hover{
-    border-radius: 5px;
+  .button-options:hover {
     transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
     background: $primary-color !important;
-    border: none;
     cursor: pointer;
   }
-  
-  </style>
+}
+</style>
+

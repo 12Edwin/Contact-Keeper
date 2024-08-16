@@ -12,6 +12,20 @@ const getToken = () => {
   return localStorage.getItem("token");
 };
 
+const getSubFromToken = () => {
+  const token = getToken(); 
+  if (!token) {
+    return null;
+  }
+  try {
+    const decodedToken = jwtDecode(token);
+    return decodedToken.sub; 
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
+  }
+};
+
 const removeToken = () => {
   return localStorage.removeItem("token");
 };
@@ -141,6 +155,7 @@ export default {
   getUserByEmail,
   getUserByName,
   getUserFromToke,
+  getSubFromToken,
   validAge,
   messageError,
   getErrorMessages,

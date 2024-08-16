@@ -56,7 +56,7 @@
                     <div class="card-footer">
                       <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
                       <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
-                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'"  ></i>
+                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" @click="openModalGetEvents(group)"  ></i>
                       <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                     </div>
                   </div>
@@ -67,6 +67,7 @@
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
           <ModalCreateGroup :visible.sync="showModalSave"/>
           <ModalEditGroup :visible.sync="showModalEdit" :groupData="groupSelected"/>
+          <EventsForGroups :group="groupSelected" :visible.sync="showModalEvents"/>
         </div>
       </Panel>
     </div>
@@ -79,8 +80,9 @@ import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
 import ModalCreateGroup from '../components/ModalSaveGroup.vue';
 import ModalEditGroup from '../components/ModalEditGroup.vue';
+import EventsForGroups from '../components/EventsForGroups.vue';
 import {getGroupsByUserId, deleteGroup, getEventsbyGroup } from '../services/groups-services';
-import { onQuestion } from '@/kernel/alerts';
+import { onQuestion, onToast } from '@/kernel/alerts';
 
 export default {
   name: 'Groups',
@@ -91,7 +93,8 @@ export default {
   components: {
     Announcements,
     ModalCreateGroup,
-    ModalEditGroup
+    ModalEditGroup,
+    EventsForGroups
   },
   data() {
     return {
@@ -100,7 +103,8 @@ export default {
       isLoading: true,
       groupSelected: {},
       showModalSave: false,
-      showModalEdit: false
+      showModalEdit: false,
+      showModalEvents: false
     }
   },
   mounted() {
@@ -146,29 +150,33 @@ export default {
       this.groupSelected = JSON.parse(JSON.stringify(group));
       this.showModalEdit = true;
     },
+    openModalGetEvents(group){
+      this.groupSelected = JSON.parse(JSON.stringify(group));
+      this.showModalEvents = true;
+    },
     async getGroups() {
       this.isLoading = true;
         try {
           const response = await getGroupsByUserId();
           this.groups = response.data;
+          console.log(this.groups);
           this.isLoading = false;
         } catch (error) {
           this.isLoading = false;
-          console.error("get=>",error);
       }
     },
     async deleteGroup(group){
       try {
         await onQuestion('¿Estás seguro de eliminar este grupo?');
-        const respose = await deleteGroup(group.id);
-        console.log("respuesta =>",respose);
-        this.getGroups();
+        const response = await deleteGroup(group.id);
+        
+        if(response.status === 200 || response.status === 201 || response.status === "success"){
+          this.getGroups();
+          onToast('success', 'Grupo eliminado correctamente', 'success');
+        }
+
       } catch (error) {
-        console.error("delete error =>", error);
       }
-    },
-    async getEventsbyGroup(group){
-      console.log("group =>", group);
     }
   }
 }
