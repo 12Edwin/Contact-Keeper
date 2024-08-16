@@ -11,7 +11,7 @@
   >
     <div class="event-info">
       <div class="event-header text-center">
-        <Avatar :label="getInitials(eventData.event)" shape="circle" size="xlarge" class="mb-2 mx-auto" />
+        <Avatar :label="getInitials(eventData.name)" shape="circle" size="xlarge" class="mb-2 mx-auto" />
         <h2 class="event-title">{{ eventData.event }}</h2>
       </div>
       <div class="event-details">

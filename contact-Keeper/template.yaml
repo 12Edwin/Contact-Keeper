@@ -122,46 +122,12 @@ Resources:
       CompatibleRuntimes:
         - python3.12
 
-  OptionsMethodFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: prelight_method/
-      Handler: manage_options.lambda_handler
-      Runtime: python3.12
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Events:
-        OptionsMethodLogin:
-          Type: Api
-          Properties:
-            RestApiId: !Ref UsersApiGateway
-            Path: /login
-            Method: OPTIONS
-            Auth:
-              Authorizer: NONE
-        OptionsMethodUser:
-          Type: Api
-          Properties:
-            RestApiId: !Ref UsersApiGateway
-            Path: /users
-            Method: OPTIONS
-            Auth:
-              Authorizer: NONE
-        OptionsMethodConfirm:
-          Type: Api
-          Properties:
-            RestApiId: !Ref UsersApiGateway
-            Path: /confirm
-            Method: OPTIONS
-            Auth:
-              Authorizer: NONE
-
   UsersApiGateway:
     Type: AWS::Serverless::Api
     Properties:
       Name: UserApi
       StageName: Prod
       Auth:
-        DefaultAuthorizer: CognitoAuthorizer
         Authorizers:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
@@ -177,14 +143,13 @@ Resources:
       Name: EventApi
       StageName: Prod
       Auth:
-        DefaultAuthorizer: CognitoAuthorizer
         Authorizers:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
       Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
 
   GroupsApiGateway:
@@ -193,14 +158,13 @@ Resources:
       Name: GroupApi
       StageName: Prod
       Auth:
-        DefaultAuthorizer: CognitoAuthorizer
         Authorizers:
           CognitoAuthorizer:
             UserPoolArn: !GetAtt CognitoUserPool.Arn
       DisableExecuteApiEndpoint: false
       Cors:
-        AllowMethods: "'*'"
-        AllowHeaders: "'*'"
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
 
   CreateUserFunction:
@@ -224,8 +188,7 @@ Resources:
             RestApiId: !Ref UsersApiGateway
             Path: /users
             Method: POST
-            Auth:
-              Authorizer: NONE
+
 
   ConfirmUserFunction:
     Type: AWS::Serverless::Function
@@ -248,8 +211,7 @@ Resources:
             RestApiId: !Ref UsersApiGateway
             Path: /confirm
             Method: POST
-            Auth:
-              Authorizer: NONE
+            
 
   LoginFunction:
     Type: AWS::Serverless::Function
@@ -272,8 +234,6 @@ Resources:
             RestApiId: !Ref UsersApiGateway
             Path: /login
             Method: POST
-            Auth:
-              Authorizer: NONE
 
   ReadUsersFunction:
     Type: AWS::Serverless::Function
@@ -603,6 +563,30 @@ Resources:
           Properties:
             RestApiId: !Ref GroupsApiGateway
             Path: /groups/moderator/{moderator}
+            Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+
+  ReadAllGroupsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/read_all_groups
+      Handler: read_all_groups.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /groups
             Method: GET
             Auth:
               Authorizer: CognitoAuthorizer

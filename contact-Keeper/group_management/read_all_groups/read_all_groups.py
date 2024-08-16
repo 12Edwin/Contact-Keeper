@@ -13,8 +13,7 @@ from app import ErrorType, get_db_connection, response_200, response_400, respon
 def lambda_handler(event, context):
     try:
         user_pool_id, user_pool_client_id = get_cognito_ids()
-        id_member = event['pathParameters']
-        data = read_groups(id_member)
+        data = read_groups()
         return response_200(data)
     except ValueError as e:
         return response_400(ErrorType.english(str(e)))
@@ -22,20 +21,15 @@ def lambda_handler(event, context):
         return response_500(ErrorType.english(str(e)))
 
 
-def read_groups(data):
-    id_member = data.get('moderator')
-
-    if not exists_user(id_member):
-        raise ValueError(ErrorType.USER_NOT_FOUND)
-
+def read_groups():
     connection = None
     try:
         connection = get_db_connection()
         with connection.cursor() as cursor:
             query = """
-            SELECT m.role, m.title, m.notes, m.created_at, m.status, g.name, g.description, g.id FROM `meets` m LEFT JOIN `group_members` g ON m.group_id = g.id WHERE m.person_id = %s
+            SELECT * FROM `group_members`
             """
-            cursor.execute(query, id_member)
+            cursor.execute(query)
             rows = cursor.fetchall()
             if rows is not None:
                 column_names = [desc[0] for desc in cursor.description]
