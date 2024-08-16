@@ -821,7 +821,7 @@ Resources:
       PreventUserExistenceErrors: ENABLED
       AccessTokenValidity: 5
       TokenValidityUnits:
-        AccessToken: 'hours
+        AccessToken: 'hours'
 
   AdminGroup:
     Type: AWS::Cognito::UserPoolGroup
