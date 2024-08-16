@@ -285,6 +285,7 @@ import userServices from '@/modules/users/services/userServices';
 import utils from '@/kernel/utils';
 import Calendar from '../views/Calendar.vue';
 import eventServices from '../services/event-services';
+import {getGroupsByUserId } from '@/modules/groups/services/groups-services';
 export default {
   name: 'ModalAddEvent',
   components: {
@@ -421,8 +422,7 @@ export default {
     async getUsergroups(){
       try {
         this.onGettingGroups = true
-        const id = utils.getIdUserFromToke()
-        const response = await groupService.getGroupsByUserId(id)
+        const response = await getGroupsByUserId()
         if(response){
           if(response.status === "success"){
             this.groups = response.data

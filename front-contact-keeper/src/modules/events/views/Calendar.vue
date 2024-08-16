@@ -221,6 +221,7 @@ export default
           // this.calendarOptions.events = this.items;
           // console.log(this.items)
         }
+        console.log('getEvents')
         this.isLoading = false
       } catch (error) {
         console.log(error)
