@@ -497,6 +497,28 @@ Resources:
             Path: /events/{id}
             Method: PUT
 
+  UpdateEventStatusFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: events_management/update_event_status
+      Handler: update_event_status.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        UpdateEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref EventsApiGateway
+            Path: /events/status/{id}
+            Method: PUT
+
   DeleteEventFunction:
     Type: AWS::Serverless::Function
     Properties:

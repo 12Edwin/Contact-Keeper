@@ -151,7 +151,7 @@ jobs:
           echo "Detalles del error: ${{ steps.update_jira.outputs.error }}"
 
       - name: Add Jira comment
-        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true' && steps.update_jira.outcome == 'success'
+        if: steps.extract_jira_keys.outputs.HAS_JIRA_KEYS == 'true'
         uses: atlassian/gajira-comment@master
         with:
           issue: ${{ steps.extract_jira_keys.outputs.JIRA_KEYS }}
