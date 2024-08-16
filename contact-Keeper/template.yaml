@@ -591,6 +591,30 @@ Resources:
             Auth:
               Authorizer: CognitoAuthorizer
 
+  ReadGroupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          AWS_STACK_NAME: !Ref AWS::StackName
+      CodeUri: group_management/read_group
+      Handler: read_group.lambda_handler
+      Runtime: python3.12
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Layers:
+        - !Ref CommonsLayer
+      Architectures:
+        - x86_64
+      Events:
+        CreateGroup:
+          Type: Api
+          Properties:
+            RestApiId: !Ref GroupsApiGateway
+            Path: /groups/{id}
+            Method: GET
+            Auth:
+              Authorizer: CognitoAuthorizer
+
   UpdateGroupFunction:
     Type: AWS::Serverless::Function
     Properties:
