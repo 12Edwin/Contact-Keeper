@@ -207,7 +207,7 @@ export default defineComponent({
         const response = await saveGroup(group);
         if (response.status === 200 || response.status === 201 || response.status === "success") {
           onToast('success', 'Grupo creado correctamente', 'success');
-          emit('update-data'); // Emit to trigger data update
+          emit('update-data'); 
         }
       } catch (error) {
         console.error('Error al guardar el grupo:', error);
