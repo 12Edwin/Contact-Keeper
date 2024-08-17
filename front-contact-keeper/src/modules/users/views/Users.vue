@@ -23,8 +23,8 @@
             </DataTable>
           </div>
           <div class="content">
-              <UsersSkeleton/>
-            </div>
+            <UsersSkeleton v-if="isLoading"/>
+          </div>
         </div>
       </Panel>
     </div>
@@ -65,7 +65,8 @@ export default {
       displayModal: false,
       displaySaveModal: false,
       searchByName: true,
-      optionSelected: null
+      optionSelected: null,
+      isLoading: false
     }
   },
   methods: {
@@ -85,10 +86,11 @@ export default {
       this.displaySaveModal = true
     },
     async getUsers() {
+      this.isLoading = true;
       const { data, status } = await services.get_users()
       if (status === "success") {
         this.users = data;
-
+        
       } else {
         onError('Error', 'Ha ocurrido un error inesperado').then(() => { })
       }
@@ -129,6 +131,7 @@ export default {
 .content {
   flex: 1;
   padding: 1rem;
+  margin-left: 0;
   transition: margin-left 0.3s;
 }
 

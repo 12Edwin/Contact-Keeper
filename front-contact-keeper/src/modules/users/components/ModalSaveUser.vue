@@ -72,7 +72,7 @@
           <div class="field">
             <div class="input-group-row">
               <div class="input-group-cols-6">
-                <label for="birthday" class="form-label-required">Nacimiento:</label>
+                <label for="birthday" class="form-label-required">Fecha de Nacimiento:</label>
                 <input type="date" id="birthday" required v-model="v$.birthday.$model"
                   :class="{ 'invalid-field-custom': v$.birthday.$error }" />
                 <div class="text-danger text-start pt-2">
@@ -358,6 +358,13 @@ export default {
   color: white;
   border: none;
   border-radius: 5px;
+}
+
+input {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
 .form-part {

@@ -1,4 +1,5 @@
 import adminRoutes from "@/router/admin-routes";
+import Profile from '@/modules/users/views/Profile.vue'
 export default [
     {
         path: '',
@@ -9,6 +10,14 @@ export default [
                 route.meta.requireAuth = false
                 return {...route}
             }),
+            {
+                path: '/profile',
+                name: 'perfil',
+                component: Profile,
+                meta:{
+                    title: 'Perfil'
+                }
+            }
         ]
     }
 ]
