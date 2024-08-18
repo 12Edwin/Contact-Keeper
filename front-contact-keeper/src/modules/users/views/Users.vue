@@ -17,16 +17,20 @@
           </div>
           <div>
             <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
-              <Column :headerStyle="config" class="ctm-name" field="name" header="Nombre" />
+              <Column :headerStyle="config" class="ctm-name" :field="formatName" header="Nombre" />
               <Column :headerStyle="config" field="phone" header="Numero de Telefono" />
               <Column :headerStyle="config" field="email" header="Correo Electronico" />
             </DataTable>
+            <div class="content">
+              <UsersSkeleton v-if="isLoading" />
+            </div>
           </div>
+
         </div>
       </Panel>
     </div>
     <ModalUserInfo :user="selectedUser" :visible.sync="displayModal" />
-    <ModalSaveUser :visible.sync="displaySaveModal" />
+    <ModalSaveUser :visible.sync="displaySaveModal" @getUsers="getUsers" />
   </div>
 </template>
 
@@ -36,7 +40,8 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import ModalUserInfo from "@/modules/users/components/ModalUserInfo.vue";
 import ModalSaveUser from "@/modules/users/components/ModalSaveUser.vue";
-import services from '../services/userServices'
+import services from '../services/userServices';
+import UsersSkeleton from '@/components/UsersSkeleton.vue';
 export default {
   name: 'Events',
   components: {
@@ -44,6 +49,7 @@ export default {
     DataTable,
     Column,
     ModalUserInfo,
+    UsersSkeleton,
     ModalSaveUser
   },
   data() {
@@ -60,7 +66,8 @@ export default {
       displayModal: false,
       displaySaveModal: false,
       searchByName: true,
-      optionSelected: null
+      optionSelected: null,
+      isLoading: false
     }
   },
   methods: {
@@ -80,18 +87,21 @@ export default {
       this.displaySaveModal = true
     },
     async getUsers() {
+      this.isLoading = true;
       const { data, status } = await services.get_users()
       if (status === "success") {
         this.users = data;
-        console.log(this.users  );
-        
+
       } else {
         onError('Error', 'Ha ocurrido un error inesperado').then(() => { })
       }
       this.isLoading = false
+    },
+    formatName(users) {
+      return `${users.name} ${users.surname}`;
     }
   },
-  mounted(){
+  mounted() {
     this.getUsers()
   }
 }
@@ -122,6 +132,7 @@ export default {
 .content {
   flex: 1;
   padding: 1rem;
+  margin-left: 0;
   transition: margin-left 0.3s;
 }
 

@@ -844,8 +844,15 @@ Resources:
   MyPublicS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: bucket-pictures
-      AccessControl: PublicRead
+      BucketName: mi-bucket-publico-de-imagenes
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: ObjectWriter
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: error.html

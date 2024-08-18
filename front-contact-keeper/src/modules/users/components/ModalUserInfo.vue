@@ -1,17 +1,9 @@
 <template>
-  <Dialog
-      header="Información del usuario"
-      :modal="true"
-      :closeOnEscape="false"
-      :closable="false"
-      :visible.sync="visible"
-      position="center"
-      :contentStyle="{overflow: 'visible', width: '35vw'}"
-      class="custom-dialog"
-      :autoZIndex="true"
-  >
+  <Dialog header="Información del usuario" :modal="true" :closeOnEscape="false" :closable="false"
+    :visible.sync="visible" position="center" :contentStyle="{ overflow: 'visible', width: '35vw' }" class="custom-dialog"
+    :autoZIndex="true">
     <div class="user-info">
-      <Avatar :label="userData.name.charAt(0)" shape="circle" size="xlarge" class="mb-2"/>
+      <Avatar :label="userData.name.charAt(0)" shape="circle" size="xlarge" class="mb-2" />
       <h3>{{ userData.name }}</h3>
     </div>
     <div class="user-data">
@@ -30,19 +22,14 @@
             <i class="pi pi-phone"></i>
             <div class="info-text">
               <label>Número de teléfono</label>
-              <p>7775673712</p>
+              <p>{{ userData.phone }}</p>
             </div>
           </div>
         </b-col>
       </b-row>
     </div>
     <template #footer>
-      <Button
-          label="Cerrar"
-          icon="pi pi-times"
-          class="p-button-text"
-          @click="closeModal()"
-      />
+      <Button label="Cerrar" icon="pi pi-times" class="p-button-text" @click="closeModal()" />
     </template>
   </Dialog>
 </template>
@@ -59,7 +46,7 @@ export default {
     Avatar,
     Dialog
   },
-  data(){
+  data() {
     return {
       userData: {
         name: '',
@@ -78,14 +65,14 @@ export default {
     },
   },
   methods: {
-    closeModal(){
+    closeModal() {
       this.$emit('update:visible', false);
     }
   },
   watch: {
     user: {
       handler: function (val) {
-        if(val && Object.keys(val).length > 0){
+        if (val && Object.keys(val).length > 0) {
           this.userData = val;
         }
       },
@@ -110,6 +97,7 @@ export default {
 .user-info p {
   margin: 0.25rem 0;
 }
+
 .user-data {
   display: flex;
   flex-direction: column;
@@ -143,5 +131,4 @@ export default {
 .info-text p {
   margin: 0;
 }
-
 </style>
