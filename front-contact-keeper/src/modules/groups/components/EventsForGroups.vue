@@ -22,7 +22,10 @@
 
     <!-- Mensaje cuando no hay eventos -->
     <template v-if="!loading && localEvents.length === 0">
-      <p>No hay eventos en este grupo.</p>
+      <div class="text-center">
+        <img src="@/assets/no_events.svg" alt="No hay eventos" class="no-events-img"/>
+        <p>No hay eventos en este grupo.</p>
+      </div>
     </template>
 
     <!-- Mostrar eventos si hay alguno -->

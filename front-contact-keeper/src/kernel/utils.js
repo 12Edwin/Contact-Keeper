@@ -15,13 +15,13 @@ const getToken = () => {
 const getSubFromToken = () => {
   const token = getToken(); 
   if (!token) {
+    window.location.href = "/login";
     return null;
   }
   try {
     const decodedToken = jwtDecode(token);
     return decodedToken.sub; 
   } catch (error) {
-    console.error("Error decoding token:", error);
     return null;
   }
 };
@@ -54,6 +54,7 @@ const getUserFromToke = () => {
 const getIdUserFromToke = () =>{
   const token = getToken();
   if (!token) {
+    window.location.href = "/login";
     return null;
   }
 

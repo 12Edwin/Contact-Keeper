@@ -65,7 +65,7 @@
           <div class="field">
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-pencil" />
-              <b-form-textarea id="field-description" v-model="group.description" rows="2"
+              <InputText id="field-description" v-model="group.description" rows="2"
                              :class="{ 'invalid-field-custom': v$.description.$error }"/>
               <label for="field-description" class="form-label-required">Descripción</label>
             </span>
@@ -89,7 +89,7 @@
           <div class="field">
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-note" />
-              <b-form-textarea id="field-notes" v-model="group.notes" rows="3"
+              <InputText id="field-notes" v-model="group.notes" rows="3"
                              :class="{ 'invalid-field-custom': v$.notes.$error }"/>
               <label for="field-notes">Notas</label>
             </span>
@@ -216,7 +216,6 @@ export default defineComponent({
           closeModal();
         }
       } catch (error) {
-        console.error('Error al actualizar el grupo:', error);
       } finally {
         isLoading.value = false;
       }

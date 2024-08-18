@@ -1,18 +1,20 @@
 <template>
   <Dialog
-      :modal="true"
-      :closeOnEscape="false"
-      :closable="false"
-      :visible.sync="visible"
-      position="center"
-      :contentStyle="{overflow: 'visible', width: '35vw'}"
-      class="custom-dialog"
-      :autoZIndex="true"
+    :modal="true"
+    :closeOnEscape="false"
+    :closable="false"
+    :visible.sync="visible"
+    position="center"
+    :contentStyle="{ width: '60vw' }"
+    class="custom-dialog"
+    :autoZIndex="true"
+    @before-show="startLoading"
   >
     <template v-slot:header>
-      <h4>{{selectedGroup.name}}</h4>
+      <h4>{{ selectedGroup.name }}</h4>
     </template>
-    <template>
+    
+    <div class="dialog-content">
       <b-row>
         <b-col cols="12" class="mb-3">
           <div class="user-list-header">
@@ -20,7 +22,7 @@
           </div>
         </b-col>
         <b-col cols="12" class="mb-3">
-          <p>{{selectedGroup.title}}</p>
+          <p>{{ selectedGroup.title }}</p>
         </b-col>
         <b-col cols="12" class="mb-3">
           <div class="user-list-header">
@@ -28,7 +30,7 @@
           </div>
         </b-col>
         <b-col cols="12" class="mb-3">
-          <p>{{selectedGroup.description}}</p>
+          <p>{{ selectedGroup.description }}</p>
         </b-col>
         <b-col cols="12" class="mb-3">
           <div class="user-list-header">
@@ -36,22 +38,75 @@
           </div>
         </b-col>
         <b-col cols="12" class="mb-3">
-          <p>{{selectedGroup.notes}}</p>
+          <p>{{ selectedGroup.notes }}</p>
         </b-col>
       </b-row>
-    </template>
+
+      <b-col cols="12" class="mb-3">
+        <div class="user-list-header">
+          <h5>Integrantes</h5>
+        </div>
+      </b-col>
+
+      <b-col v-if="showSkeleton" cols="12" class="mb-3">
+        <div class="skeleton-class"></div>
+      </b-col>
+
+      <b-col v-if="!showSkeleton && users.length === 0" cols="12" class="mb-3">
+        <div class="user-list text-center">
+          <img src="@/assets/User_empty.svg" alt="No hay integrantes" class="no-users-image"/>
+          <p>No hay integrantes en este grupo</p>
+        </div>
+      </b-col>
+
+      <b-col v-if="!showSkeleton && users.length > 0" cols="12" class="mb-3">
+        <div v-for="user in users" :key="user.id" class="user-list">
+          <div class="user-info-container">
+            <b-col cols="6">
+              <div class="user-zone">
+              {{ user.name }} {{ user.surname }} {{ user.last_name }}
+            </div>
+            </b-col>
+            <b-col cols="6">
+              <div class="icon-container d-flex justify-content-end">
+              <Button
+                v-if="isUserInGroup(user.id)"
+                icon="pi pi-trash"
+                class="button-remove"
+                :disabled="loadingUserId === user.id"
+                @click="removeUserFromGroups(user.id)"
+              />
+              <Button
+                v-else
+                icon="pi pi-plus"
+                class="button-add"
+                variant="info"
+                :disabled="loadingUserId === user.id"
+                @click="addUserToGroup(user.id)"
+              />
+            </div>
+            </b-col>
+          </div>
+        </div>
+      </b-col>
+    </div>
+
     <template #footer>
-      <Button  label="Guardar" icon="pi pi-check"  iconPos="right" class="button-options"/>
-      <Button  label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
+      <Button label="Guardar" icon="pi pi-check" iconPos="right" class="button-options" @click="saveModal()"/>
+      <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
     </template>
   </Dialog>
 </template>
 
 <script>
 import Tooltip from 'primevue/tooltip';
+import { getUsers, getUsersByGroup, assignUserToGroup, removeUserFromGroup } from '../services/groups-services';
+import { onQuestion, onToast } from '@/kernel/alerts';
+
+
 export default {
-  name: 'Announcements',
-  directives:{
+  name: 'GroupInfo',
+  directives: {
     'tooltip': Tooltip
   },
   props: {
@@ -63,30 +118,128 @@ export default {
       required: true
     }
   },
-  data(){
+  data() {
     return {
-      selectedGroup :{
+      selectedGroup: {
         name: '',
         description: '',
         title: '',
         status: '',
         notes: '',
-      }
+      },
+      isLoading: true,
+      showSkeleton: true,
+      users: [],
+      groupUsers: [],
+      skeletonTimeout: null,
+      loadingUserId: null, 
     }
   },
   methods: {
-    closeModal(){
+    closeModal() {
       this.$emit('update:visible', false);
+      this.showSkeleton = true;
+      clearTimeout(this.skeletonTimeout);
+    },
+    saveModal() {
+      this.$emit('update-data');
+      this.$emit('update:visible', false);
+      this.showSkeleton = true;
+      clearTimeout(this.skeletonTimeout);
+    },
+    startLoading() {
+      this.showSkeleton = true;
+      this.skeletonTimeout = setTimeout(() => {
+        this.showSkeleton = false;
+      }, 5000);
+      this.getAllUsers();
+    },
+    async getAllUsers() {
+      try {
+        const response = await getUsers();
+        this.users = response.data;
+        await this.getUsersGroup();
+      } catch (error) {
+      }
+    },
+    async getUsersGroup() {
+      onToast('info','Cargando integrantes del grupo', 'info');
+      try {
+        const response = await getUsersByGroup(this.selectedGroup.id);
+        this.groupUsers = response.data;
+        this.isLoading = false;
+      } catch (error) {
+      }
+    },
+    isUserInGroup(userId) {
+      let content = false;
+      let filterGroups = this.groupUsers && this.groupUsers.people.filter(user => user.id === userId); 
+      if (filterGroups && filterGroups.length > 0) {
+        content = true;
+      }
+      return content;
+    },
+    async addUserToGroup(userId) {
+      let question = await onQuestion('¿Estás seguro de agregar a este integrante al grupo?');
+      if (question === true) {
+        onToast('info','Agregando integrante al grupo', 'info');
+        try {
+          this.loadingUserId = userId; 
+          let newUserByGroup ={
+            title: this.selectedGroup.title,
+            notes: "Haz sido agregado al grupo",
+            member: userId,
+            group_id: this.selectedGroup.id
+          }
+          let response = await assignUserToGroup(newUserByGroup);
+          if (response.status === 200 || response.status === 201 || response.status === "success") {
+            onToast('success', 'Integrante agregado correctamente', 'success');
+          }
+          await this.getUsersGroup();
+        } catch (error) {
+        } finally {
+          this.loadingUserId = null; 
+        }
+      }
+    },
+    async removeUserFromGroups(userId) {
+      let question = await onQuestion('¿Estás seguro de eliminar a este integrante del grupo?');
+      if (question === true) {
+        onToast('info','Eliminando integrante del grupo', 'info');
+        try {
+          this.loadingUserId = userId; 
+          let deleteUserByGroup ={
+            title: this.selectedGroup.title,
+            notes: "Haz sido eliminado del grupo",
+            member: userId,
+            group_id: this.selectedGroup.id
+          }
+          let response = await removeUserFromGroup(deleteUserByGroup);
+          if (response.status === 200 || response.status === 201 || response.status === "success") {
+            onToast('success', 'Integrante eliminado correctamente', 'success');
+          }
+          await this.getUsersGroup();
+        } catch (error) {
+        } finally {
+          this.loadingUserId = null; 
+        }
+      }
     }
   },
   watch: {
     group: {
-      handler: function (val) {
-        if(val && Object.keys(val).length > 0){
+      handler(val) {
+        if (val && Object.keys(val).length > 0) {
           this.selectedGroup = val;
+          this.getUsersGroup();
         }
       },
       immediate: true
+    },
+    visible(newValue) {
+      if (newValue) {
+        this.startLoading();
+      }
     }
   }
 }
@@ -94,6 +247,12 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/styles/colors';
+
+.custom-dialog .p-dialog-content {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
 .info-group {
   text-align: center;
   padding: 1rem;
@@ -142,12 +301,42 @@ export default {
   margin-right: 15px;
 }
 
-.pi-minus-circle {
+.button-add {
+  color: #fff; 
+  background-color: $sidebar-items;
+}
+
+.button-remove {
+  color: #fff; 
+  background-color: $sidebar-items;
+}
+
+.pi-minus-circle, .pi-plus-circle {
   font-size: 16px;
-  color: #555;
   cursor: pointer;
 }
 
+.button-add:disabled, .button-remove:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.skeleton-class {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  height: 20px;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 .button-options {
   background: $primary-color;
   color: white;
@@ -155,7 +344,7 @@ export default {
   border-radius: 5px;
 }
 
-.button-options:hover{
+.button-options:hover {
   border-radius: 5px;
   transform: translateY(-5px);
   box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
@@ -163,5 +352,5 @@ export default {
   border: none;
   cursor: pointer;
 }
-
 </style>
+

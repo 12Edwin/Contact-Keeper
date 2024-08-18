@@ -8,8 +8,10 @@
             <b-col class="d-flex justify-content-between align-content-between mb-3">
               <span class="p-input-icon-right">
                 <i class="pi pi-search"/>
-                <InputText type="text" placeholder="Buscar..."/>
+                <InputText type="text" placeholder="Buscar..." v-model="searchQuery"/>
               </span>
+            </b-col>
+            <b-col class="d-flex justify-content-end mb-3">
               <Button
                 class="button-options"
                 label="Nuevo grupo"
@@ -41,7 +43,7 @@
           <!-- Contenido Real -->
           <template v-else>
             <b-row class="mt-2">
-              <b-col cols="12" lg="4" md="6" v-for="(group, index) in groups" :key="index">
+              <b-col cols="12" lg="4" md="6" v-for="(group, index) in filteredGroups" :key="index">
                 <div class="card mb-4">
                   <div class="card-header">
                     <div class="card-header-text">
@@ -67,7 +69,7 @@
           </template>
 
           <!-- Componentes Modales y de Anuncios -->
-          <Announcements :group="groupSelected" :visible.sync="showInfo"/>
+          <Announcements :group="groupSelected" :visible.sync="showInfo" @update-data="getGroups"/>
           <ModalCreateGroup :visible.sync="showModalSave" @update-data="getGroups"/>
           <ModalEditGroup :visible.sync="showModalEdit" :groupData="groupSelected" @update-data="getGroups"/>
           <EventsForGroups :group="groupSelected" :events="events" :visible.sync="showModalEvents"/>
@@ -109,7 +111,8 @@ export default {
       groupSelected: {},
       showModalSave: false,
       showModalEdit: false,
-      showModalEvents: false
+      showModalEvents: false,
+      searchQuery: ''
     }
   },
   mounted() {
@@ -168,7 +171,6 @@ export default {
           this.events = [];
         }
       } catch (error) {
-        console.error('Error al obtener eventos:', error);
         this.events = []; 
       }
     },
@@ -184,16 +186,26 @@ export default {
     },
     async deleteGroup(group){
       try {
-        await onQuestion('¿Estás seguro de eliminar este grupo?');
-        const response = await deleteGroup(group.id);
-        
-        if(response.status === 200 || response.status === 201 || response.status === "success"){
-          this.getGroups();
-          onToast('success', 'Grupo eliminado correctamente', 'success');
+        let question = await onQuestion('¿Estás seguro de eliminar este grupo?');
+        if(question === true){
+          onToast('info', 'Eliminando grupo', 'info');
+          const response = await deleteGroup(group.id);
+          if(response.status === 200 || response.status === 201 || response.status === "success"){
+            this.getGroups();
+            onToast('success', 'Grupo eliminado correctamente', 'success');
+          }
         }
-
       } catch (error) {
       }
+    }
+  },
+  computed: {
+    filteredGroups() {
+      const query = this.searchQuery.toLowerCase();
+      return this.groups.filter(group => {
+        return group.name.toLowerCase().includes(query) ||
+              group.title.toLowerCase().includes(query);
+      });
     }
   }
 }

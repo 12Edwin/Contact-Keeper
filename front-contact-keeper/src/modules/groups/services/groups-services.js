@@ -5,11 +5,8 @@ export const getGroupsByUserId = async () => {
     try {
         const userId = utils.getSubFromToken();
         const response = await api.axiosClientGroups.doGet(`/groups/moderator/${userId}`); 
-        console.log("response =>",response.data);
         return response.data;
     } catch (error) {
-        console.log("error =>",error);
-        
         return error.response;
     }
 };
@@ -72,7 +69,7 @@ export const assignUserToGroup = async (groupData) => {
 
 export const removeUserFromGroup = async (groupData) => {
     try {
-        const response = await api.axiosClientGroups.doPost(`/unassign_member_group/${groupData.member}`, groupData);
+        const response = await api.axiosClientGroups.doPost(`/unassign_member_group/${groupData.member}/${groupData.group_id}`, groupData);
         return response.data;
     } catch (error) {
         return error.response;
