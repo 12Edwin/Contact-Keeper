@@ -10,9 +10,9 @@
     <div class="w-100">
       <ul>
         <li 
-          class="item" 
-          v-for="(item, index) in menuItems"
+          v-for="(item, index) in filteredMenuItems"
           :key="index" 
+          class="item" 
           @click="navigate(item.route)"
         >
           <i :class="`${item.icon} sidebar-icon`" /> <span class="sidebar-text">{{ item.label }}</span>
@@ -30,6 +30,7 @@
 </template>
 
 
+
 <script>
 import utils from "@/kernel/utils";
 export default {
@@ -42,12 +43,17 @@ export default {
   },
   data() {
     return {
+      userRole: '',
       menuItems: [
-        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users'},
-        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar'},
-        {label: 'Anuncios', icon: 'pi pi-fw pi-megaphone'},
-        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups'}
+        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators']},
+        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers']},
+        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers']},
       ]
+    }
+  },
+  computed: {
+    filteredMenuItems() {
+      return this.menuItems.filter(item => item.roles.includes(this.userRole));
     }
   },
   methods: {
@@ -64,6 +70,7 @@ export default {
   },
   getRole(){
     const role = utils.getRoleStorage()
+    this.userRole = role;
     return role === 'Administrators' ? 'Administrador' : 'Usuario'
   },
   navigate(route) {

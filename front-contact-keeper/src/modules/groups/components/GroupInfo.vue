@@ -64,10 +64,10 @@
           <div class="user-info-container">
             <b-col cols="6">
               <div class="user-zone">
-              {{ user.name }} {{ user.surname }} {{ user.last_name }}
-            </div>
+                {{ user.name }} {{ user.surname }} {{ user.last_name }}
+              </div>
             </b-col>
-            <b-col cols="6">
+            <b-col cols="6" v-if="userRole === 'Administrators'">
               <div class="icon-container d-flex justify-content-end">
                 <i
                   v-if="isUserInGroup(user.id)"
@@ -76,7 +76,6 @@
                   @click="removeUserFromGroup(user.id)"
                   :class="{ 'icon-disabled': loadingUserId === user.id }"
                 ></i>
-                <!-- Para agregar un usuario -->
                 <i
                   v-else
                   class="pi pi-plus icon-add"
@@ -84,8 +83,7 @@
                   @click="addUserToGroup(user.id)"
                   :class="{ 'icon-disabled': loadingUserId === user.id }"
                 ></i>
-
-            </div>
+              </div>
             </b-col>
           </div>
         </div>
@@ -93,7 +91,7 @@
     </div>
 
     <template #footer>
-      <Button label="Guardar" icon="pi pi-check" iconPos="right" class="button-options" @click="saveModal()"/>
+      <Button v-if="userRole === 'Administrators'" label="Guardar" icon="pi pi-check" iconPos="right" class="button-options" @click="saveModal()"/>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
     </template>
   </Dialog>
@@ -103,7 +101,7 @@
 import Tooltip from 'primevue/tooltip';
 import { getUsers, getUsersByGroup, assignUserToGroup, removeUserFromGroup } from '../services/groups-services';
 import { onQuestion, onToast } from '@/kernel/alerts';
-
+import utils from '@/kernel/utils';
 
 export default {
   name: 'GroupInfo',
@@ -134,6 +132,7 @@ export default {
       groupUsers: [],
       skeletonTimeout: null,
       loadingUserId: null, 
+      userRole: ''
     }
   },
   methods: {
@@ -148,12 +147,19 @@ export default {
       this.showSkeleton = true;
       clearTimeout(this.skeletonTimeout);
     },
-    startLoading() {
-      this.showSkeleton = true;
-      this.skeletonTimeout = setTimeout(() => {
-        this.showSkeleton = false;
-      }, 5000);
-      this.getAllUsers();
+    async startLoading() {
+      this.users = [];
+      this.groupUsers = [];
+      let user = utils.getRoleStorage();
+      this.userRole = user;
+
+      if (this.userRole === 'Administrators') {
+        await this.getAllUsers();
+      } else {
+        await this.getUserGroup();
+      }
+
+      this.showSkeleton = false; 
     },
     async getAllUsers() {
       try {
@@ -163,30 +169,30 @@ export default {
       } catch (error) {
       }
     },
-    async getUsersGroup() {
-      onToast('info','Cargando integrantes del grupo', 'info');
+    async getUserGroup() {
+      onToast('info', 'Cargando integrantes del grupo', 'info');
       try {
         const response = await getUsersByGroup(this.selectedGroup.id);
         this.groupUsers = response.data;
+
+        if (this.userRole !== 'Administrators') {
+          this.users = this.groupUsers.people;
+        }
+
         this.isLoading = false;
       } catch (error) {
       }
     },
     isUserInGroup(userId) {
-      let content = false;
-      let filterGroups = this.groupUsers && this.groupUsers.people.filter(user => user.id === userId); 
-      if (filterGroups && filterGroups.length > 0) {
-        content = true;
-      }
-      return content;
+      return this.groupUsers.people.some(user => user.id === userId);
     },
     async addUserToGroup(userId) {
       let question = await onQuestion('¿Estás seguro de agregar a este integrante al grupo?');
       if (question === true) {
-        onToast('info','Agregando integrante al grupo', 'info');
+        onToast('info', 'Agregando integrante al grupo', 'info');
         try {
           this.loadingUserId = userId; 
-          let newUserByGroup ={
+          let newUserByGroup = {
             title: this.selectedGroup.title,
             notes: "Haz sido agregado al grupo",
             member: userId,
@@ -196,20 +202,21 @@ export default {
           if (response.status === 200 || response.status === 201 || response.status === "success") {
             onToast('success', 'Integrante agregado correctamente', 'success');
           }
-          await this.getUsersGroup();
+          await this.getUserGroup();
         } catch (error) {
+          console.error(error);
         } finally {
           this.loadingUserId = null; 
         }
       }
     },
-    async removeUserFromGroups(userId) {
+    async removeUserFromGroup(userId) {
       let question = await onQuestion('¿Estás seguro de eliminar a este integrante del grupo?');
       if (question === true) {
-        onToast('info','Eliminando integrante del grupo', 'info');
+        onToast('info', 'Eliminando integrante del grupo', 'info');
         try {
           this.loadingUserId = userId; 
-          let deleteUserByGroup ={
+          let deleteUserByGroup = {
             title: this.selectedGroup.title,
             notes: "Haz sido eliminado del grupo",
             member: userId,
@@ -219,8 +226,9 @@ export default {
           if (response.status === 200 || response.status === 201 || response.status === "success") {
             onToast('success', 'Integrante eliminado correctamente', 'success');
           }
-          await this.getUsersGroup();
+          await this.getUserGroup();
         } catch (error) {
+          console.error(error);
         } finally {
           this.loadingUserId = null; 
         }
@@ -232,7 +240,7 @@ export default {
       handler(val) {
         if (val && Object.keys(val).length > 0) {
           this.selectedGroup = val;
-          this.getUsersGroup();
+          this.getUserGroup();
         }
       },
       immediate: true
@@ -245,6 +253,7 @@ export default {
   }
 }
 </script>
+
 
 <style lang="scss" scoped>
 @import '@/styles/colors';
@@ -303,30 +312,27 @@ export default {
 }
 
 .button-add, .button-remove {
-  color: $sidebar-items; // Color gris para el texto del botón
-  background-color: $white-color; // Fondo blanco
-  border-color: $white-color; // Borde blanco
-  border: 1px solid $white-color; // Asegura que el borde sea blanco
+  color: $sidebar-items; 
+  background-color: $white-color; 
+  border-color: $white-color;
+  border: 1px solid $white-color; 
 }
 
-// Estilos de hover para los botones
 .button-add:hover, .button-remove:hover {
-  background-color: $white-color; // Fondo blanco en hover
-  border-color: $white-color; // Borde blanco en hover
-  color: $sidebar-items; // Color del texto en hover
-  box-shadow: none; // Elimina el sombreado azul del hover
+  background-color: $white-color; 
+  border-color: $white-color;
+  color: $sidebar-items; 
+  box-shadow: none; 
 }
 
-// Estilos de iconos
 .pi-trash, .pi-plus {
-  font-size: 16px; // Tamaño de fuente para los iconos
-  color: $sidebar-items; // Color gris para los iconos
+  font-size: 16px; 
+  color: $sidebar-items; 
 }
 
-// Estilos para los botones deshabilitados
 .button-add:disabled, .button-remove:disabled {
-  cursor: not-allowed; // Cursor de no permitido
-  opacity: 0.6; // Opacidad reducida
+  cursor: not-allowed; 
+  opacity: 0.6; 
 }
 
 .pi-minus-circle, .pi-plus-circle {
@@ -366,4 +372,3 @@ export default {
   cursor: pointer;
 }
 </style>
-

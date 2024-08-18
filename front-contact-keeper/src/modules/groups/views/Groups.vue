@@ -13,6 +13,7 @@
             </b-col>
             <b-col class="d-flex justify-content-end mb-3">
               <Button
+                v-if="userRole === 'Administrators'"
                 class="button-options"
                 label="Nuevo grupo"
                 iconPos="right"
@@ -58,8 +59,8 @@
                     <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
                   </div>
                   <div class="card-footer">
-                    <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
-                    <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
+                    <i v-if="userRole === 'Administrators'" class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
+                    <i v-if="userRole === 'Administrators'" class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
                     <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" @click="openModalGetEvents(group)"></i>
                     <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                   </div>
@@ -89,6 +90,7 @@ import ModalEditGroup from '../components/ModalEditGroup.vue';
 import EventsForGroups from '../components/EventsForGroups.vue';
 import {getGroupsByUserId, deleteGroup, getEventsbyGroup } from '../services/groups-services';
 import { onQuestion, onToast } from '@/kernel/alerts';
+import utils from '@/kernel/utils';
 
 export default {
   name: 'Groups',
@@ -113,11 +115,14 @@ export default {
       showModalEdit: false,
       showModalEvents: false,
       searchQuery: '',
-      idGroup: 0
+      idGroup: 0,
+      userRole: ''
     }
   },
   mounted() {
     this.getGroups();
+    let user = utils.getRoleStorage();
+    this.userRole = user;
   },
   methods: {
     getInitial(name){

@@ -23,11 +23,14 @@
 
         <!-- Mensaje cuando no hay eventos -->
         <template v-if="!loading && localEvents.length === 0">
-          <div class="text-center">
-            <img src="@/assets/no_events.svg" alt="No hay eventos" class="no-events-img"/>
-            <p>No hay eventos en este grupo.</p>
+          <div style="display: flex; justify-content: center; align-items: center;">
+            <div class="text-center">
+              <img src="@/assets/no_events.svg" alt="No hay eventos" class="no-events-img"/>
+              <p>No hay eventos en este grupo.</p>
+            </div>
           </div>
         </template>
+
 
           <!-- Mostrar eventos si hay alguno -->
           <template v-else>
@@ -184,7 +187,6 @@ export default {
   },
   methods: {
     alignSide(idUser){
-      console.log(idUser)
       const userLogged = utils.getIdUserFromToke()
       return userLogged === idUser ? 'd-flex justify-content-end align-items-end' : 'd-flex justify-content-start align-items-start'
     },
