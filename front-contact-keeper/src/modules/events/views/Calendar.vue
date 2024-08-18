@@ -40,7 +40,7 @@
             </b-row>
           </Panel>
           <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
-          <ModalAddEvent :visible.sync="showModalAddEvent" />
+          <ModalAddEvent :visible.sync="showModalAddEvent" @getEvents="getEvents"/>
         </b-col>
       </b-row>
     </div>
@@ -63,6 +63,7 @@ import utils from '@/kernel/utils'
 import eventServices from '../services/event-services'
 import CalendarSkeleton from '@/components/CalendarSkeleton.vue'
 import Tooltip from 'primevue/tooltip';
+import { onError, onToast} from '@/kernel/alerts';
 export default
 {
   name: 'Calendar',
@@ -202,6 +203,7 @@ export default
     },
     async getEvents(){
       try {
+        this.items = []
         this.isLoading = true
         const userLogged = utils.getIdUserFromToke()
         const response = await eventServices.getEvents(userLogged)
@@ -217,14 +219,10 @@ export default
               event
             })
           })
-          // this.items = response.data
-          // this.calendarOptions.events = this.items;
-          // console.log(this.items)
         }
-        console.log('getEvents')
         this.isLoading = false
       } catch (error) {
-        console.log(error)
+        onToast('Error al obtener los eventos', 'Parece que hubo un error al obtener los eventos, por favor intenta de nuevo', 'error')
       }
     }
   },

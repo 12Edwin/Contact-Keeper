@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import moment from "moment";
+const moment = require('moment-timezone');
 const getUserByName = (name, people) => {
   return people.some((person) => person.name === name);
 };
@@ -111,6 +111,18 @@ const getErrorMessages = (errorCode) => {
   return errorMessages[errorCode] || 'Ocurrió un error desconocido en el servidor';
 }
 
+const splitDateTime = (dateTimeString)  =>{
+  moment.locale('es');
+  const momentDateTime = moment(dateTimeString);
+  let date = momentDateTime.format('ddd D [de] MMMM [de] YYYY');
+  date = date.charAt(0).toUpperCase() + date.slice(1);
+  const time = momentDateTime.format('hh:mm a');
+  return {
+      date: date,
+      time: time
+  };
+}
+
 const startAfterEnd = (startHour, endHour) => {
   if (!endHour) {
     return true;
@@ -141,13 +153,24 @@ const formatDate = (startDate, startHour, endDate, endHour) => {
   const momentEnd = moment(endDate).format('YYYY-MM-DD');
   const momentStartHour = moment(startHour, 'HH:mm').format('HH:mm:ss'); 
   const momentEndHour = moment(endHour, 'HH:mm').format('HH:mm:ss');
-  console.log("inicio",momentStartHour,"fin", momentEndHour)
   return {
     start_date: `${momentStart} ${momentStartHour}`,
     end_date: `${momentEnd} ${momentEndHour}`
   };
 };
 
+
+const formatDateForChat = (date) => {
+  moment.locale('es');
+  moment.updateLocale('es', {
+  meridiem: (hour, minute, isLower) => {
+    return hour < 12 ? 'am' : 'pm';
+  },
+  weekdaysShort : ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+  });
+
+  return moment.utc(date).format('ddd [a las] h:mm a');
+}
 
 export default {
   getToken,
@@ -164,5 +187,7 @@ export default {
   startAfterEnd,
   endBeforeStart,
   isSameDate,
-  formatDate
+  formatDate,
+  splitDateTime,
+  formatDateForChat
 };

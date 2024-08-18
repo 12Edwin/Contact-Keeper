@@ -94,4 +94,21 @@ export const getUsers = async () => {
     }
 }
 
+export const getGroupById = async (groupId) => {
+    try {
+        const response = await api.axiosClientGroups.doGet(`/groups/${groupId}`);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
 
+
+export const sendMessage = async (messageData) => {
+    try {
+        const response = await api.axiosClientGroups.doPost('/message', messageData);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
