@@ -7,7 +7,6 @@ const SERVER_URL_EVENT = process.env.VUE_APP_EVENTS_URL;
 const VUE_APP_GROUPS_URL = process.env.VUE_APP_GROUPS_URL;
 const SERVER_URL_EVENT_MANAGEMENT = process.env.VUE_APP_EVENTS_MANAGEMENT
 
-
 const AxiosClient = axios.create({
     baseURL: SERVER_URL,
     timeout: 20000,
@@ -130,7 +129,7 @@ const axiosClientGroups = {
         return GroupsAxiosClient.put(endPoint, object, config || {})
     },
     doDelete(endPoint, object, config){
-        return GroupsAxiosClient.put(endPoint, object, config || {});
+        return GroupsAxiosClient.delete(endPoint, object, config || {});
     },
 }
 

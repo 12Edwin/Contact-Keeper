@@ -1,36 +1,24 @@
 import api from "@/config/http-client.gateway"
-
-// Función para decodificar el payload de un JWT
-const decodeJwtPayload = (token) => {
-    const base64Url = token.split('.')[1]; // Obtener el payload
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/'); // Reemplazar caracteres para Base64
-    const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => 
-        '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-    ).join(''));
-
-    return JSON.parse(jsonPayload);
-};
-
+import utils from "@/kernel/utils";
 
 export const getGroupsByUserId = async () => {
     try {
-        const token = localStorage.getItem("token");
-        const payload = decodeJwtPayload(token);
-        const userId = payload.sub;
-        const response = await api.axiosClientEvent.doGet(`/groups/moderator/${userId}`);
+        const userId = utils.getSubFromToken();
+        const response = await api.axiosClientGroups.doGet(`/groups/moderator/${userId}`); 
+        console.log("response =>",response.data);
         return response.data;
     } catch (error) {
+        console.log("error =>",error);
+        
         return error.response;
     }
 };
 
 export const saveGroup = async (groupData) => {
     try {
-        const token = localStorage.getItem("token");
-        const payload = decodeJwtPayload(token);
-        const userId = payload.sub;
+        const userId = utils.getSubFromToken();
         groupData = { ...groupData, moderator: userId };   
-        const response = await api.axiosClientEvent.doPost('/groups', groupData);
+        const response = await api.axiosClientGroups.doPost('/groups', groupData);
         return response.data;
     } catch (error) {
         return error.response;
@@ -39,7 +27,7 @@ export const saveGroup = async (groupData) => {
 
 export const updateGroup = async (groupId, groupData) => {
     try {
-        const response = await api.axiosClientEvent.doPut(`/groups/${groupId}`, groupData);
+        const response = await api.axiosClientGroups.doPut(`/groups/${groupId}`, groupData);
         return response.data;
     } catch (error) {
         return error.response;
@@ -48,7 +36,7 @@ export const updateGroup = async (groupId, groupData) => {
 
 export const deleteGroup = async (groupId) => {
     try {
-        const response = await api.axiosClientEvent.doDelete(`/groups/${groupId}`);
+        const response = await api.axiosClientGroups.doDelete(`/groups/${groupId}`);
         return response.data;
     } catch (error) {
         return error.response;
@@ -57,7 +45,52 @@ export const deleteGroup = async (groupId) => {
 
 export const getEventsbyGroup = async (groupId) => {
     try {
-        const response = await api.axiosClientEvent.doGet(`/events/group/${groupId}`);
+        const response = await api.axiosClientEventManagement.doGet(`/events/group/${groupId}`);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+export const getUsersByGroup = async (groupId) => {
+    try {
+        const response = await api.axiosClientGroups.doGet(`/groups/${groupId}`);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+export const assignUserToGroup = async (groupData) => {
+    try {
+        const response = await api.axiosClientGroups.doPost("assign_member_group", groupData);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+export const removeUserFromGroup = async (groupData) => {
+    try {
+        const response = await api.axiosClientGroups.doPost(`/unassign_member_group/${groupData.member}`, groupData);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+export const createMessage = async (messageData) => {
+    try {
+        const response = await api.axiosClientGroups.doPost('/message', messageData);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+export const getUsers = async () => {
+    try {
+        const response = await api.axiosClientApi.doGet('/users/');
         return response.data;
     } catch (error) {
         return error.response;
@@ -65,31 +98,3 @@ export const getEventsbyGroup = async (groupId) => {
 }
 
 
-
-
-const groupService = {
-    
-    // getAllGroups() {
-    //     return api.doGet('/groups/moderator');
-    // },
-    // getGroupById(groupId) {
-    //     return api.doGet(`/groups/${groupId}`);
-    // },
-    // createGroup(groupData) {
-    //     return api.doPost('/groups', groupData);
-    // },
-    // updateGroup(groupId, groupData) {
-    //     return api.doPut(`/groups/${groupId}`, groupData);
-    // },
-    // deleteGroup(groupId) {
-    //     return api.doDelete(`/groups/${groupId}`);
-    // },
-    // addMemberToGroup() {
-    //     return api.doPost(`/assign_member_group`, groupData);
-    // },
-    // removeMemberFromGroup(groupId, memberId) {
-    //     return api.doDelete(`/unassign_member_group/${memberId}/${groupId}`);
-    // }
-};
-
-export default groupService;

@@ -3,23 +3,24 @@
     <div class="content">
       <Panel header="Grupos" class="shadow-lg">
         <div class="p-1">
-          <template>
-            <b-row>
-              <b-col class="d-flex justify-content-between align-content-between mb-3">
-                <span class="p-input-icon-right">
-                  <i class="pi pi-search"/>
-                  <InputText type="text" placeholder="Buscar..."/>
-                </span>
-                <Button
-                    class="button-options"
-                    label="Nuevo grupo"
-                    iconPos="right"
-                    icon="pi pi-sitemap"
-                    @click="openSaveModal"
-                />
-              </b-col>
-            </b-row>
-          </template>
+          <!-- Contenido de la barra de búsqueda y botón de nuevo grupo -->
+          <b-row>
+            <b-col class="d-flex justify-content-between align-content-between mb-3">
+              <span class="p-input-icon-right">
+                <i class="pi pi-search"/>
+                <InputText type="text" placeholder="Buscar..."/>
+              </span>
+              <Button
+                class="button-options"
+                label="Nuevo grupo"
+                iconPos="right"
+                icon="pi pi-sitemap"
+                @click="openSaveModal"
+              />
+            </b-col>
+          </b-row>
+
+          <!-- Skeleton Loader -->
           <template v-if="isLoading">
             <b-row>
               <b-col cols="12" lg="4" md="6" v-for="n in 3" :key="n">
@@ -36,42 +37,46 @@
               </b-col>
             </b-row>
           </template>
-          <template>
+
+          <!-- Contenido Real -->
+          <template v-else>
             <b-row class="mt-2">
-              <b-col  cols="12" lg="4" md="6" v-for="(group, index) in groups" :key="index">
-                <template>
-                  <div class="card mb-4">
-                    <div class="card-header">
-                      <div class="card-header-text">
-                        <h2>{{group.name}}</h2>
-                        <p>{{ group.title }}</p>
-                        <p>
-                          <span :class="['custom-badge', getBadgeClass(group.status)]">
-                            {{ translateStatus(group.status) }}
-                          </span>
-                        </p>
-                      </div>
-                      <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
+              <b-col cols="12" lg="4" md="6" v-for="(group, index) in groups" :key="index">
+                <div class="card mb-4">
+                  <div class="card-header">
+                    <div class="card-header-text">
+                      <h2>{{ group.name }}</h2>
+                      <p>{{ group.title }}</p>
+                      <p>
+                        <span :class="['custom-badge', getBadgeClass(group.status)]">
+                          {{ translateStatus(group.status) }}
+                        </span>
+                      </p>
                     </div>
-                    <div class="card-footer">
-                      <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
-                      <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
-                      <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" ></i>
-                      <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
-                    </div>
+                    <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
                   </div>
-                </template>
+                  <div class="card-footer">
+                    <i class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
+                    <i class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
+                    <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" @click="openModalGetEvents(group)"></i>
+                    <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
+                  </div>
+                </div>
               </b-col>
             </b-row>
           </template>
+
+          <!-- Componentes Modales y de Anuncios -->
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
-          <ModalCreateGroup :visible.sync="showModalSave"/>
-          <ModalEditGroup :visible.sync="showModalEdit" :groupData="groupSelected"/>
+          <ModalCreateGroup :visible.sync="showModalSave" @update-data="getGroups"/>
+          <ModalEditGroup :visible.sync="showModalEdit" :groupData="groupSelected" @update-data="getGroups"/>
+          <EventsForGroups :group="groupSelected" :events="events" :visible.sync="showModalEvents"/>
         </div>
       </Panel>
     </div>
   </div>
 </template>
+
 
 <script>
 import BadgeDirective from 'primevue/badgedirective';
@@ -79,8 +84,9 @@ import Tooltip from 'primevue/tooltip';
 import Announcements from "@/modules/groups/components/GroupInfo.vue";
 import ModalCreateGroup from '../components/ModalSaveGroup.vue';
 import ModalEditGroup from '../components/ModalEditGroup.vue';
-import {getGroupsByUserId, deleteGroup } from '../services/groups-services';
-import { onQuestion } from '@/kernel/alerts';
+import EventsForGroups from '../components/EventsForGroups.vue';
+import {getGroupsByUserId, deleteGroup, getEventsbyGroup } from '../services/groups-services';
+import { onQuestion, onToast } from '@/kernel/alerts';
 
 export default {
   name: 'Groups',
@@ -91,16 +97,19 @@ export default {
   components: {
     Announcements,
     ModalCreateGroup,
-    ModalEditGroup
+    ModalEditGroup,
+    EventsForGroups
   },
   data() {
     return {
       groups: [],
+      events: [],
       showInfo: false,
       isLoading: true,
       groupSelected: {},
       showModalSave: false,
-      showModalEdit: false
+      showModalEdit: false,
+      showModalEvents: false
     }
   },
   mounted() {
@@ -146,6 +155,23 @@ export default {
       this.groupSelected = JSON.parse(JSON.stringify(group));
       this.showModalEdit = true;
     },
+    async openModalGetEvents(group){
+      this.groupSelected = JSON.parse(JSON.stringify(group));
+      try {
+        onToast('info', 'Cargando eventos', 'info');
+        this.showModalEvents = true;
+        const response = await getEventsbyGroup(this.groupSelected.id);
+
+        if (response.status === 'success') {
+          this.events = response.data;
+        } else {
+          this.events = [];
+        }
+      } catch (error) {
+        console.error('Error al obtener eventos:', error);
+        this.events = []; 
+      }
+    },
     async getGroups() {
       this.isLoading = true;
         try {
@@ -154,17 +180,19 @@ export default {
           this.isLoading = false;
         } catch (error) {
           this.isLoading = false;
-          console.error(error);
       }
     },
     async deleteGroup(group){
       try {
         await onQuestion('¿Estás seguro de eliminar este grupo?');
-        const respose = await deleteGroup(group.id);
-        console.log("respuesta =>",respose);
-        this.getGroups();
+        const response = await deleteGroup(group.id);
+        
+        if(response.status === 200 || response.status === 201 || response.status === "success"){
+          this.getGroups();
+          onToast('success', 'Grupo eliminado correctamente', 'success');
+        }
+
       } catch (error) {
-        console.error(error);
       }
     }
   }
@@ -230,6 +258,7 @@ export default {
   justify-content: right;
   margin-top: 16px;
   gap: 5px;
+  flex-wrap: wrap;
 }
 
 .icon-camera,
@@ -243,8 +272,6 @@ export default {
   font-size: 20px;
   cursor: pointer;
   margin-top: 5px;
-  margin-right: 18px;
-  float: left;
 }
 
 .icon-camera {
