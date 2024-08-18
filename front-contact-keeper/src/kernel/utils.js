@@ -51,6 +51,16 @@ const getUserFromToke = () => {
   return jwtDecode(token).name;
 }
 
+const getEmailFromToke = () => {
+  const token = getToken();
+  if (!token) {
+    return null;
+  }
+
+  return jwtDecode(token).email;
+}
+
+
 const getIdUserFromToke = () =>{
   const token = getToken();
   if (!token) {
@@ -155,6 +165,7 @@ export default {
   getUserByEmail,
   getUserByName,
   getUserFromToke,
+  getEmailFromToke,
   getSubFromToken,
   validAge,
   messageError,

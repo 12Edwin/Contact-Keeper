@@ -10,6 +10,26 @@
             <div class="skeleton-item skeleton-cell"></div>
             <div class="skeleton-item skeleton-cell"></div>
         </div>
+        <div class="skeleton-row">
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+        </div>
+        <div class="skeleton-row">
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+        </div>
+        <div class="skeleton-row">
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+        </div>
+        <div class="skeleton-row">
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+            <div class="skeleton-item skeleton-cell"></div>
+        </div>
     </div>
 </template>
 

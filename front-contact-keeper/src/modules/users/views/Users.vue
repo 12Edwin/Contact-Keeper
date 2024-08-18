@@ -21,10 +21,11 @@
               <Column :headerStyle="config" field="phone" header="Numero de Telefono" />
               <Column :headerStyle="config" field="email" header="Correo Electronico" />
             </DataTable>
+            <div class="content">
+              <UsersSkeleton v-if="isLoading" />
+            </div>
           </div>
-          <div class="content">
-            <UsersSkeleton v-if="isLoading"/>
-          </div>
+
         </div>
       </Panel>
     </div>
@@ -90,7 +91,7 @@ export default {
       const { data, status } = await services.get_users()
       if (status === "success") {
         this.users = data;
-        
+
       } else {
         onError('Error', 'Ha ocurrido un error inesperado').then(() => { })
       }
