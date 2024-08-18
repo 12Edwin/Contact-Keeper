@@ -3,7 +3,7 @@
         :contentStyle="{ overflow: 'visible' }" :visible.sync="visible" @click="close">
 
         <div class="user-info-container">
-            <div class="avatar">{{ getAvatarLetter() }}</div>
+            <img src="https://mi-bucket-publico-de-imagenes.s3.amazonaws.com/kriko.jpg" class="avatar" alt="">
             <p class="user-name"><strong>Nombre:</strong> {{ name }}</p>
             <p class="user-email"><strong>Correo:</strong> {{ email }}</p>
         </div>
@@ -60,16 +60,11 @@ export default {
 }
 
 .avatar {
-  background-color: #333;
-  color: #fff;
-  width: 100px;
-  height: 100px;
+  width: 250px;
+  height: 250px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 20%;
-  font-weight: bold;
-  transition: transform 0.3s, margin-left 0.3s;
 }
 
 .user-name {
