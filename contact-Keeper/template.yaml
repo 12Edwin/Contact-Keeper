@@ -841,6 +841,32 @@ Resources:
       Precedence: 1
       RoleArn: !GetAtt UsersRole.Arn
 
+  MyPublicS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: bucket-pictures
+      AccessControl: PublicRead
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: error.html
+
+  MyPublicS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MyPublicS3Bucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref MyPublicS3Bucket
+                - /*
+
 Outputs:
   EventKeeperApi:
     Description: "API Gateway endpoint URL for Prod stage for Event Keeper functions"
