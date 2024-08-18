@@ -206,6 +206,7 @@ export default
         this.items = []
         this.isLoading = true
         const userLogged = utils.getIdUserFromToke()
+        console.log(userLogged)
         const response = await eventServices.getEvents(userLogged)
         if(response.status === "success"){
           this.isLoading = false
