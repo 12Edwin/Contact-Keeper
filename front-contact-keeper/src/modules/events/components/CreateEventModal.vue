@@ -9,10 +9,12 @@
     >
       <div class="p-grid p-fluid">
         <div class="p-col-12 p-md-6">
-          <span class="p-float-label">
-            <InputText id="name" v-model="event.name" />
-            <label for="name">Nombre</label>
-          </span>
+          <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-user" />
+              <InputText id="field-name" v-model="v$.name.$model"
+                         :class="{ 'invalid-field-custom': v$.name.$error }"/>
+              <label for="field-name" class="form-label-required">Nombre</label>
+            </span>
         </div>
         <div class="p-col-12 p-md-6">
           <span class="p-float-label">
@@ -113,7 +115,6 @@
     },
     methods: {
       createEvent() {
-        // Implementa la lógica para crear el evento
         console.log('Evento creado:', this.event, this.selectedUsers, this.selectedGuests)
         this.$emit('close')
       },

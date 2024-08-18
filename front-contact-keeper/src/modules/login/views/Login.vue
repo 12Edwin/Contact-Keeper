@@ -130,7 +130,7 @@ export default {
     },
     getInputType() {
       return this.showPassword ? 'text' : 'password'
-    }
+    },
   }
 }
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div :class="['custom-sidebar', { closed: visible }]">
+  <div :class="['custom-sidebar', { open: visible, closed: !visible }]">
     <div class="sidebar-header">
       <div class="avatar">{{getAvatarLetter() }}</div>
       <div class="user-info">
@@ -9,8 +9,11 @@
     </div>
     <div class="w-100">
       <ul>
-        <li class="item" v-for="(item, index) in menuItems"
-            :key="index" @click="() => $router.push({ name: item.route })"
+        <li 
+          v-for="(item, index) in filteredMenuItems"
+          :key="index" 
+          class="item" 
+          @click="navigate(item.route)"
         >
           <i :class="`${item.icon} sidebar-icon`" /> <span class="sidebar-text">{{ item.label }}</span>
         </li>
@@ -18,14 +21,15 @@
     </div>
     <div class="w-100">
       <ul>
-        <li class="item" @click="logOut()"
-        >
+        <li class="item" @click="logOut()">
           <i class="pi pi-fw pi-power-off sidebar-icon" /> <span class="sidebar-text">Cerrar sesión</span>
         </li>
       </ul>
     </div>
   </div>
 </template>
+
+
 
 <script>
 import utils from "@/kernel/utils";
@@ -39,34 +43,57 @@ export default {
   },
   data() {
     return {
+      userRole: '',
       menuItems: [
-        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users'},
-        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar'},
-        {label: 'Anuncios', icon: 'pi pi-fw pi-megaphone'},
-        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap'}
+        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators']},
+        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers']},
+        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers']},
       ]
     }
   },
+  computed: {
+    filteredMenuItems() {
+      return this.menuItems.filter(item => item.roles.includes(this.userRole));
+    }
+  },
   methods: {
-    logOut() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      this.$router.push({ name: 'login' });
-    },
-    getAvatarLetter(){
-      return utils.getUserFromToke().charAt(0);
-    },
-    getName(){
-      return utils.getUserFromToke();
-    },
+  logOut() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    this.$router.push({ name: 'login' });
+  },
+  getAvatarLetter(){
+    return utils.getUserFromToke().charAt(0);
+  },
+  getName(){
+    return utils.getUserFromToke();
+  },
+  getRole(){
+    const role = utils.getRoleStorage()
+    this.userRole = role;
+    return role === 'Administrators' ? 'Administrador' : 'Usuario'
+  },
+  navigate(route) {
+    const currentRoute = this.$route.name;
 
-    getRole(){
-      const role = utils.getRoleStorage()
-      return role === 'Administrators' ? 'Administrador' : 'Usuario'
+    if (route !== currentRoute) {
+      this.$router.push({ name: route }).then(() => {
+        if (window.innerWidth <= 768) {
+          this.visible = false;
+        }
+      }).catch(err => {
+        if (err.name !== 'NavigationDuplicated') {
+        }
+      });
+    } else if (window.innerWidth <= 768) {
+      this.visible = false;
     }
   }
 }
+
+}
 </script>
+
 
 <style scoped lang="scss" >
 @import '@/styles/colors.scss';
@@ -80,6 +107,29 @@ export default {
   padding: 10px;
   box-sizing: border-box;
   box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    width: 100%; // El sidebar se expande a todo el ancho en pantallas pequeñas
+    height: 100vh; // Mantiene el alto de toda la pantalla
+    position: absolute;
+    z-index: 1000;
+    left: 0;
+    transform: translateX(-100%); // Inicia oculto fuera de la pantalla
+  }
+
+  &.closed {
+    width: 100px; // Ancho reducido en estado cerrado
+    @media (max-width: 768px) {
+      transform: translateX(-100%); // Oculto completamente en pantallas pequeñas
+    }
+  }
+
+  &.open {
+    @media (max-width: 768px) {
+      transform: translateX(0); // Se muestra completamente en pantallas pequeñas
+    }
+  }
+
 }
 
 .sidebar-header {

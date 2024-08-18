@@ -7,7 +7,7 @@
           <h6 class="mt-2">Identificación</h6>
           <Divider align="right">
             <div class="inline-flex align-items-center">
-              <small>Paso {{ formPart }} de 3</small>
+              <small>Paso {{ formPart }} de 2</small>
             </div>
           </Divider>
           <div class="input-group-row">
@@ -28,6 +28,9 @@
                 <p class="error-messages" v-if="v$.username.$dirty && v$.username.maxLength.$invalid">
                   {{ v$.username.maxLength.$message }}
                 </p>
+                <p class="error-messages" v-if="serverError && serverError.field === 'username'">
+                  {{ serverError.translate }}
+                </p>
               </div>
             </div>
             <div class="input-group-cols-6">
@@ -47,6 +50,9 @@
                 </p>
                 <p class="error-messages" v-if="v$.name.$dirty && v$.name.maxLength.$invalid">
                   {{ v$.name.maxLength.$message }}
+                </p>
+                <p class="error-messages" v-if="serverError && serverError.field === 'name'">
+                  {{ serverError.translate }}
                 </p>
               </div>
             </div>
@@ -72,18 +78,24 @@
                 <p class="error-messages" v-if="v$.surname.$dirty && v$.surname.maxLength.$invalid">
                   {{ v$.surname.maxLength.$message }}
                 </p>
+                <p class="error-messages" v-if="serverError && serverError.field === 'surname'">
+                  {{ serverError.translate }}
+                </p>
               </div>
             </div>
             <div class="input-group-cols-6">
-              <label for="surname" class="form-label-required"
+              <label for="lastname" class="form-label-required"
                 >Apellido materno:</label
               >
-              <input type="text" id="surname" required v-model="v$.lastname.$model"
+              <input type="text" id="lastname" required v-model="v$.lastname.$model"
               :class="{ 'invalid-field-custom': v$.lastname.$error }"/>
               <div class="text-danger text-start pt-2">
                 <p class="error-messages"
                   v-if="v$.lastname.$dirty && v$.lastname.onlyLetters.$invalid">
                   {{ v$.lastname.onlyLetters.$message }}
+                </p>
+                <p class="error-messages" v-if="serverError && serverError.field === 'lastname'">
+                  {{ serverError.translate }}
                 </p>
               </div>
             </div>
@@ -93,7 +105,7 @@
           <h6 class="mt-2">Sobre ti</h6>
           <Divider align="right">
             <div class="inline-flex align-items-center">
-              <small>Paso {{ formPart }} de 3</small>
+              <small>Paso {{ formPart }} de 2</small>
             </div>
           </Divider>
           <div class="input-group-row">
@@ -106,6 +118,9 @@
               <div class="text-danger text-start pt-2">
               <p class="error-messages" v-if="v$.birthdate.$dirty && v$.birthdate.required.$invalid">
                 {{ v$.birthdate.required.$message }}
+              </p>
+              <p class="error-messages" v-if="serverError && serverError.field === 'birthday'">
+                  {{ serverError.translate }}
               </p>
             </div>
             </div>
@@ -127,6 +142,9 @@
                 <p class="error-messages" v-if="v$.phone.$dirty && v$.phone.maxLength.$invalid">
                   {{ v$.phone.maxLength.$message }}
                 </p>
+                <p class="error-messages" v-if="serverError && serverError.field === 'phone'">
+                  {{ serverError.translate }}
+                </p>
               </div>
             </div>
           </div>
@@ -143,38 +161,8 @@
               <p class="error-messages" v-if="v$.email.$dirty && v$.email.email.$invalid">
                 {{ v$.email.email.$message }}
               </p>
-            </div>
-          </div>
-        </template>
-        <template v-if="formPart === 3">
-          <h6 class="mt-2">Acceso</h6>
-          <Divider align="right">
-            <div class="inline-flex align-items-center">
-              <small>Paso {{ formPart }} de 3</small>
-            </div>
-          </Divider>
-          <div class="input-group">
-            <label for="password" class="form-label-required"
-              >Contraseña:</label
-            >
-            <input type="password" id="password" required v-model="v$.password.$model" :class="{ 'invalid-field-custom': v$.password.$error }"/>
-            <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.password.$dirty && v$.password.required.$invalid">
-                {{ v$.password.required.$message }}
-              </p>
-            </div>
-          </div>
-          <div class="input-group">
-            <label for="confirmPasswors" class="form-label-required"
-              >Confirmar contraseña:</label
-            >
-            <input type="password" id="confirmPasswors" required v-model="v$.confirmPassword.$model"/>
-            <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.confirmPassword.$dirty && v$.confirmPassword.required.$invalid">
-                {{ v$.confirmPassword.required.$message }}
-              </p>
-              <p class="error-messages" v-if="v$.confirmPassword.$dirty && v$.confirmPassword.match.$invalid">
-                {{ v$.confirmPassword.match.$message }}
+              <p class="error-messages" v-if="serverError && serverError.field === 'email'">
+                {{ serverError.translate }}
               </p>
             </div>
           </div>
@@ -188,10 +176,10 @@
                 @click="formPart === 1 ? showLoginForm() : lastStep()"
               />
               <Button
-                :label="formPart <= 2 ? 'Siguiente' : 'Registrate'"
+                :label="formPart <= 1 ? 'Siguiente' : isLoading ? 'Registrando...' : 'Registrarse'"
                 class="login-button"
-                @click="formPart <= 2 ? nextStep() : signUp()"
-                :disabled="validFormPart()"
+                @click="formPart <= 1 ? nextStep() : signUp()"
+                :disabled="validFormPart() || isLoading"
               />
             </b-col>
           </b-row>
@@ -199,7 +187,7 @@
       </form>
     </template>
     <template v-else>
-      <ConfirmAccount @showLoginForm="showLoginForm" />
+      <ConfirmAccount @showLoginForm="showLoginForm" :email="email"/>
     </template>
   </div>
 </template>
@@ -211,6 +199,8 @@ import {reactive} from "@vue/composition-api";
 import useVuelidate from "@vuelidate/core";
 import { required, helpers, maxLength, minLength, email } from '@vuelidate/validators'
 import {nameRegex, noRequiredField, phoneRegex} from "@/kernel/patterns.js";
+import utils from "@/kernel/utils"
+import services from '../services/Access'
 import moment from 'moment'
 export default {
   data() {
@@ -219,6 +209,9 @@ export default {
       password: "",
       formPart: 1,
       onConfirmAccount: false,
+      email: "",
+      isLoading: false,
+      serverError: null,
     };
   },
   setup(){
@@ -239,7 +232,7 @@ export default {
         required: helpers.withMessage('El nombre de usuario es requerido', required),
         onlyLetters: helpers.withMessage('El nombre de usuario solo puede contener letras y numeros', (value) => nameRegex.test(value)),
         minLength: helpers.withMessage("El nombre debe tener al menos 3 caracteres", minLength(3)),
-        maxLength: helpers.withMessage("El nombre debe tener menos de 10 caracteres", maxLength(10))
+        maxLength: helpers.withMessage("El nombre debe tener menos de 10 caracteres", maxLength(10)),
       },
       name: {
         required: helpers.withMessage('El nombre es requerido', required),
@@ -262,16 +255,9 @@ export default {
         minLength: helpers.withMessage("El teléfono debe ser de 10 caracteres", minLength(10)),
         maxLength: helpers.withMessage("El teléfono debe tener máximo 10 caracteres", maxLength(10))
       },
-      password: {
-        required: helpers.withMessage('La contraseña es requerida', required),
-      },
       email: {
         required: helpers.withMessage('El correo electrónico es requerido', required),
         email: helpers.withMessage('El correo electrónico no es válido', email),
-      },
-      confirmPassword: {
-        required: helpers.withMessage('La confirmación de la contraseña es requerida', required),
-        match: helpers.withMessage('Las contraseñas no coinciden', (value) => value === newPerson.password)
       },
       birthdate: {
         required: helpers.withMessage('La fecha de nacimiento es requerida', required),
@@ -290,7 +276,7 @@ export default {
       this.$emit("showLoginForm");
     },
     nextStep() {
-      if (this.formPart < 3) {
+      if (this.formPart < 2) {
         this.formPart++;
       }
     },
@@ -299,23 +285,43 @@ export default {
         this.formPart--;
       }
     },
-    signUp() {
-      if(this.v$.$invalid) return;
-      console.log("user creado =>",this.prepareObject())
+    async signUp() {
+      try {
+        if (this.v$.$invalid) return;
+        this.isLoading = true;
+        this.serverError = null;
+        const response = await services.signUp(this.prepareObject());
+        if (response) {
+
+          if (response.status === 'success') {
+            this.email = this.newPerson.email
+            this.onReady()
+          }
+
+          if (response.status === 'error') {
+            const translate = utils.getErrorMessages(response.data.message)
+            const { field, formPart } = utils.messageError(response.data.message)
+            this.serverError = { field, formPart, translate }
+            this.v$[field].$touch();
+            this.formPart = formPart;
+          }
+
+          this.isLoading = false;
+        };
+      } catch (error) {}
+      finally {
+        this.isLoading = false;
+      }
     },
     onReady() {
-      setTimeout(() => {
-        this.onConfirmAccount = true;
-        this.formPart = 1;
-      }, 3000);
+      this.onConfirmAccount = true;
+      this.formPart = 1;
     },
     validFormPart(){
       if(this.formPart === 1){
         return this.v$.username.$invalid || this.v$.name.$invalid || this.v$.surname.$invalid || this.v$.lastname.$invalid;
       }else if(this.formPart === 2){
         return this.v$.phone.$invalid || this.v$.email.$invalid || this.v$.birthdate.$invalid;
-      }else if(this.formPart === 3){
-        return this.v$.password.$invalid || this.v$.confirmPassword.$invalid;
       }
     },
     formmatDate(date){
@@ -327,10 +333,9 @@ export default {
         name: this.newPerson.name,
         last_name: this.newPerson.lastname,
         surname: this.newPerson.surname,
-        birthdate: this.formmatDate(this.newPerson.birthdate),
+        birthday: this.formmatDate(this.newPerson.birthdate),
         phone: this.newPerson.phone,
         email: this.newPerson.email,
-        password: this.newPerson.password,
         user_type: 'normal'
       }
     }
