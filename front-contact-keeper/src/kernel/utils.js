@@ -1,5 +1,5 @@
 import { jwtDecode } from "jwt-decode";
-import moment from "moment";
+const moment = require('moment-timezone');
 const getUserByName = (name, people) => {
   return people.some((person) => person.name === name);
 };
@@ -21,7 +21,7 @@ const getSubFromToken = () => {
     const decodedToken = jwtDecode(token);
     return decodedToken.sub; 
   } catch (error) {
-    console.error("Error decoding token:", error);
+    console.error("Error decoding token");
     return null;
   }
 };
@@ -159,6 +159,18 @@ const formatDate = (startDate, startHour, endDate, endHour) => {
 };
 
 
+const formatDateForChat = (date) => {
+  moment.locale('es');
+  moment.updateLocale('es', {
+  meridiem: (hour, minute, isLower) => {
+    return hour < 12 ? 'am' : 'pm';
+  },
+  weekdaysShort : ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"]
+  });
+
+  return moment.utc(date).format('ddd [a las] h:mm a');
+}
+
 export default {
   getToken,
   removeToken,
@@ -175,5 +187,6 @@ export default {
   endBeforeStart,
   isSameDate,
   formatDate,
-  splitDateTime
+  splitDateTime,
+  formatDateForChat
 };

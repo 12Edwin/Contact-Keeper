@@ -70,7 +70,7 @@
           <Announcements :group="groupSelected" :visible.sync="showInfo"/>
           <ModalCreateGroup :visible.sync="showModalSave" @update-data="getGroups"/>
           <ModalEditGroup :visible.sync="showModalEdit" :groupData="groupSelected" @update-data="getGroups"/>
-          <EventsForGroups :group="groupSelected" :events="events" :visible.sync="showModalEvents"/>
+          <EventsForGroups :group="groupSelected" :events="events" :visible.sync="showModalEvents" @addNewMessages="addNewMessages"/>
         </div>
       </Panel>
     </div>
@@ -109,7 +109,8 @@ export default {
       groupSelected: {},
       showModalSave: false,
       showModalEdit: false,
-      showModalEvents: false
+      showModalEvents: false,
+      idGroup: 0
     }
   },
   mounted() {
@@ -155,8 +156,13 @@ export default {
       this.groupSelected = JSON.parse(JSON.stringify(group));
       this.showModalEdit = true;
     },
+    addNewMessages(group){
+      const index = this.groups.findIndex(g => g.id === group.id);
+      this.groups[index].messages = group.messages;
+    },
     async openModalGetEvents(group){
       this.groupSelected = JSON.parse(JSON.stringify(group));
+      
       try {
         onToast('info', 'Cargando eventos', 'info');
         this.showModalEvents = true;
@@ -168,7 +174,7 @@ export default {
           this.events = [];
         }
       } catch (error) {
-        console.error('Error al obtener eventos:', error);
+        console.error('Error al obtener eventos:');
         this.events = []; 
       }
     },
@@ -255,7 +261,7 @@ export default {
 
 .card-footer {
   display: flex;
-  justify-content: right;
+  justify-content: flex-end;
   margin-top: 16px;
   gap: 5px;
   flex-wrap: wrap;
