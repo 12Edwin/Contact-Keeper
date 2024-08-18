@@ -69,21 +69,22 @@
             </b-col>
             <b-col cols="6">
               <div class="icon-container d-flex justify-content-end">
-              <Button
-                v-if="isUserInGroup(user.id)"
-                icon="pi pi-trash"
-                class="button-remove"
-                :disabled="loadingUserId === user.id"
-                @click="removeUserFromGroups(user.id)"
-              />
-              <Button
-                v-else
-                icon="pi pi-plus"
-                class="button-add"
-                variant="info"
-                :disabled="loadingUserId === user.id"
-                @click="addUserToGroup(user.id)"
-              />
+                <i
+                  v-if="isUserInGroup(user.id)"
+                  class="pi pi-trash icon-remove"
+                  v-tooltip.top="'Eliminar'"
+                  @click="removeUserFromGroup(user.id)"
+                  :class="{ 'icon-disabled': loadingUserId === user.id }"
+                ></i>
+                <!-- Para agregar un usuario -->
+                <i
+                  v-else
+                  class="pi pi-plus icon-add"
+                  v-tooltip.top="'Agregar'"
+                  @click="addUserToGroup(user.id)"
+                  :class="{ 'icon-disabled': loadingUserId === user.id }"
+                ></i>
+
             </div>
             </b-col>
           </div>
@@ -301,24 +302,36 @@ export default {
   margin-right: 15px;
 }
 
-.button-add {
-  color: #fff; 
-  background-color: $sidebar-items;
+.button-add, .button-remove {
+  color: $sidebar-items; // Color gris para el texto del botón
+  background-color: $white-color; // Fondo blanco
+  border-color: $white-color; // Borde blanco
+  border: 1px solid $white-color; // Asegura que el borde sea blanco
 }
 
-.button-remove {
-  color: #fff; 
-  background-color: $sidebar-items;
+// Estilos de hover para los botones
+.button-add:hover, .button-remove:hover {
+  background-color: $white-color; // Fondo blanco en hover
+  border-color: $white-color; // Borde blanco en hover
+  color: $sidebar-items; // Color del texto en hover
+  box-shadow: none; // Elimina el sombreado azul del hover
+}
+
+// Estilos de iconos
+.pi-trash, .pi-plus {
+  font-size: 16px; // Tamaño de fuente para los iconos
+  color: $sidebar-items; // Color gris para los iconos
+}
+
+// Estilos para los botones deshabilitados
+.button-add:disabled, .button-remove:disabled {
+  cursor: not-allowed; // Cursor de no permitido
+  opacity: 0.6; // Opacidad reducida
 }
 
 .pi-minus-circle, .pi-plus-circle {
   font-size: 16px;
   cursor: pointer;
-}
-
-.button-add:disabled, .button-remove:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .skeleton-class {
