@@ -1,28 +1,48 @@
 <template>
   <div class="main-content">
     <div class="content">
-      <Panel header="Eventos" class="shadow-lg">
-        <b-row>
-          <b-col cols="12">
-            <Loader v-if="isLoading" key="load" />
-            <div v-else class="calendar-container">
-              <FullCalendar :options="calendarOptions" :events="events" id="myCustomCalendar">
-                <template v-slot:eventContent="{ event }">
-                  <div class="my-custom-event" @click="handleEventClick(event)">
-                    <span class="my-event-dot"></span>
-                    <div class="my-event-info">
-                      <span class="my-event-title"><b>{{ event.title }}</b></span>
-                      <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
+      <b-row>
+        <b-col>
+          <Panel header="Eventos" class="shadow-lg">
+            <b-row>
+              <b-col cols="12">
+                <div class="calendar-container">
+                  <template v-if="!isLoading">
+                    <template v-if="items.length > 0">
+                    <FullCalendar :options="calendarOptions" id="myCustomCalendar">
+                      <template v-slot:eventContent='{ event }'>
+                        <div class="my-custom-event" @click="handleEventClick(event)">
+                          <span class="my-event-dot" :v-tooltip.top="eventType(event.extendedProps.type)"  :style="{'background-color': setDotBackgrund(event.extendedProps.type)}"></span>
+                          <div class="my-event-info">
+                            <span class="my-event-title"><b>{{ event.extendedProps.title ? event.extendedProps.title : event.extendedProps.name}}</b></span>
+                            <span class="my-event-location">{{ event.extendedProps.location }}</span>
+                            <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
+                          </div>
+                        </div>
+                      </template>
+                    </FullCalendar>
+                    </template>
+                    <template v-else>
+                        <div class="no-events-img">
+                          <img src="@/assets/no_events.svg" alt="No hay eventos" />
+                          <p class="no-events-text">¡Aquí verás todos tus eventos por venir!</p>
+                          <Button label="Crear evento" @click="openModalAddEvent()" class="p-button-text p-button-text mt-1 p-button-plain button-styles text" />
+                        </div>
+                    </template>
+                  </template>
+                  <template v-else>
+                    <div class="content">
+                      <CalendarSkeleton />
                     </div>
-                  </div>
-                </template>
-              </FullCalendar>
-            </div>
-          </b-col>
-        </b-row>
-      </Panel>
-      <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
-      <ModalAddEvent :visible.sync="showModalAddEvent" />
+                  </template>
+                </div>
+              </b-col>
+            </b-row>
+          </Panel>
+          <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
+          <ModalAddEvent :visible.sync="showModalAddEvent" @getEvents="getEvents"/>
+        </b-col>
+      </b-row>
     </div>
   </div>
 </template>
@@ -37,8 +57,13 @@ import ModalEventInfo from '@/modules/events/components/ModalEventInfo.vue'
 import ModalAddEvent from '@/modules/events/components/ModalAddEvent.vue'
 import moment from 'moment';
 import Panel from 'primevue/panel'
+import esLocale from '@fullcalendar/core/locales/es';
 import Chip from 'primevue/chip';
-
+import utils from '@/kernel/utils'
+import eventServices from '../services/event-services'
+import CalendarSkeleton from '@/components/CalendarSkeleton.vue'
+import Tooltip from 'primevue/tooltip';
+import { onError, onToast} from '@/kernel/alerts';
 export default
 {
   name: 'Calendar',
@@ -48,19 +73,25 @@ export default
     ModalEventInfo,
     ModalAddEvent,
     Panel,
-    Chip
+    Chip,
+    CalendarSkeleton
   },
+  directives: {
+    'tooltip': Tooltip
+},
   data() {
     return {
       sidebarVisible: false,
       showModalEventInfo: false,
       showModalAddEvent: false,
-      events: [],
+      items: [],
       calendarOptions: {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
         initialView: 'dayGridMonth',
+        locale: esLocale,
         weekends: false,
         dayMaxEventRows: 2,
+        events: this.items,
         headerToolbar: {
           start: 'dayGridMonth,timeGridWeek,timeGridDay today prev,next',
           center: 'title',
@@ -69,7 +100,7 @@ export default
         customButtons: {
           addEventButton: {
             text: 'Agregar Evento',
-            click: () => this.showModalAddEvent = true,
+            click: () => this.openModalAddEvent(),
           },
         },
         views: {
@@ -113,22 +144,12 @@ export default
             el.style.color = 'black';
           });
         },
-        events: [
-          { title: 'Evento 1', start: '2024-07-18', end: '2024-07-18', description: 'Descripción del Evento 1' },
-          { title: 'Evento 2', start: '2024-07-20', end: '2024-07-23', description: 'Descripción del Evento 2' },
-          { title: 'Evento 3', start: '2024-07-22', end: '2024-07-25', description: 'Descripción del Evento 3' },
-          { title: 'Evento 4', start: '2024-07-25', end: '2024-08-28', description: 'Descripción del Evento 4' },
-          { title: 'Evento 5', start: '2024-08-28', end: '2024-08-28', description: 'Descripción del Evento 5' },
-        ],
       },
       isLoading: false,
       selectedEvent: {},
     };
   },
   methods: {
-    toggleSidebar() {
-      this.sidebarVisible = !this.sidebarVisible;
-    },
 
     addEvent(eventData) {
       const newEvent = {
@@ -140,33 +161,82 @@ export default
       };
       this.events.push(newEvent);
     },
-
     handleEventClick(event) {
-        this.selectedEvent = {
-        title: event.title,
-        startDate: event.start.toISOString().split('T')[0],
-        endDate: event.end ? event.end.toISOString().split('T')[0] : event.start.toISOString().split('T')[0],
-        description: event.extendedProps.description,
-        status: event.extendedProps.status || 'No especificado',
-        participants: event.extendedProps.participants || 'No especificado',
-      };
+      this.selectedEvent = event.extendedProps.event;
       this.showModalEventInfo = true;
     },
-    setDotBackground(status) {
-      const colors = {
-        success: 'green',
-        warning: 'orange',
-        danger: 'red',
-        primary: 'blue',
-        secondary: 'grey',
-        info: 'cyan'
-      };
-      return colors[status] || 'grey';
+    setDotBackgrund(status) {
+      let color = '';
+      switch (status) {
+        case 'meeting':
+          color = '#007bff';
+          break;
+        case 'session':
+          color = '#28a745';
+          break;
+        case 'event':
+          color = '#ffc107';
+          break;
+        default:
+          color = '#dc3545';
+          break;
+      }
+      return color;
     },
-    formatCalendarDate(date){
-      return moment(date).format('YYYY-MM-DD');
+    formatCalendarDate(pop){
+      return moment(pop).format("YYYY-MM-DD")
     },
+    openModalAddEvent() {
+      console.log('openModalAddEvent')
+      this.showModalAddEvent = true;
+    },
+    eventType(type){
+      if(type === 'meeting'){
+        return 'Reunión'
+      } else if(type === "session"){
+        return 'Sesión'
+      } else if(type === "event"){
+        return 'Evento'
+      }else{
+        return 'Otro'
+      }
+    },
+    async getEvents(){
+      try {
+        this.items = []
+        this.isLoading = true
+        const userLogged = utils.getIdUserFromToke()
+        const response = await eventServices.getEvents(userLogged)
+        if(response.status === "success"){
+          this.isLoading = false
+          response.data.forEach((event) => {
+            this.items.push({
+              title: event.title,
+              start: new Date(event.start_date).toISOString(),
+              end: new Date(event.end_date).toISOString(),
+              location: event.location,
+              name: event.name,
+              event
+            })
+          })
+        }
+        this.isLoading = false
+      } catch (error) {
+        onToast('Error al obtener los eventos', 'Parece que hubo un error al obtener los eventos, por favor intenta de nuevo', 'error')
+      }
+    }
   },
+  watch: {
+  items: {
+    handler(newEvents) {
+      this.calendarOptions = { ...this.calendarOptions, events: newEvents };
+    },
+    deep: true
+  }
+},
+  mounted() {
+    this.getEvents()
+  }
 }
 </script>
 
@@ -273,8 +343,35 @@ export default
 </style>
 
 
-<style scoped>
+<style scoped lang="scss">
+@import '@/styles/colors.scss';
+
 /* Estilos existentes */
+.my-event-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.my-custom-event {
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+}
+
+.my-event-location {
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.my-event-title {
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+.my-event-time {
+    font-size: 10px;
+}
 .main-content {
   display: flex;
 }
@@ -284,5 +381,44 @@ export default
   padding: 1rem;
   margin-left: 0;
   transition: margin-left 0.3s;
+}
+.no-events-img{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.no-events-text{
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+  
+}
+.button-styles{
+  width: 15% !important;
+  padding: 0.50rem !important;
+  background-color: black !important;
+  color: white !important;
+  border: none;
+  border-radius: 9px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  justify-content: center;
+}
+
+.button-styles:hover{
+   transform: translateY(-5px);
+   box-shadow: 0 4px 8px rgba(72, 70, 70, 0.3);
+   background: $primary-color !important;
+   border: none;
+   cursor: pointer;
+ }
+
+
+.p-panel{
+ width: 100% !important;
 }
 </style>

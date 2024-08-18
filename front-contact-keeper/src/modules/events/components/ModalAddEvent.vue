@@ -1,74 +1,270 @@
 <template>
   <Dialog
-    header="Agregar Nuevo Evento"
+    header="Nuevo Evento"
     :modal="true"
     :closeOnEscape="false"
     :closable="false"
     :visible.sync="visible"
     position="center"
-    :contentStyle="{ overflow: 'visible', width: '35vw' }"
+    :contentStyle="{ overflow: 'visible', width: '70vw' }"
     class="custom-dialog"
     :autoZIndex="true"
   >
-    <div class="event-form">
+    <div class="p-fluid grid">
       <b-row>
-        <b-col cols="12">
-          <div class="form-group">
-            <label for="title">Título</label>
-            <InputText v-model="v$.title.$model" type="text" class="form-control" id="title" placeholder="Título del Evento" @input="v$.title.$touch"/>
-            <small class="p-error" v-if="v$.title.$error">{{ v$.title.$errors[0].$message }}</small>
-          </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12">
-          <div class="form-group">
-            <label for="description">Descripción</label>
-            <textarea v-model="v$.description.$model" class="form-control" id="description" placeholder="Descripción del Evento" @input="v$.description.$touch"></textarea>
-            <small class="p-error" v-if="v$.description.$error">{{ v$.description.$errors[0].$message }}</small>
-          </div>
-        </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <span class="p-float-label">
-              <Dropdown id="type" :options="types" v-model="v$.type.$model" optionLabel="label" class="full-width-dropdown" @change="v$.type.$touch"/>
-              <label for="type">Tipo</label>
+        <b-col cols="12" lg="4" md="6" sm="12">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-bookmark"/>
+              <InputText id="field-event-title" v-model="v$.title.$model" :class="{ 'invalid-field-custom': v$.title.$error }" />
+              <label for="field-event-title" class="form-label-required">Título</label>
             </span>
-            <small class="p-error" v-if="v$.type.$error">{{ v$.type.$errors[0].$message }}</small>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.required.$invalid">
+                {{ v$.title.required.$message }}
+              </p>
+              <p class="error-messages"
+                 v-if="v$.title.$dirty && v$.title.onlyLetters.$invalid">
+                {{ v$.title.onlyLetters.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.minLength.$invalid">
+                {{ v$.title.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.title.$dirty && v$.title.maxLength.$invalid">
+                {{ v$.title.maxLength.$message }}
+              </p>
+            </div>
           </div>
         </b-col>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <span class="p-float-label">
-              <Dropdown id="participants" :options="invites" v-model="v$.participants.$model" optionLabel="label" class="full-width-dropdown" @change="v$.participants.$touch"/>
-              <label for="participants">Participantes</label>
+        <b-col cols="12" lg="4" md="6" sm="12">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <Dropdown id="field-event-type" v-model="v$.type.$model" :options="types" optionLabel="label"  optionValue="value"/>
+              <label for="field-event-type" class="form-label-required">Tipo</label>
             </span>
-            <small class="p-error" v-if="v$.participants.$error">{{ v$.participants.$errors[0].$message }}</small>
           </div>
         </b-col>
-      </b-row>
-      <b-row>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <label for="start">Fecha de Inicio</label>
-            <input v-model="v$.startDate.$model" type="date" class="form-control" id="start" :min="today" @input="v$.startDate.$touch">
-            <small class="p-error" v-if="v$.startDate.$error">{{ v$.startDate.$errors[0].$message }}</small>
+        <b-col cols="12" lg="4" md="6" sm="12">
+          <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-map-marker"/>
+              <InputText id="field-event-location" v-model="v$.location.$model" :class="{ 'invalid-field-custom': v$.location.$error }" />
+              <label for="field-event-location" class="form-label-required">Ubicación</label>
+            </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages"
+                 v-if="v$.location.$dirty && v$.location.onlyLetters.$invalid">
+                {{ v$.location.onlyLetters.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.location.$dirty && v$.location.maxLength.$invalid">
+                {{ v$.location.maxLength.$message }}
+              </p>
+            </div>
+        </b-col>
+        <b-col cols="12" lg="3" md="6" sm="12" class="mt-2">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-info"/>
+              <InputText id="field-event-title" v-model="v$.name.$model" :class="{ 'invalid-field-custom': v$.name.$error }" />
+              <label for="field-event-title" class="form-label-required">Nombre</label>
+            </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.name.$dirty && v$.name.required.$invalid">
+                {{ v$.name.required.$message }}
+              </p>
+              <p class="error-messages"
+                 v-if="v$.name.$dirty && v$.name.onlyLetters.$invalid">
+                {{ v$.name.onlyLetters.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.name.$dirty && v$.name.minLength.$invalid">
+                {{ v$.name.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.name.$dirty && v$.name.maxLength.$invalid">
+                {{ v$.name.maxLength.$message }}
+              </p>
+            </div>
           </div>
         </b-col>
-        <b-col cols="12" lg="6">
-          <div class="form-group">
-            <label for="end">Fecha de Fin</label>
-            <input v-model="v$.endDate.$model" type="date" class="form-control" id="end" :min="v$.startDate.$model" @input="v$.endDate.$touch">
-            <small class="p-error" v-if="v$.endDate.$error">{{ v$.endDate.$errors[0].$message }}</small>
+        <b-col cols="12" lg="3" md="6" sm="12" class="mt-2">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-calendar"/>
+              <Calendar v-model="v$.dates.$model" selectionMode="range" dateFormat="yy/mm/dd"/>
+              <label for="field-event-dates" class="form-label-required">Duración</label>
+            </span>
           </div>
+        </b-col>
+        <b-col cols="12" lg="3" md="6" sm="12" class="mt-2">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-clock"></i>
+              <Calendar id="field-event-start" v-model="v$.startHour.$model" :class="{ 'invalid-field-custom': v$.startHour.$error }" :timeOnly="true" hourFormat="12"/>
+              <label for="field-event-start" class="form-label-required">Hora inicio</label>
+            </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.startHour.$dirty && v$.startHour.required.$invalid">
+              {{ v$.startHour.required.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.startHour.$dirty && v$.startHour.isBeforeEnd.$invalid">
+              {{ v$.startHour.isBeforeEnd.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.startHour.$dirty && v$.startHour.notEqualEnd.$invalid">
+              {{ v$.startHour.notEqualEnd.$message }}
+              </p>
+            </div>
+          </div>
+        </b-col>
+        <b-col cols="12" lg="3" md="12" sm="12" class="mt-2">
+          <div class="fields">
+            <span class="p-float-label p-input-icon-right">
+              <i class="pi pi-clock"></i>
+              <Calendar id="field-event-end" v-model="v$.endHour.$model" :timeOnly="true" hourFormat="12" :class="{ 'invalid-field-custom': v$.startHour.$error }"/>
+              <label for="field-event-end" class="form-label-required">Hora fin</label>
+            </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.endHour.$dirty && v$.endHour.required.$invalid">
+              {{ v$.endHour.required.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.endHour.$dirty && v$.endHour.isAfterStart.$invalid">
+              {{ v$.endHour.isAfterStart.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.endHour.$dirty && v$.endHour.notEqualStart.$invalid">
+                {{ v$.endHour.notEqualStart.$message }} 
+              </p>
+            </div>
+          </div>
+        </b-col>
+        <b-col cols="12" class="mt-2">
+          <div class="field">
+            <span class="p-float-label p-input-icon-right">
+              <Textarea id="field-event-description" rows="2" cols="30" v-model="v$.description.$model" :class="{ 'invalid-field-custom': v$.description.$error }" />
+              <label for="field-event-description" class="form-label-required">Descripción</label>
+            </span>
+            <div class="text-danger text-start pt-2">
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.required.$invalid">
+                {{ v$.description.required.$message }}
+              </p>
+              <p class="error-messages"
+                 v-if="v$.description.$dirty && v$.description.onlyLetters.$invalid">
+                {{ v$.description.onlyLetters.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.minLength.$invalid">
+                {{ v$.description.minLength.$message }}
+              </p>
+              <p class="error-messages" v-if="v$.description.$dirty && v$.description.maxLength.$invalid">
+                {{ v$.description.maxLength.$message }}
+              </p>
+            </div>
+          </div>
+        </b-col>
+        <b-col cols="12" class="mt-1">
+          <TabView >
+            <TabPanel header="Usuarios">
+              <ScrollPanel style="width: 100%; height: 160px">
+                <template v-if="!onGettingUsers">
+                  <template v-if="invites.length > 0">
+                    <div class="user-list d-flex justify-content-between align-items-center" v-for="(member, userIndex) in invites" :key="userIndex">
+                      <div class="user-info-container d-flex align-items-center mb-2">
+                        <Avatar :label="member.name.charAt(0)"  shape="circle" size="small"/>
+                        <div class="user-info">
+                          <label class="username">{{ member.name }} {{ member.surname }} {{ member.last_name }}</label>
+                          <p class="role">{{ member.email }}</p>
+                        </div>
+                      </div>
+                      <div class="icon-container">
+                        <b-form-checkbox :binary="true" @change="onCheckboxUserChange(member)" :checked="ifUserSelected(member)"/>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="no-events-img">
+                      <img src="@/assets/User_empty.svg" alt="Sin usuarios" style="width: 120px; height: 120px;"/>
+                        <p class="no-events-text">Sin usuarios</p>
+                    </div>
+                  </template>
+                </template>
+                <template v-else>
+                  <div class="custom-skeleton">
+                    <ul class="m-0 p-0">
+                      <li class="mb-3" v-for="i in 3">
+                        <div class="flex">
+                          <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
+                          <div style="flex: 1">
+                            <Skeleton width="100%" class="mb-2"></Skeleton>
+                            <Skeleton width="75%"></Skeleton>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </template>
+              </ScrollPanel>
+            </TabPanel>
+            <TabPanel header="Grupos">
+              <ScrollPanel style="width: 100%; height: 160px;">
+                <template v-if="!onGettingGroups">
+                  <template v-if="groups.length > 0">
+                    <div class="user-list d-flex justify-content-between align-items-center" v-for="(group, userIndex) in groups" :key="userIndex">
+                      <div class="user-info-container d-flex align-items-center mb-2">
+                        <Avatar :label="getLetter(group.name)" shape="circle" size="small"/>
+                        <div class="user-info">
+                          <label class="username">{{ group.name }}</label>
+                          <p class="role">{{ eventStatus(group.status) }}</p>
+                        </div>
+                      </div>
+                      <div class="icon-container">
+                        <b-form-checkbox :binary="true" @change="onCheckboxGroupChange(group)" :checked="ifGroupSelected(group)"/>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="no-events-img">
+                      <img src="@/assets/inbox_empty.svg" alt="Sin grupos" style="width: 120px; height: 120px;"/>
+                        <p class="no-events-text">Sin grupos</p>
+                    </div>
+                  </template>
+                </template>
+                <template v-else>
+                  <div class="custom-skeleton">
+                    <ul class="m-0 p-0">
+                      <li class="mb-3">
+                        <div class="flex">
+                          <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
+                          <div style="flex: 1">
+                            <Skeleton width="100%" class="mb-2"></Skeleton>
+                            <Skeleton width="75%"></Skeleton>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-3">
+                        <div class="flex">
+                          <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
+                          <div style="flex: 1">
+                            <Skeleton width="100%" class="mb-2"></Skeleton>
+                            <Skeleton width="75%"></Skeleton>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="mb-3">
+                        <div class="flex">
+                          <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
+                          <div style="flex: 1">
+                            <Skeleton width="100%" class="mb-2"></Skeleton>
+                            <Skeleton width="75%"></Skeleton>
+                          </div>
+                        </div>
+					            </li>
+                    </ul>
+                  </div>
+                </template>
+              </ScrollPanel>
+            </TabPanel>
+          </TabView>
         </b-col>
       </b-row>
     </div>
     <template #footer>
-      <Button label="Guardar" icon="pi pi-check" style="background-color: black; color: white;" class="p-button-text" @click="saveEvent" />
-      <Button label="Cancelar" icon="pi pi-times" style="color: gray;" class="p-button-text" @click="closeModal" />
+      <Button label="Guardar" icon="pi pi-check" style="background-color: black; color: white;" class="p-button-text" @click="saveEvent()" />
+      <Button label="Cancelar" icon="pi pi-times" style="color: gray;" class="p-button-text" @click="closeModal()" />
     </template>
   </Dialog>
 </template>
@@ -82,7 +278,15 @@ import Button from 'primevue/button';
 import Dropdown from 'primevue/dropdown';
 import InputText from 'primevue/inputtext';
 import {phraseRegex} from "@/kernel/patterns.js";
-
+import Textarea from 'primevue/textarea/Textarea';
+import ScrollPanel from 'primevue/scrollpanel/ScrollPanel';
+import groupService from '@/modules/groups/services/groups-services';
+import userServices from '@/modules/users/services/userServices';
+import utils from '@/kernel/utils';
+import Calendar from '../views/Calendar.vue';
+import eventServices from '../services/event-services';
+import {getGroupsByUserId } from '@/modules/groups/services/groups-services';
+import { onToast} from '@/kernel/alerts';
 export default {
   name: 'ModalAddEvent',
   components: {
@@ -100,14 +304,24 @@ export default {
   data() {
     return {
       types: [
-        { label: 'Cumpleaños', value: 'tipo1' },
-        { label: 'Tipo 2', value: 'tipo2' }
+        { label: 'Reunión', value: 'meeting' },
+        { label: 'Sesión', value: 'session' },
+        {label: 'Cumpleaños', value: 'birthday'},
+        {label: 'Otro', value: 'other'}
       ],
       invites: [
-        { label: 'Merri Chrismas', value: 'invitado1' },
-        { label: 'Isa Palacios', value: 'invitado2' },
-        { label: 'Typescrips', value: 'invitado3' }
+        // { name: 'Merri Chrismas', email: '20213tn103@utez.edu.mx' },
+        // { name: 'Isa Palacios', email: '20213tn103@utez.edu.mx' },
+        // { name: 'Typescrips', email: '20203tn103@utez.edu.mx' }
+
       ],
+      groups: [
+        // { name: 'Grupo 1', status: 'active' },
+        // { name: 'Grupo 2', status: 'pending' },
+        // { name: 'Grupo 3', status: 'active' }
+      ],
+      onGettingUsers: false,
+      onGettingGroups: false,
       today: new Date().toISOString().split('T')[0]
     };
   },
@@ -115,10 +329,14 @@ export default {
     const eventData = reactive({
       title: '',
       description: '',
-      startDate: '',
-      endDate: '',
+      dates: null,
       type: null,
-      participants: null
+      participants: null,
+      location: '',
+      startHour: '',
+      endHour: '',
+      name: '',
+      id_group_member: ''
     });
 
     const rules = {
@@ -126,25 +344,45 @@ export default {
         required: helpers.withMessage('El título del evento es requerido', required),
         onlyLetters: helpers.withMessage('El título solo puede contener letras y números', (value) => phraseRegex.test(value)),
         minLength: helpers.withMessage("El título debe tener al menos 3 caracteres", minLength(3)),
-        maxLength: helpers.withMessage("El título debe tener máximo de 30 caracteres", maxLength(30))
+        maxLength: helpers.withMessage("El título debe tener máximo de 30 caracteres", maxLength(30)),
+      },
+      name: {
+        required: helpers.withMessage('El nombre del evento es requerido', required),
+        onlyLetters: helpers.withMessage('El nombre solo puede contener letras y números', (value) => phraseRegex.test(value)),
+        minLength: helpers.withMessage("El nombre debe tener al menos 3 caracteres", minLength(3)),
+        maxLength: helpers.withMessage("El nombre debe tener máximo de 30 caracteres", maxLength(30)),
       },
       description: {
         required: helpers.withMessage('La descripción es requerida', required),
         onlyLetters: helpers.withMessage('La descripción solo puede contener letras y números', (value) => phraseRegex.test(value)),
         minLength: helpers.withMessage("La descripción debe tener al menos 3 caracteres", minLength(3)),
-        maxLength: helpers.withMessage("La descripción debe tener máximo 70 caracteres", maxLength(70))
+        maxLength: helpers.withMessage("La descripción debe tener máximo 70 caracteres", maxLength(100))
       },
-      startDate: {
+      dates: {
         required: helpers.withMessage('La fecha de inicio del evento es requerida', required),
-      },
-      endDate: {
-        required: helpers.withMessage('La fecha de fin del evento es requerida', required),
       },
       type: {
         required: helpers.withMessage('El tipo de evento es requerido', required),
       },
       participants: {
-        required: helpers.withMessage('El tipo de evento es requerido', required),
+        required: helpers.withMessage('Debes seleccionar al menos un ', required),
+      },
+      dates: {
+        required: helpers.withMessage('La fecha de inicio y de fin son requeridos', required),
+      },
+      location: {
+        onlyLetters: helpers.withMessage('El npmbre del lugar solo pueden contener letras y números', (value) => phraseRegex.test(value)),
+        maxLength: helpers.withMessage("El nombre del lugar debe tener máximo 70 caracteres", maxLength(70))
+      },
+      startHour: {
+        required: helpers.withMessage('La hora de inicio es requerida', required),
+        isBeforeEnd: helpers.withMessage('La hora de inicio debe ser menor a la hora de fin', (value) => utils.startAfterEnd(value, eventData.endHour)),
+        notEqualEnd: helpers.withMessage('La hora de inicio no puede ser igual a la hora de fin', (value) => !utils.isSameDate(value, eventData.endHour))
+      },
+      endHour: {
+        required: helpers.withMessage('La hora de fin es requerida', required),
+        isAfterStart: helpers.withMessage('La hora de fin debe ser mayor a la hora de inicio', (value) => utils.endBeforeStart(eventData.startHour, value)),
+        notEqualStart: helpers.withMessage('La hora de fin no puede ser igual a la hora de inicio', (value) => !utils.isSameDate(eventData.startHour, value))
       }
     };
 
@@ -155,11 +393,128 @@ export default {
     closeModal(){
       this.$emit('update:visible', false);
     },
-
-    saveEvent() {
-      console.log(this.eventData);
-      this.closeModal(); 
+    async saveEvent() {
+      const event = this.prepareObject()
+      const {id_group_member} = event
+      try {
+        if(id_group_member){
+          const response = await eventServices.saveGroupEvent(event)
+          if(response){
+            if(response.status === "success"){
+              onToast('¡Evento programado con éxito!', 'Puedes visualizar tus eventos en el calendario' , 'success')
+              this.closeModal()
+              this.$emit("getEvents")
+            }
+          }
+        }else{
+          const response = await eventServices.saveMeetingEvent(event)
+          if(response){
+            if(response.status === "success"){
+              onToast('¡Evento programado con éxito!', 'Puedes visualizar tus eventos en el calendario' , 'success')
+              this.closeModal()
+              this.$emit("getEvents")
+            }
+          }
+        }
+      } catch (error) {
+        onToast('¡Error al programar el evento!', 'Inténtalo de nuevo' , 'error')
+      }
+    },
+    eventStatus(status){
+      return status=== 'pending' ? 'Pendiente' : 'Activo';
+    },
+    async getUsergroups(){
+      try {
+        this.onGettingGroups = true
+        const response = await getGroupsByUserId()
+        if(response){
+          if(response.status === "success"){
+            this.groups = response.data
+          }
+        }
+        this.onGettingGroups = false
+      } catch (error) {
+        console.log(error)
+      }finally{
+        this.onGettingGroups = false
+      }
+    },
+    async getUsers(){
+      try {
+        this.onGettingUsers = true
+        const response = await userServices.get_users()
+        if(response){
+          if(response.status === "success"){
+            this.invites = response.data
+          }
+        }
+      this.onGettingUsers = false
+      } catch (error) {
+        console.log(error)
+      }finally{
+        this.onGettingUsers = false
+      }
+    },
+    onCheckboxUserChange(userSelected) {
+      if (this.eventData.participants === userSelected.id) {
+        this.eventData.participants = null;
+      } else {
+        this.eventData.participants = userSelected.id;
+      }
+      this.eventData.id_group_member = null;
+    },
+    onCheckboxGroupChange(groupSelected) {
+      if (this.eventData.id_group_member === groupSelected.id) {
+        this.eventData.id_group_member = null;
+      } else {
+        this.eventData.id_group_member = groupSelected.id;
+      }
+      this.eventData.participants = null;
+    },
+    ifUserSelected(userSelected){
+      return this.eventData.participants === userSelected.id
+    },
+    ifGroupSelected(groupSelected){
+      return this.eventData.id_group_member === groupSelected.id
+    },
+    prepareObject(){
+      const startHour = this.eventData.startHour
+      const endHour = this.eventData.endHour
+      const {start_date, end_date} = utils.formatDate(this.eventData.dates[0], startHour, this.eventData.dates[1], endHour)
+      const event = {
+        title: this.eventData.title,
+        description: this.eventData.description,
+        start_date,
+        end_date,
+        type: this.eventData.type,
+        location: this.eventData.location,
+        name: this.eventData.name,
+        reminder: "",
+        notes: "",
+      }
+      if (this.eventData.id_group_member) {
+        event.id_group_member = this.eventData.id_group_member;
+      } else {
+        // Si no hay un grupo seleccionado
+        if (this.eventData.participants) {
+          event.moderator = this.eventData.participants;
+        } else {
+          // Si no hay un usuario seleccionado, tomar el ID del usuario del localStorage
+          const userLogged = utils.getIdUserFromToke();
+          event.moderator = userLogged;
+        }
+      }
+      return event
+    },
+    getLetter(name){
+      if(name){
+        return name.charAt(0)
+      }
     }
+  },
+  mounted(){
+    this.getUsergroups()
+    this.getUsers()
   }
 };
 </script>
@@ -167,22 +522,79 @@ export default {
 
 <style scoped lang="scss">
  @import '@/styles/colors';
- .field {
-    margin-bottom: 1rem;
-  }
+
+ .no-events-img{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.no-events-text{
+  margin-top: 0.2rem;
+  font-size: 1.0rem;
+  color: #333;
+  
+}
+
+ .fields {
+    margin-bottom: 1.3rem !important;
+ }
   .full-width-dropdown {
     width: 100%;
   }
-  .event-form {
-    margin: 1rem;
-  }
-  .form-group {
-    margin-bottom: 1rem;
-  }
-  .invalid-field-custom {
-    border-color: $red-color;
-  }
-  .p-error {
-    color: $red-color;
-  }
+  .form-label-required::after {
+  content: " *";
+  color: $red-color;
+}
+
+.invalid-field-custom {
+  border-color: $red-color !important;
+  box-shadow: 0 0 3px $shadows !important;
+}
+
+.error-messages {
+  margin-bottom: 0;
+  font-weight: 350;
+  font-size: 15px;
+}
+
+.error-messages::before {
+  content: "* ";
+  color: $red-color;
+}
+
+.user-list {
+  border-bottom: solid 1px #dddddd;
+  display: flex;
+  align-items: center;
+  padding: 0.2rem;
+  width: 100%;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.role {
+  margin: 0;
+  font-size: 12px;
+  color: #808080;
+}
+
+.icon-container {
+  background: transparent;
+  margin-right: 15px;
+  font-size: 1rem
+}
+
 </style>
