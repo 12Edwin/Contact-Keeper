@@ -11,7 +11,7 @@
     <div class="p-fluid grid">
       <b-row>
         <b-col cols="12">
-          <h2 class="form-part">Información del Grupo</h2>
+          <h2 class="form-part">Nuevo Grupo</h2>
         </b-col>
 
         <!-- Campo Nombre -->
@@ -75,7 +75,7 @@
               <i class="pi pi-pencil" />
               <InputText id="field-description" v-model="group.description" rows="5"
                          :class="{ 'invalid-field-custom': !v$.description.$pending && v$.description.$error }"
-                         @input="v$.description.$touch()"/>
+                         @blur="v$.description.$touch()"/>
               <label for="field-description" class="form-label-required">Descripción</label>
             </span>
             <div class="text-danger text-start pt-2">
@@ -144,7 +144,7 @@ import { required, maxLength, minLength } from '@vuelidate/validators';
 import { helpers } from '@vuelidate/validators';
 import { saveGroup } from '../services/groups-services';
 import { onToast } from '@/kernel/alerts';
-import { nameRegex, phraseRegex } from '@/kernel/patterns';
+import { nameRegex } from '@/kernel/patterns';
 
 export default defineComponent({
   name: 'ModalCreateGroup',
@@ -165,13 +165,13 @@ export default defineComponent({
     const rules = {
       name: {
         required: helpers.withMessage('El nombre del grupo es requerido', required),
-        maxLength: helpers.withMessage("El nombre del grupo debe tener menos de 50 caracteres", maxLength(50)),
+        maxLength: helpers.withMessage("El nombre del grupo debe tener menos de 20 caracteres", maxLength(20)),
         minLength: helpers.withMessage("El nombre del grupo debe tener al menos 3 caracteres", minLength(3)),
         format: helpers.withMessage("El nombre del grupo solo puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
       title: {
         required: helpers.withMessage('El título es requerido', required),
-        maxLength: helpers.withMessage("El título debe tener menos de 50 caracteres", maxLength(50)),
+        maxLength: helpers.withMessage("El título debe tener menos de 30 caracteres", maxLength(30)),
         minLength: helpers.withMessage("El título debe tener al menos 3 caracteres", minLength(3)),
         format: helpers.withMessage("El título solo puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
@@ -179,11 +179,11 @@ export default defineComponent({
         required: helpers.withMessage('La descripción es requerida', required),
         maxLength: helpers.withMessage("La descripción debe tener menos de 50 caracteres", maxLength(50)),
         minLength: helpers.withMessage("La descripción debe tener al menos 3 caracteres", minLength(3)),
-        format: helpers.withMessage("La descripción puede contener letras, números, espacios, puntos y comas", helpers.regex(phraseRegex))
+        format: helpers.withMessage("La descripción puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
       notes: {
         maxLength: helpers.withMessage("Las notas deben tener menos de 70 caracteres", maxLength(70)),
-        format: helpers.withMessage("Las notas pueden contener letras, números, espacios, puntos y comas", helpers.regex(phraseRegex))
+        format: helpers.withMessage("Las notas pueden contener letras, números y espacios", helpers.regex(nameRegex))
       }
     };
 
@@ -193,6 +193,7 @@ export default defineComponent({
 
     const closeModal = () => {
       emit('update:visible', false);
+      v$.value.$reset();
     };
 
     const saveGroupForMember = async () => {
@@ -207,7 +208,7 @@ export default defineComponent({
         const response = await saveGroup(group);
         if (response.status === 200 || response.status === 201 || response.status === "success") {
           onToast('success', 'Grupo creado correctamente', 'success');
-          emit('update-data'); // Emit to trigger data update
+          emit('update-data'); 
         }
       } catch (error) {
         console.error('Error al guardar el grupo:', error);

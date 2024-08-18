@@ -12,35 +12,42 @@
     <template v-slot:header>
       <h4>Eventos</h4>
     </template>
-    
-    <template v-if="events.length === 0">
+
+    <!-- Mostrar skeleton mientras se cargan los eventos -->
+    <template v-if="loading">
       <div class="skeleton-container">
         <div class="skeleton-item" v-for="index in 6" :key="index"></div>
       </div>
     </template>
-    
+
+    <!-- Mensaje cuando no hay eventos -->
+    <template v-if="!loading && localEvents.length === 0">
+      <p>No hay eventos en este grupo.</p>
+    </template>
+
+    <!-- Mostrar eventos si hay alguno -->
     <template v-else>
       <b-row>
-        <b-col v-for="event in events" :key="event.id" cols="12" class="mb-3">
-          <div class="event-container">
+        <b-col v-for="(event, index) in localEvents" :key="event.id" cols="12" class="mb-2">
+          <div class="event-container" :class="{ 'event-container--small': index > 0 }">
             <div class="event-header">
               <h5>Título</h5>
             </div>
             <p>{{ event.name }}</p>
           </div>
-          <div class="event-container">
+          <div class="event-container" :class="{ 'event-container--small': index > 0 }">
             <div class="event-header">
               <h5>Localización</h5>
             </div>
             <p>{{ event.location }}</p>
           </div>
-          <div class="event-container">
+          <div class="event-container" :class="{ 'event-container--small': index > 0 }">
             <div class="event-header">
               <h5>Tipo</h5>
             </div>
             <p>{{ event.type }}</p>
           </div>
-          <div class="event-container">
+          <div class="event-container" :class="{ 'event-container--small': index > 0 }">
             <div class="event-header">
               <h5>Fechas</h5>
             </div>
@@ -50,6 +57,7 @@
       </b-row>
     </template>
 
+    <!-- Botones de acción en el footer del modal -->
     <template #footer>
       <Button label="Guardar" icon="pi pi-check" iconPos="right" class="button-options"/>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
@@ -57,14 +65,11 @@
   </Dialog>
 </template>
 
-
-  
 <script>
 import Tooltip from 'primevue/tooltip';
-import { getEventsbyGroup } from '../services/groups-services';
 
 export default {
-  name: 'Announcements',
+  name: 'EventsForGroups',
   directives: {
     'tooltip': Tooltip
   },
@@ -72,42 +77,60 @@ export default {
     visible: {
       type: Boolean,
     },
-    group: {
-      type: Object,
-      required: true
+    events: {
+      type: Array,
+      default: () => []
     }
   },
   data() {
     return {
-      events: [],
+      loading: false, 
+      timer: null,
+      localEvents: [] 
     };
   },
-  mounted() {
-    this.getEvents();
+  watch: {
+    visible: {
+      handler(val) {
+        if (val) {
+          this.resetModal();
+        }
+      },
+      immediate: true
+    },
+    events: {
+      handler(val) {
+        if (val.length > 0) {
+          this.localEvents = val;
+          clearTimeout(this.timer);
+          this.loading = false;
+        }
+      },
+      immediate: true
+    }
   },
   methods: {
     closeModal() {
       this.$emit('update:visible', false);
     },
-    async getEvents() {
-      try {
-        const response = await getEventsbyGroup(this.group.id);
-        this.events = response.data;
-        console.log(this.events);
-      } catch (error) {
-        console.error(error);
-      }
+    startTimer() {
+      this.timer = setTimeout(() => {
+        if (this.localEvents.length === 0) {
+          this.localEvents = [];
+          this.loading = false;
+        }
+      }, 5000); 
+    },
+    resetModal() {
+      this.loading = true; 
+      this.localEvents = []; 
+      clearTimeout(this.timer); 
+      this.startTimer(); 
     }
   },
-  watch: {
-    group: {
-      handler(val) {
-        if (val && Object.keys(val).length > 0) {
-          this.selectedGroup = val;
-        }
-      },
-      immediate: true
-    }
+  mounted() {},
+  beforeDestroy() {
+    clearTimeout(this.timer);
   }
 };
 </script>
@@ -156,14 +179,27 @@ export default {
   }
 
   .event-container {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem; /* Mayor margen inferior para diferenciar entre iteraciones */
     border-bottom: solid 1px #dddddd;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.3rem;
+    transition: all 0.3s ease;
   }
-  
+
+  .event-container--small {
+    margin-bottom: 0.9rem; /* Ajuste del margen inferior para iteraciones posteriores */
+  }
+
   .event-header {
     padding: 0.2rem;
+    margin-bottom: 0.3rem;
+    font-size: 1rem;
     border-bottom: solid 1px #dddddd;
+  }
+
+  p {
+    margin: 0.2rem 0; /* Ajuste del margen entre los párrafos */
+    font-size: 1rem; /* Tamaño de fuente un poco más grande */
+    line-height: 1.5; /* Ajustar la altura de la línea */
   }
 
   .button-options {
@@ -181,4 +217,5 @@ export default {
   }
 }
 </style>
+
 

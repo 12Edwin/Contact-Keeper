@@ -22,16 +22,16 @@
               <label for="field-name" class="form-label-required">Nombre del Grupo</label>
             </span>
             <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.name.$dirty && v$.name.required.$invalid">
+              <p class="error-messages" v-if="!v$.name.$pending && v$.name.required.$invalid">
                 {{ v$.name.required.$message }}
               </p>
-              <p class="error-messages" v-if="v$.name.$dirty && v$.name.maxLength.$invalid">
+              <p class="error-messages" v-if="!v$.name.$pending && v$.name.maxLength.$invalid">
                 {{ v$.name.maxLength.$message }}
               </p>
-              <p class="error-messages" v-if="v$.name.$dirty && v$.name.minLength.$invalid">
+              <p class="error-messages" v-if="!v$.name.$pending && v$.name.minLength.$invalid">
                 {{ v$.name.minLength.$message }}
               </p>
-              <p class="error-messages" v-if="v$.name.$dirty && v$.name.format.$invalid">
+              <p class="error-messages" v-if="!v$.name.$pending && v$.name.format.$invalid">
                 {{ v$.name.format.$message }}
               </p>
             </div>
@@ -43,19 +43,19 @@
               <i class="pi pi-align-left" />
               <InputText id="field-title" v-model="group.title"
                          :class="{ 'invalid-field-custom': v$.title.$error }"/>
-              <label for="field-title">Título</label>
+              <label for="field-title" class="form-label-required">Título</label>
             </span>
             <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.title.$dirty && v$.title.required.$invalid">
+              <p class="error-messages" v-if="!v$.title.$pending && v$.title.required.$invalid">
                 {{ v$.title.required.$message }}
               </p>
-              <p class="error-messages" v-if="v$.title.$dirty && v$.title.maxLength.$invalid">
+              <p class="error-messages" v-if="!v$.title.$pending && v$.title.maxLength.$invalid">
                 {{ v$.title.maxLength.$message }}
               </p>
-              <p class="error-messages" v-if="v$.title.$dirty && v$.title.minLength.$invalid">
+              <p class="error-messages" v-if="!v$.title.$pending && v$.title.minLength.$invalid">
                 {{ v$.title.minLength.$message }}
               </p>
-              <p class="error-messages" v-if="v$.title.$dirty && v$.title.format.$invalid">
+              <p class="error-messages" v-if="!v$.title.$pending && v$.title.format.$invalid">
                 {{ v$.title.format.$message }}
               </p>
             </div>
@@ -67,19 +67,19 @@
               <i class="pi pi-pencil" />
               <b-form-textarea id="field-description" v-model="group.description" rows="2"
                              :class="{ 'invalid-field-custom': v$.description.$error }"/>
-              <label for="field-description">Descripción</label>
+              <label for="field-description" class="form-label-required">Descripción</label>
             </span>
             <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.description.$dirty && v$.description.required.$invalid">
+              <p class="error-messages" v-if="!v$.description.$pending && v$.description.required.$invalid">
                 {{ v$.description.required.$message }}
               </p>
-              <p class="error-messages" v-if="v$.description.$dirty && v$.description.maxLength.$invalid">
+              <p class="error-messages" v-if="!v$.description.$pending && v$.description.maxLength.$invalid">
                 {{ v$.description.maxLength.$message }}
               </p>
-              <p class="error-messages" v-if="v$.description.$dirty && v$.description.minLength.$invalid">
+              <p class="error-messages" v-if="!v$.description.$pending && v$.description.minLength.$invalid">
                 {{ v$.description.minLength.$message }}
               </p>
-              <p class="error-messages" v-if="v$.description.$dirty && v$.description.format.$invalid">
+              <p class="error-messages" v-if="!v$.description.$pending && v$.description.format.$invalid">
                 {{ v$.description.format.$message }}
               </p>
             </div>
@@ -94,10 +94,10 @@
               <label for="field-notes">Notas</label>
             </span>
             <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.notes.$dirty && v$.notes.maxLength.$invalid">
+              <p class="error-messages" v-if="!v$.notes.$pending && v$.notes.maxLength.$invalid">
                 {{ v$.notes.maxLength.$message }}
               </p>
-              <p class="error-messages" v-if="v$.notes.$dirty && v$.notes.format.$invalid">
+              <p class="error-messages" v-if="!v$.notes.$pending && v$.notes.format.$invalid">
                 {{ v$.notes.format.$message }}
               </p>
             </div>
@@ -132,7 +132,7 @@ import { required, maxLength, minLength } from '@vuelidate/validators';
 import { helpers } from '@vuelidate/validators';
 import { onQuestion } from '@/kernel/alerts';
 import { updateGroup } from '../services/groups-services';
-import { nameRegex, phraseRegex } from '@/kernel/patterns';
+import { nameRegex } from '@/kernel/patterns';
 
 export default defineComponent({
   name: 'ModalPutGroup',
@@ -164,13 +164,13 @@ export default defineComponent({
     const rules = {
       name: {
         required: helpers.withMessage('El nombre del grupo es requerido', required),
-        maxLength: helpers.withMessage("El nombre del grupo debe tener menos de 50 caracteres", maxLength(50)),
+        maxLength: helpers.withMessage("El nombre del grupo debe tener menos de 20 caracteres", maxLength(20)),
         minLength: helpers.withMessage("El nombre del grupo debe tener al menos 3 caracteres", minLength(3)),
         format: helpers.withMessage("El nombre del grupo solo puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
       title: {
         required: helpers.withMessage('El título es requerido', required),
-        maxLength: helpers.withMessage("El título debe tener menos de 50 caracteres", maxLength(50)),
+        maxLength: helpers.withMessage("El título debe tener menos de 30 caracteres", maxLength(30)),
         minLength: helpers.withMessage("El título debe tener al menos 3 caracteres", minLength(3)),
         format: helpers.withMessage("El título solo puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
@@ -178,11 +178,11 @@ export default defineComponent({
         required: helpers.withMessage('La descripción es requerida', required),
         maxLength: helpers.withMessage("La descripción debe tener menos de 50 caracteres", maxLength(50)),
         minLength: helpers.withMessage("La descripción debe tener al menos 3 caracteres", minLength(3)),
-        format: helpers.withMessage("La descripción puede contener letras, números, espacios, puntos y comas", helpers.regex(phraseRegex))
+        format: helpers.withMessage("La descripción puede contener letras, números y espacios", helpers.regex(nameRegex))
       },
       notes: {
         maxLength: helpers.withMessage("Las notas deben tener menos de 70 caracteres", maxLength(70)),
-        format: helpers.withMessage("Las notas pueden contener letras, números, espacios, puntos y comas", helpers.regex(phraseRegex))
+        format: helpers.withMessage("Las notas pueden contener letras, números y espacios", helpers.regex(nameRegex))
       }
     };
 
