@@ -1,13 +1,6 @@
 <template>
-  <Dialog
-    header="Crear Nuevo Grupo"
-    :modal="true"
-    :closeOnEscape="false"
-    :closable="false"
-    position="center"
-    :contentStyle="{ overflow: 'visible', width: '50vw' }"
-    :visible.sync="visible"
-  >
+  <Dialog header="Crear Nuevo Grupo" :modal="true" :closeOnEscape="false" :closable="false" position="center"
+    :contentStyle="{ overflow: 'visible', width: '50vw' }" :visible.sync="visible">
     <div class="p-fluid grid">
       <b-row>
         <b-col cols="12">
@@ -20,9 +13,8 @@
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-briefcase" />
               <InputText id="field-name" v-model="group.name"
-                         :class="{ 'invalid-field-custom': v$.name.$error && v$.name.$dirty }"
-                         @focus="v$.name.$touch()"
-                         @blur="v$.name.$touch()"/>
+                :class="{ 'invalid-field-custom': v$.name.$error && v$.name.$dirty }" @focus="v$.name.$touch()"
+                @blur="v$.name.$touch()" />
               <label for="field-name" class="form-label-required">Nombre del Grupo</label>
             </span>
             <div class="text-danger text-start pt-2">
@@ -48,9 +40,8 @@
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-align-left" />
               <InputText id="field-title" v-model="group.title"
-                         :class="{ 'invalid-field-custom': v$.title.$error && v$.title.$dirty }"
-                         @focus="v$.title.$touch()"
-                         @blur="v$.title.$touch()"/>
+                :class="{ 'invalid-field-custom': v$.title.$error && v$.title.$dirty }" @focus="v$.title.$touch()"
+                @blur="v$.title.$touch()" />
               <label for="field-title" class="form-label-required">Título</label>
             </span>
             <div class="text-danger text-start pt-2">
@@ -76,9 +67,8 @@
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-pencil" />
               <InputText id="field-description" v-model="group.description" rows="5"
-                         :class="{ 'invalid-field-custom': v$.description.$error && v$.description.$dirty }"
-                         @focus="v$.description.$touch()"
-                         @blur="v$.description.$touch()"/>
+                :class="{ 'invalid-field-custom': v$.description.$error && v$.description.$dirty }"
+                @focus="v$.description.$touch()" @blur="v$.description.$touch()" />
               <label for="field-description" class="form-label-required">Descripción</label>
             </span>
             <div class="text-danger text-start pt-2">
@@ -103,10 +93,9 @@
           <div class="field">
             <span class="p-float-label p-input-icon-right">
               <i class="pi pi-note" />
-              <InputText id="field-notes" v-model="group.notes" 
-                               :class="{ 'invalid-field-custom': v$.notes.$error && v$.notes.$dirty }"
-                               @focus="v$.notes.$touch()"
-                               @blur="v$.notes.$touch()"/>
+              <InputText id="field-notes" v-model="group.notes"
+                :class="{ 'invalid-field-custom': v$.notes.$error && v$.notes.$dirty }" @focus="v$.notes.$touch()"
+                @blur="v$.notes.$touch()" />
               <label for="field-notes">Notas</label>
             </span>
             <div class="text-danger text-start pt-2">
@@ -122,21 +111,10 @@
       </b-row>
     </div>
     <template #footer>
-      <Button 
-        @click="saveGroupForMember" 
-        label="Guardar" 
-        icon="pi pi-check" 
-        iconPos="right" 
-        class="button-options" 
-        :disabled="isLoading || !isFormValid"
-      />
-      <Button 
-        label="Cancelar" 
-        icon="pi pi-times" 
-        class="p-button-text p-button-plain" 
-        iconPos="right" 
-        @click="closeModal"
-      />
+      <Button @click="saveGroupForMember" label="Guardar" icon="pi pi-check" iconPos="right" class="button-options"
+        :disabled="isLoading || !isFormValid" />
+      <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-plain" iconPos="right"
+        @click="closeModal" />
     </template>
   </Dialog>
 </template>
@@ -195,41 +173,41 @@ export default defineComponent({
     const isLoading = ref(false);
     const isFormValid = computed(() => !v$.value.$pending && !v$.value.$invalid);
 
-const closeModal = () => {
-  emit('update:visible', false);
-  v$.value.$reset();
-};
+    const closeModal = () => {
+      emit('update:visible', false);
+      v$.value.$reset();
+    };
 
-const saveGroupForMember = async () => {
-  isLoading.value = true;
-  v$.value.$touch();
-  if (v$.value.$invalid) {
-    isLoading.value = false;
-    return;
+    const saveGroupForMember = async () => {
+      isLoading.value = true;
+      v$.value.$touch();
+      if (v$.value.$invalid) {
+        isLoading.value = false;
+        return;
+      }
+
+      try {
+        const response = await saveGroup(group);
+        if (response.status === 200 || response.status === 201 || response.status === "success") {
+          onToast('success', 'Grupo creado correctamente', 'success');
+          emit('update-data');
+        }
+      } catch (error) {
+      } finally {
+        isLoading.value = false;
+        closeModal();
+      }
+    };
+
+    return {
+      group,
+      v$,
+      closeModal,
+      saveGroupForMember,
+      isFormValid,
+      isLoading
+    };
   }
-
-  try {
-    const response = await saveGroup(group);
-    if (response.status === 200 || response.status === 201 || response.status === "success") {
-      onToast('success', 'Grupo creado correctamente', 'success');
-      emit('update-data'); 
-    }
-  } catch (error) {
-  } finally {
-    isLoading.value = false;
-    closeModal();
-  }
-};
-
-return {
-  group,
-  v$,
-  closeModal,
-  saveGroupForMember,
-  isFormValid,
-  isLoading
-};
-}
 });
 </script>
 
@@ -237,38 +215,37 @@ return {
 @import '@/styles/colors';
 
 .button-options {
-background: $primary-color;
-color: white;
-border: none;
-border-radius: 5px;
+  background: $primary-color;
+  color: white;
+  border: none;
+  border-radius: 5px;
 }
 
 .form-part {
-font-size: 16px;
-color: $sidebar-items;
-font-weight: 600;
-margin-bottom: 10px;
+  font-size: 16px;
+  color: $sidebar-items;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 .form-label-required::after {
-content: " *";
-color: $red-color;
+  content: " *";
+  color: $red-color;
 }
 
 .invalid-field-custom {
-border-color: $red-color !important;
-box-shadow: 0 0 3px $shadows !important;
+  border-color: $red-color !important;
+  box-shadow: 0 0 3px $shadows !important;
 }
 
 .error-messages {
-margin-bottom: 0;
-font-weight: 350;
-font-size: 15px;
+  margin-bottom: 0;
+  font-weight: 350;
+  font-size: 15px;
 }
 
 .error-messages::before {
-content: "* ";
-color: $red-color;
+  content: "* ";
+  color: $red-color;
 }
 </style>
-

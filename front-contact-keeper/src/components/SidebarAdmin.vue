@@ -1,20 +1,15 @@
 <template>
   <div :class="['custom-sidebar', { open: visible, closed: !visible }]">
-    <div class="sidebar-header">
-      <div class="avatar">{{getAvatarLetter() }}</div>
+    <div v-tooltip="getUserInfo()" @click="openUserModal" class="sidebar-header item-avatar">
+      <div class="avatar">{{ getAvatarLetter() }}</div>
       <div class="user-info">
-        <h2 class="user-sidebar">{{getName()}}</h2>
+        <h2 class="user-sidebar">{{ getName() }}</h2>
         <p class="role">{{ getRole() }}</p>
       </div>
     </div>
     <div class="w-100">
       <ul>
-        <li 
-          v-for="(item, index) in filteredMenuItems"
-          :key="index" 
-          class="item" 
-          @click="navigate(item.route)"
-        >
+        <li class="item" v-for="(item, index) in menuItems" :key="index" @click="navigate(item.route)">
           <i :class="`${item.icon} sidebar-icon`" /> <span class="sidebar-text">{{ item.label }}</span>
         </li>
       </ul>
@@ -26,15 +21,24 @@
         </li>
       </ul>
     </div>
+    <UserModal :visible.sync="showModal" :name="getName()" :email="getEmail()" @close="closeUserModal" />
   </div>
 </template>
 
-
-
 <script>
 import utils from "@/kernel/utils";
+import UserModal from "@/components/UserModal.vue";
+import Tooltip from 'primevue/tooltip';
+
 export default {
   name: 'SidebarAdmin',
+  components: {
+    UserModal,
+    Tooltip
+  },
+  directives: {
+    'tooltip': Tooltip
+  },
   props: {
     visible: {
       type: Boolean,
@@ -43,11 +47,18 @@ export default {
   },
   data() {
     return {
+<<<<<<< HEAD
       userRole: '',
       menuItems: [
         {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators']},
         {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers']},
         {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers']},
+      showModal: false,
+      menuItems: [
+        { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users' },
+        { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar' },
+        { label: 'Anuncios', icon: 'pi pi-fw pi-megaphone' },
+        { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups' }
       ]
     }
   },
@@ -57,6 +68,7 @@ export default {
     }
   },
   methods: {
+<<<<<<< HEAD
   logOut() {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
@@ -75,27 +87,68 @@ export default {
   },
   navigate(route) {
     const currentRoute = this.$route.name;
+=======
+    openUserModal() {
+      this.showModal = true;
+    },
+    closeUserModal() {
+      this.showModal = false;
+    },
+    logOut() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      this.$router.push({ name: 'login' });
+    },
+    getAvatarLetter() {
+      return utils.getUserFromToke().charAt(0);
+    },
+    getName() {
+      return utils.getUserFromToke();
+    },
+    getEmail() {
+      return utils.getEmailFromToke();
+    },
+    getRole() {
+      const role = utils.getRoleStorage()
+      return role === 'Administrators' ? 'Administrador' : 'Usuario'
+    },
+    getUserInfo() {
+      const name = utils.getUserFromToke();
+      const role = utils.getRoleStorage() === 'Administrators' ? 'Administrador' : 'Usuario';
+      const info = `${name} - ${role}`;
+      return info
+    },
+    navigate(route) {
+      const currentRoute = this.$route.name;
 
-    if (route !== currentRoute) {
-      this.$router.push({ name: route }).then(() => {
-        if (window.innerWidth <= 768) {
-          this.visible = false;
-        }
-      }).catch(err => {
-        if (err.name !== 'NavigationDuplicated') {
-        }
-      });
-    } else if (window.innerWidth <= 768) {
-      this.visible = false;
+      if (route !== currentRoute) {
+        this.$router.push({ name: route }).then(() => {
+          if (window.innerWidth <= 768) {
+            this.visible = false;
+          }
+        }).catch(err => {
+          if (err.name !== 'NavigationDuplicated') {
+          }
+        });
+      } else if (window.innerWidth <= 768) {
+        this.visible = false;
+      }
+    },
+
+  },
+  computed: {
+    tooltipContent() {
+      const name = this.getName();
+      const role = this.getRole();
+      const content = name && role ? `${name} - ${role}` : '';
+      console.log(content); // Agrega este log para depuración
+      return content;
     }
   }
 }
-
-}
 </script>
 
-
-<style scoped lang="scss" >
+<style scoped lang="scss">
 @import '@/styles/colors.scss';
 
 .custom-sidebar {
@@ -119,6 +172,7 @@ export default {
 
   &.closed {
     width: 100px; // Ancho reducido en estado cerrado
+
     @media (max-width: 768px) {
       transform: translateX(-100%); // Oculto completamente en pantallas pequeñas
     }
@@ -164,7 +218,8 @@ export default {
   font-size: 16px;
   font-weight: 700;
   margin: 0;
-  color: #333; /* Texto oscuro */
+  color: #333;
+  /* Texto oscuro */
 }
 
 .role {
@@ -204,6 +259,12 @@ ul {
   margin-bottom: 10px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.item-avatar {
+  color: #333;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
 
 .item:hover {
   border-radius: 9px;
@@ -253,5 +314,4 @@ ul {
 .custom-sidebar.closed .role {
   display: none;
 }
-
 </style>

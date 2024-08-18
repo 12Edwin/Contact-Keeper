@@ -11,11 +11,7 @@ const get_users = async () => {
 
 const save_user = async (person) => {
   try {
-    const response = await api.doPost("/users", person,{
-      headers: {
-        "Content-Type": "text/plain"
-      }
-    });
+    const response = await api.axiosClientApi.doPost("/users", person);
     return response.data
   } catch (error) {
     return error.response;

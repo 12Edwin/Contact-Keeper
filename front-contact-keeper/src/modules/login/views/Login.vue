@@ -111,10 +111,12 @@ export default {
           if (role === "Administrators") {
             this.$router.push({name: 'users'})
           } else if(role === "NormalUsers"){
-            console.log('otro usuario')
+            this.$router.push({name: "perfil"})
           }
         }else{
           this.loginError = true;
+          
+          
         }
       } catch (error) {
         this.loginError = true;
