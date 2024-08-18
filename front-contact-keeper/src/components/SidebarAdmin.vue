@@ -47,12 +47,12 @@ export default {
   },
   data() {
     return {
-<<<<<<< HEAD
       userRole: '',
       menuItems: [
-        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators']},
-        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers']},
-        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers']},
+        { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators'] },
+        { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers'] },
+        { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers'] }
+      ],
       showModal: false,
       menuItems: [
         { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users' },
@@ -68,26 +68,25 @@ export default {
     }
   },
   methods: {
-<<<<<<< HEAD
-  logOut() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    this.$router.push({ name: 'login' });
-  },
-  getAvatarLetter(){
-    return utils.getUserFromToke().charAt(0);
-  },
-  getName(){
-    return utils.getUserFromToke();
-  },
-  getRole(){
-    const role = utils.getRoleStorage()
-    this.userRole = role;
-    return role === 'Administrators' ? 'Administrador' : 'Usuario'
-  },
-  navigate(route) {
-    const currentRoute = this.$route.name;
-=======
+    logOut() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      this.$router.push({ name: 'login' });
+    },
+    getAvatarLetter() {
+      return utils.getUserFromToke().charAt(0);
+    },
+    getName() {
+      return utils.getUserFromToke();
+    },
+    getRole() {
+      const role = utils.getRoleStorage()
+      this.userRole = role;
+      return role === 'Administrators' ? 'Administrador' : 'Usuario'
+    },
+    navigate(route) {
+      const currentRoute = this.$route.name;
+    },
     openUserModal() {
       this.showModal = true;
     },
