@@ -205,7 +205,6 @@ export default {
           }
           await this.getUserGroup();
         } catch (error) {
-          console.error(error);
         } finally {
           this.loadingUserId = null; 
         }
@@ -229,7 +228,6 @@ export default {
           }
           await this.getUserGroup();
         } catch (error) {
-          console.error(error);
         } finally {
           this.loadingUserId = null; 
         }
