@@ -4,11 +4,11 @@
     :autoZIndex="true">
     <div class="user-info">
       <Avatar :label="userData.name.charAt(0)" shape="circle" size="xlarge" class="mb-2" />
-      <h3>{{ userData.name }}</h3>
+      <h3>{{ userData.name }} {{ userData.last_name }} {{ userData.surname }}</h3>
     </div>
     <div class="user-data">
       <b-row>
-        <b-col cols="12" lg="6" md="4" sm="12" class="ml-2">
+        <b-col cols="12" lg="6" md="6" sm="12" class="mb-3">
           <div class="info-item">
             <i class="pi pi-envelope"></i>
             <div class="info-text">
@@ -17,7 +17,7 @@
             </div>
           </div>
         </b-col>
-        <b-col cols="12" lg="6" md="4" sm="12">
+        <b-col cols="12" lg="6" md="6" sm="12" class="mb-3">
           <div class="info-item">
             <i class="pi pi-phone"></i>
             <div class="info-text">
