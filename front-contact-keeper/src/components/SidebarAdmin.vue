@@ -9,12 +9,7 @@
     </div>
     <div class="w-100">
       <ul>
-        <li 
-          v-for="(item, index) in filteredMenuItems"
-          :key="index" 
-          class="item" 
-          @click="navigate(item.route)"
-        >
+        <li class="item" v-for="(item, index) in filteredRoutes" :key="index" @click="navigate(item.route)">
           <i :class="`${item.icon} sidebar-icon`" /> <span class="sidebar-text">{{ item.label }}</span>
         </li>
       </ul>
@@ -54,18 +49,23 @@ export default {
     return {
       showModal: false,
       menuItems: [
-        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators']},
-        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers']},
-        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers']},
-      ]
+        { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators'] },
+        { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers'] },
+        { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers'] }
+      ],
     }
   },
   computed: {
-    userRole() {
-      return utils.getRoleStorage(); // Obtén el rol del usuario
+    tooltipContent() {
+      const name = this.getName();
+      const role = this.getRole();
+      const content = name && role ? `${name} - ${role}` : '';
+      return content;
     },
-    filteredMenuItems() {
-      return this.menuItems.filter(item => item.roles.includes(this.userRole));
+    filteredRoutes() {
+      const role = utils.getRoleStorage()
+      
+      return this.menuItems.filter(item => item.roles.includes(role));
     }
   },
   methods: {
@@ -108,13 +108,13 @@ export default {
           }
         }).catch(err => {
           if (err.name !== 'NavigationDuplicated') {
-            console.error(err);
           }
         });
       } else if (window.innerWidth <= 768) {
         this.visible = false;
       }
-    }
+    },
+
   }
 }
 </script>
