@@ -66,7 +66,7 @@
                 {{ user.name }} {{ user.surname }} {{ user.last_name }}
               </div>
             </b-col>
-            <b-col cols="6" v-if="userRole === 'Administrators'">
+            <b-col cols="6" v-if="groupRole === 'moderator'">
               <div class="icon-container d-flex justify-content-end">
                 <i
                   v-if="isUserInGroup(user.id)"
