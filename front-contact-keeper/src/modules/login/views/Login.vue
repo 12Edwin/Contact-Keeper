@@ -56,10 +56,10 @@
       </template>
       </div>
     </template>
-    <template v-else-if="recoveringPassword">
+    <template v-if="recoveringPassword">
       <ConfirmPassword @showLoginForm="showLoginForm" />
     </template>
-    <template v-else>
+    <template v-if="singingUp">
       <SignUp @showLoginForm="showLoginForm" />
     </template>
   </div>
@@ -103,6 +103,7 @@ export default {
       isLoggingIn: true,
       showPassword: false,
       isLoading: false,
+      singingUp: false,
       loginError: false,
       recoveringPassword: false
     }
@@ -120,7 +121,7 @@ export default {
           if (role === "Administrators") {
             this.$router.push({name: 'users'})
           } else if(role === "NormalUsers"){
-            this.$router.push({name: "perfil"})
+            this.$router.push({name: "calendar"})
           }
         }else{
           this.loginError = true;
@@ -134,14 +135,18 @@ export default {
     showConfirmAccount(){
       this.recoveringPassword = true;
       this.isLoggingIn = false;
+      this.singingUp = false;
 
     },
     showSignForm() {
       this.isLoggingIn = false
       this.recoveringPassword = false;
+      this.singingUp = true;
     },
     showLoginForm() {
       this.isLoggingIn = true
+      this.recoveringPassword = false;
+      this.singingUp = false;
     },
     getInputType() {
       return this.showPassword ? 'text' : 'password'

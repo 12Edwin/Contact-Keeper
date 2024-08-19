@@ -321,7 +321,6 @@ export default {
                     this.groups = response.data.data;
                 }
             } catch (error) {
-                console.log(error);
                 onToast('Error', 'Ocurrió un error al obtener los grupos', 'error');
             }
         },

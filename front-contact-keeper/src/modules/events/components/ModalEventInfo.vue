@@ -122,7 +122,6 @@ export default {
     event: {
       handler(val) {
         if (val && Object.keys(val).length > 0) {
-          console.log(val);
           this.eventData = {
             event: val.title || '',
             description: val.description || '',

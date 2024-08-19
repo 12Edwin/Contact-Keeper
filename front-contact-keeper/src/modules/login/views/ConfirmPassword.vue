@@ -1,6 +1,6 @@
 <template>
     <div class="form-zone">
-        <form @submit.prevent="signup" class="login-form onLoginShowed">
+        <form @submit.prevent="onConfirmPassword" class="login-form onLoginShowed">
             <h3 class="text-center">¡Confirma tu cuenta!</h3>
             <Divider />
             <div class="inf-text text-center">
@@ -37,6 +37,9 @@
                     <div class="text-danger text-start pt-2">
                         <p class="error-messages" v-if="v$.new_password.$dirty && v$.new_password.required.$invalid">
                             {{ v$.new_password.required.$message }}
+                        </p>
+                        <p class="error-messages" v-if="v$.new_password.$dirty && v$.new_password.validPass.$invalid">
+                            {{ v$.new_password.validPass.$message }}
                         </p>
                     </div>
                 </div>
@@ -86,6 +89,8 @@ import services from '../services/Access'
 import {
     onToast
 } from "@/kernel/alerts";
+import utils from "@/kernel/utils";
+import { validPassword } from "@/kernel/patterns";
 export default {
     name: 'ConfirmAccount',
     data() {
@@ -110,7 +115,8 @@ export default {
                 required: helpers.withMessage('La contraseña es requerida', required),
             },
             new_password: {
-                required: helpers.withMessage('Debes ingresar una nueva contraseña', required)
+                required: helpers.withMessage('Debes ingresar una nueva contraseña', required),
+                validPass: helpers.withMessage('La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un carácter especial, un número y tener un mínimo de 6 caracteres.', (value) => validPassword.test(value))
             }
         }
         const v$ = useVuelidate(rules, confirmInfo)
@@ -125,9 +131,7 @@ export default {
         },
         async onConfirmPassword() {
             try {
-                if (this.v$.password.$invalid || this.v$.new_password.$invalid) return;
-                this.isLoading = true
-                this.confirmInfo.email = this.email
+                if (this.v$.password.$invalid || this.v$.new_password.$invalid || this.v$.email.$invalid) return;
                 const response = await services.confirmAccount(this.confirmInfo)
                 if (response) {
                     if (response.status === 'success') {

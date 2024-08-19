@@ -108,7 +108,6 @@ export default {
           }
         }).catch(err => {
           if (err.name !== 'NavigationDuplicated') {
-            console.error(err);
           }
         });
       } else if (window.innerWidth <= 768) {
