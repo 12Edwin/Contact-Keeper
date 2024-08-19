@@ -8,7 +8,12 @@
               <b-col class="d-flex justify-content-between align-content-between mb-3">
                 <span class="p-input-icon-right">
                   <i class="pi pi-search custom" @click="changeSearch()" />
-                  <InputText type="text" :placeholder="searchBy()" />
+                  <InputText 
+                    type="text" 
+                    :placeholder="searchBy()" 
+                    v-model="searchQuery"
+                    @input="filterUsers"
+                  />
                 </span>
                 <Button class="button-options" label="Nuevo usuario" iconPos="right" icon="pi pi-user-plus"
                   @click="openSaveModal" />
@@ -16,7 +21,13 @@
             </b-row>
           </div>
           <div>
-            <DataTable class="custom-datatable" :value="users" selectionMode="single" @row-select="onUserSelect">
+          
+            <DataTable 
+              responsiveLayout="scroll" 
+              class="custom-datatable" 
+              :value="filteredUsers" 
+              selectionMode="single" 
+              @row-select="onUserSelect">
               <Column :headerStyle="config" class="ctm-name" :field="formatName" header="Nombre" />
               <Column :headerStyle="config" field="phone" header="Numero de Telefono" />
               <Column :headerStyle="config" field="email" header="Correo Electronico" />
@@ -56,6 +67,7 @@ export default {
     return {
       sidebarVisible: false,
       users: [],
+      filteredUsers: [],
       selectedUser: null,
       config: {
         background: '#333',
@@ -67,6 +79,7 @@ export default {
       displaySaveModal: false,
       searchByName: true,
       optionSelected: null,
+      searchQuery: '',
       isLoading: false
     }
   },
@@ -79,6 +92,7 @@ export default {
     },
     changeSearch() {
       this.searchByName = !this.searchByName
+      this.filterUsers();
     },
     searchBy() {
       return this.searchByName ? 'Buscar por nombre...' : 'Buscar por correo..'
@@ -91,11 +105,24 @@ export default {
       const { data, status } = await services.get_users()
       if (status === "success") {
         this.users = data;
-
+        this.filteredUsers = data;
       } else {
         onError('Error', 'Ha ocurrido un error inesperado').then(() => { })
       }
       this.isLoading = false
+    },
+
+    filterUsers() {
+      const query = this.searchQuery.toLowerCase();
+      if (this.searchByName) {
+        this.filteredUsers = this.users.filter(user => 
+          `${user.name} ${user.surname}`.toLowerCase().includes(query)
+        );
+      } else {
+        this.filteredUsers = this.users.filter(user => 
+          user.email.toLowerCase().includes(query)
+        );
+      }
     },
     formatName(users) {
       return `${users.name} ${users.surname}`;

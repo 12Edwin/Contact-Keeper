@@ -75,6 +75,10 @@ const validAge = (birthday) => {
   return true
 }
 
+const filterByName = (array, name) => {
+  return array.filter((item) => item.name.toLowerCase().includes(name.toLowerCase()));
+}
+
 const messageError = (error) =>{
   let wrongField;
   switch (error) {
@@ -192,6 +196,7 @@ export default {
   getEmailFromToke,
   getSubFromToken,
   validAge,
+  filterByName,
   messageError,
   getErrorMessages,
   getIdUserFromToke,
