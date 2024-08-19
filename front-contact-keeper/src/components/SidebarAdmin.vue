@@ -9,7 +9,12 @@
     </div>
     <div class="w-100">
       <ul>
-        <li class="item" v-for="(item, index) in menuItems" :key="index" @click="navigate(item.route)">
+        <li 
+          v-for="(item, index) in filteredMenuItems"
+          :key="index" 
+          class="item" 
+          @click="navigate(item.route)"
+        >
           <i :class="`${item.icon} sidebar-icon`" /> <span class="sidebar-text">{{ item.label }}</span>
         </li>
       </ul>
@@ -47,46 +52,23 @@ export default {
   },
   data() {
     return {
-      userRole: '',
-      menuItems: [
-        { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators'] },
-        { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers'] },
-        { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers'] }
-      ],
       showModal: false,
       menuItems: [
-        { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users' },
-        { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar' },
-        { label: 'Anuncios', icon: 'pi pi-fw pi-megaphone' },
-        { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups' }
+        {label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators']},
+        {label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers']},
+        {label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers']},
       ]
     }
   },
   computed: {
+    userRole() {
+      return utils.getRoleStorage(); // Obtén el rol del usuario
+    },
     filteredMenuItems() {
       return this.menuItems.filter(item => item.roles.includes(this.userRole));
     }
   },
   methods: {
-    logOut() {
-      localStorage.removeItem('token');
-      localStorage.removeItem('role');
-      this.$router.push({ name: 'login' });
-    },
-    getAvatarLetter() {
-      return utils.getUserFromToke().charAt(0);
-    },
-    getName() {
-      return utils.getUserFromToke();
-    },
-    getRole() {
-      const role = utils.getRoleStorage()
-      this.userRole = role;
-      return role === 'Administrators' ? 'Administrador' : 'Usuario'
-    },
-    navigate(route) {
-      const currentRoute = this.$route.name;
-    },
     openUserModal() {
       this.showModal = true;
     },
@@ -108,14 +90,13 @@ export default {
       return utils.getEmailFromToke();
     },
     getRole() {
-      const role = utils.getRoleStorage()
-      return role === 'Administrators' ? 'Administrador' : 'Usuario'
+      const role = utils.getRoleStorage();
+      return role === 'Administrators' ? 'Administrador' : 'Usuario';
     },
     getUserInfo() {
       const name = utils.getUserFromToke();
       const role = utils.getRoleStorage() === 'Administrators' ? 'Administrador' : 'Usuario';
-      const info = `${name} - ${role}`;
-      return info
+      return `${name} - ${role}`;
     },
     navigate(route) {
       const currentRoute = this.$route.name;
@@ -127,21 +108,12 @@ export default {
           }
         }).catch(err => {
           if (err.name !== 'NavigationDuplicated') {
+            console.error(err);
           }
         });
       } else if (window.innerWidth <= 768) {
         this.visible = false;
       }
-    },
-
-  },
-  computed: {
-    tooltipContent() {
-      const name = this.getName();
-      const role = this.getRole();
-      const content = name && role ? `${name} - ${role}` : '';
-      console.log(content); // Agrega este log para depuración
-      return content;
     }
   }
 }

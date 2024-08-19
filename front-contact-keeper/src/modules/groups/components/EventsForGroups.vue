@@ -52,13 +52,13 @@
                   <div class="event-header">
                     <h5>Tipo</h5>
                   </div>
-                  <p>{{ event.type }}</p>
+                  <p>{{ translateTypeEvent(event.type)}}</p>
                 </div>
                 <div class="event-container" :class="{ 'event-container--small': index > 0 }">
                   <div class="event-header">
                     <h5>Fechas</h5>
                   </div>
-                  <p>{{ event.start_date }} - {{ event.end_date }}</p>
+                  <p>{{ formatEventDate(event.start_date)}} - {{ formatEventDate(event.end_date) }}</p>
                 </div>
               </b-col>
             </b-row>
@@ -121,6 +121,7 @@ import Tooltip from 'primevue/tooltip';
 import { getGroupById, sendMessage } from '../services/groups-services';
 import { onToast } from '@/kernel/alerts';
 import ChatSkeleton from '@/components/ChatSkeleton.vue';
+import { formatDate } from '@fullcalendar/core';
 export default {
   name: 'EventsForGroups',
   directives: {
@@ -152,7 +153,7 @@ export default {
       gettingChat: false,
       idGroup: null,
       message: '',
-      sendingMessage: false
+      sendingMessage: false,
     };
   },
   watch: {
@@ -227,6 +228,24 @@ export default {
     },
     formatDateChat(date){
       return utils.formatDateForChat(date);
+    },
+    formatEventDate(date){
+      let dateFormatted = utils.splitDateTime(date);
+      return dateFormatted.date + ' ' + dateFormatted.time;
+    },
+    translateTypeEvent(value) {
+      switch (value) {
+        case 'meeting':
+          return 'Reunión';
+        case 'session':
+          return 'Sesión';
+        case 'birthday':
+          return 'Cumpleaños';
+        case 'other':
+          return 'Otro';
+        default:
+          return value;
+      }
     },
     onTabChange(event) {
       const activeIndex = event.index;
