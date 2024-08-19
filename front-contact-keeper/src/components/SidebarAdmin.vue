@@ -48,12 +48,11 @@ export default {
   data() {
     return {
       showModal: false,
-      // menuItems: [
-      //   { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users' },
-      //   { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar' },
-      //   { label: 'Anuncios', icon: 'pi pi-fw pi-megaphone' },
-      //   { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups' }
-      // ]
+      menuItems: [
+        { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users', roles: ['Administrators'] },
+        { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar', roles: ['Administrators', 'NormalUsers'] },
+        { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers'] }
+      ],
     }
   },
   computed: {
