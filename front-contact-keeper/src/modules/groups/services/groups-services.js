@@ -5,6 +5,7 @@ export const getGroupsByUserId = async () => {
     try {
         const userId = utils.getSubFromToken();
         const response = await api.axiosClientGroups.doGet(`/groups/moderator/${userId}`); 
+        console.log(response.data);
         return response.data;
     } catch (error) {
         return error.response;

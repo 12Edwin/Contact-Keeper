@@ -91,7 +91,7 @@
     </div>
 
     <template #footer>
-      <Button v-if="userRole === 'Administrators'" label="Guardar" icon="pi pi-check" iconPos="right" class="button-options" @click="saveModal()"/>
+      <Button v-if="groupRole === 'moderator'" label="Guardar" icon="pi pi-check" iconPos="right" class="button-options" @click="saveModal()"/>
       <Button label="Cancelar" icon="pi pi-times" class="p-button-text p-button-text p-button-plain" iconPos="right" @click="closeModal()"/>
     </template>
   </Dialog>
@@ -132,7 +132,8 @@ export default {
       groupUsers: [],
       skeletonTimeout: null,
       loadingUserId: null, 
-      userRole: ''
+      userRole: '',
+      groupRole: ''
     }
   },
   methods: {
@@ -153,7 +154,7 @@ export default {
       let user = utils.getRoleStorage();
       this.userRole = user;
 
-      if (this.userRole === 'Administrators') {
+      if (this.groupRole === 'moderator') {
         await this.getAllUsers();
       } else {
         await this.getUserGroup();
@@ -175,7 +176,7 @@ export default {
         const response = await getUsersByGroup(this.selectedGroup.id);
         this.groupUsers = response.data;
 
-        if (this.userRole !== 'Administrators') {
+        if (this.groupRole !== 'moderator') {
           this.users = this.groupUsers.people;
         }
 
@@ -239,6 +240,7 @@ export default {
     group: {
       handler(val) {
         if (val && Object.keys(val).length > 0) {
+          this.groupRole = val.role;
           this.selectedGroup = val;
           this.getUserGroup();
         }

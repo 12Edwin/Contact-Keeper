@@ -13,7 +13,6 @@
             </b-col>
             <b-col class="d-flex justify-content-end mb-3">
               <Button
-                v-if="userRole === 'Administrators'"
                 class="button-options"
                 label="Nuevo grupo"
                 iconPos="right"
@@ -59,8 +58,8 @@
                     <Avatar :label="getInitial(group.name)" shape="circle" size="xlarge" class="card-header-image"/>
                   </div>
                   <div class="card-footer">
-                    <i v-if="userRole === 'Administrators'" class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
-                    <i v-if="userRole === 'Administrators'" class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
+                    <i v-if="group.role === 'moderator'" class="pi pi-trash icon-folder-end" v-tooltip.top="'Eliminar'" @click="deleteGroup(group)"></i>
+                    <i v-if="group.role === 'moderator'" class="pi pi-pencil icon-folder" v-tooltip.top="'Editar'" @click="openEditModal(group)"></i>
                     <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" @click="openModalGetEvents(group)"></i>
                     <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                   </div>
@@ -71,10 +70,10 @@
 
           <template v-else-if="groups.length === 0">
             <b-row class="mt-2">
-              <b-col cols="12">
+              <b-col cols="12" class="text-center">
                 <div class="no-groups-img">
-                    <img src="@/assets/no_events.svg" alt="No hay eventos" />
-                    <p class="no-events-text">¡Aquí verás todos tus eventos por venir!</p>
+                    <img src="@/assets/inbox_empty.svg" alt="No hay eventos" />
+                    <p class="no-events-text">¡Ups no estas en ningun grupo!</p>
                 </div>
               </b-col>
             </b-row>
@@ -393,6 +392,13 @@ export default {
 
 .badge-primary {
   background-color: #007bff;
+}
+no-groups-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 50px;
 }
 
 </style>
