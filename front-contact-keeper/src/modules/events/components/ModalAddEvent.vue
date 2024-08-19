@@ -331,7 +331,6 @@ export default {
       description: '',
       dates: null,
       type: null,
-      participants: null,
       location: '',
       startHour: '',
       endHour: '',
@@ -356,7 +355,7 @@ export default {
         required: helpers.withMessage('La descripción es requerida', required),
         onlyLetters: helpers.withMessage('La descripción solo puede contener letras y números', (value) => phraseRegex.test(value)),
         minLength: helpers.withMessage("La descripción debe tener al menos 3 caracteres", minLength(3)),
-        maxLength: helpers.withMessage("La descripción debe tener máximo 70 caracteres", maxLength(100))
+        maxLength: helpers.withMessage("La descripción debe tener máximo 100 caracteres", maxLength(100))
       },
       dates: {
         required: helpers.withMessage('La fecha de inicio del evento es requerida', required),
@@ -364,14 +363,11 @@ export default {
       type: {
         required: helpers.withMessage('El tipo de evento es requerido', required),
       },
-      participants: {
-        required: helpers.withMessage('Debes seleccionar al menos un ', required),
-      },
       dates: {
         required: helpers.withMessage('La fecha de inicio y de fin son requeridos', required),
       },
       location: {
-        onlyLetters: helpers.withMessage('El npmbre del lugar solo pueden contener letras y números', (value) => phraseRegex.test(value)),
+        onlyLetters: helpers.withMessage('El nombre del lugar solo pueden contener letras y números', (value) => phraseRegex.test(value)),
         maxLength: helpers.withMessage("El nombre del lugar debe tener máximo 70 caracteres", maxLength(70))
       },
       startHour: {
@@ -480,6 +476,9 @@ export default {
     prepareObject(){
       const startHour = this.eventData.startHour
       const endHour = this.eventData.endHour
+      if(!this.eventData.dates[1]){
+        this.eventData.dates[1] = this.eventData.dates[0]
+      }
       const {start_date, end_date} = utils.formatDate(this.eventData.dates[0], startHour, this.eventData.dates[1], endHour)
       const event = {
         title: this.eventData.title,
@@ -495,11 +494,9 @@ export default {
       if (this.eventData.id_group_member) {
         event.id_group_member = this.eventData.id_group_member;
       } else {
-        // Si no hay un grupo seleccionado
         if (this.eventData.participants) {
           event.moderator = this.eventData.participants;
         } else {
-          // Si no hay un usuario seleccionado, tomar el ID del usuario del localStorage
           const userLogged = utils.getIdUserFromToke();
           event.moderator = userLogged;
         }

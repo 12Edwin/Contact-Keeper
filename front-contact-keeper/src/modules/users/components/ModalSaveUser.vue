@@ -68,11 +68,11 @@
             </div>
           </div>
         </b-col>
-        <b-col class="mt-3 mb-3" lg="4">
+        <b-col class="mt-3 mb-3" lg="5">
           <div class="field">
             <div class="input-group-row">
               <div class="input-group-cols-6">
-                <label for="birthday" class="form-label-required">Fecha de Nacimiento:</label>
+                <label for="birthday" class="form-label-required mb-2">Fecha de Nacimiento:</label>
                 <input type="date" id="birthday" required v-model="v$.birthday.$model"
                   :class="{ 'invalid-field-custom': v$.birthday.$error }" />
                 <div class="text-danger text-start pt-2">

@@ -132,8 +132,29 @@ const getErrorMessages = (errorCode) => {
     "Invalid password": "Credenciales inválidas",
     "Invalid end date": "Fecha de fin inválida",
     "Invalid start date": "Fecha de inicio inválida",
+    "Invalid event status": "Estado del evento inválido",
+    "User not found": "Usuario no encontrado",
+    "Invalid ID": "ID inválido",
+    "Missing fields": "Faltan campos",
+    "Invalid event type": "Tipo de evento inválido",
+    "Invalid user type": "Tipo de usuario inválido",
+    "Invalid title": "Título inválido",
+    "Invalid notes": "Notas inválidas",
+    "Invalid reminder": "Recordatorio inválido",
+    "Connection error": "Error de conexión",
+    "Internal server error": "Error interno del servidor",
+    "Group not found": "Grupo no encontrado",
+    "Event not found": "Evento no encontrado"
   }
   return errorMessages[errorCode] || 'Ocurrió un error desconocido en el servidor';
+}
+
+function extractDateAndTime(dateTimeString) {
+  const momentDate = moment(dateTimeString);
+  const date = momentDate.format('YYYY-MM-DD');
+  const time = momentDate.format('HH:mm');
+
+  return { date, time };
 }
 
 const splitDateTime = (dateTimeString)  =>{
@@ -184,6 +205,36 @@ const formatDate = (startDate, startHour, endDate, endHour) => {
   };
 };
 
+const startDateBeforeEndDate = (startDate, endDate) => {
+  if (!endDate) {
+    return true;
+  }
+  const momentStartDate = moment(startDate, 'YYYY-MM-DD');
+  const momentEndDate = moment(endDate, 'YYYY-MM-DD');
+
+  return momentStartDate.isBefore(momentEndDate, 'day');
+};
+
+const endDateAfterStartDate = (startDate, endDate) => {
+  const momentStartDate = moment(startDate, 'YYYY-MM-DD');
+  const momentEndDate = moment(endDate, 'YYYY-MM-DD');
+
+  return momentEndDate.isAfter(momentStartDate, 'day');
+};
+
+const isSameDay = (startDate, endDate) => {
+  const momentStartDate = moment(startDate, 'YYYY-MM-DD');
+  const momentEndDate = moment(endDate, 'YYYY-MM-DD');
+
+  return momentStartDate.isSame(momentEndDate, 'day');
+};
+
+const isOneDayDifference = (startDate, endDate) => {
+  const momentStartDate = moment(startDate, 'YYYY-MM-DD');
+  const momentEndDate = moment(endDate, 'YYYY-MM-DD');
+
+  return momentEndDate.diff(momentStartDate, 'days') === 1;
+};
 
 const formatDateForChat = (date) => {
   moment.locale('es');

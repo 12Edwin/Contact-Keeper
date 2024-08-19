@@ -145,7 +145,7 @@ const axiosClientEventManagement = {
         return EventManagementClient.put(endPoint, object, config || {})
     },
     doDelete(endPoint, object, config){
-        return EventManagementClient.put(endPoint, object, config || {});
+        return EventManagementClient.delete(endPoint, object, config || {});
     },
 }
 
