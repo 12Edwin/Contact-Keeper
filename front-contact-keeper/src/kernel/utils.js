@@ -51,6 +51,16 @@ const getUserFromToke = () => {
   return jwtDecode(token).name;
 }
 
+const getEmailFromToke = () => {
+  const token = getToken();
+  if (!token) {
+    return null;
+  }
+
+  return jwtDecode(token).email;
+}
+
+
 const getIdUserFromToke = () =>{
   const token = getToken();
   if (!token) {
@@ -63,6 +73,10 @@ const getIdUserFromToke = () =>{
 
 const validAge = (birthday) => {
   return true
+}
+
+const filterByName = (array, name) => {
+  return array.filter((item) => item.name.toLowerCase().includes(name.toLowerCase()));
 }
 
 const messageError = (error) =>{
@@ -179,8 +193,10 @@ export default {
   getUserByEmail,
   getUserByName,
   getUserFromToke,
+  getEmailFromToke,
   getSubFromToken,
   validAge,
+  filterByName,
   messageError,
   getErrorMessages,
   getIdUserFromToke,

@@ -28,17 +28,12 @@ def update_event(event):
     end_date = event.get('end_date')
     _type = event.get('type')
     location = event.get('location')
-    id_group_member = event.get('id_group_member')
 
     # Validate the attributes
     if not validate_id(id_event):
         raise ValueError(ErrorType.INVALID_ID)
     if not exists_by_id(id_event):
         raise ValueError(ErrorType.EVENT_NOT_FOUND)
-    if not validate_id(id_group_member):
-        raise ValueError(ErrorType.INVALID_ID)
-    if not exists_group(id_group_member):
-        raise ValueError(ErrorType.GROUP_NOT_FOUND)
     if not validate_name(name):
         raise ValueError(ErrorType.INVALID_NAME)
     if not validate_start_date(start_date):
@@ -53,10 +48,10 @@ def update_event(event):
         with connection.cursor() as cursor:
             query = """
             UPDATE events 
-            SET name = %s, description = %s, start_date = %s, end_date = %s, type = %s, location = %s, id_group_member = %s
+            SET name = %s, description = %s, start_date = %s, end_date = %s, type = %s, location = %s
             WHERE id = %s
             """
-            cursor.execute(query, (name, description, start_date, end_date, _type, location, id_group_member, id_event))
+            cursor.execute(query, (name, description, start_date, end_date, _type, location, id_event))
             connection.commit()
             return {"message": "Event updated successfully"}
     except pymysql.OperationalError as e:
