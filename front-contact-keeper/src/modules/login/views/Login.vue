@@ -126,7 +126,7 @@ export default {
             this.$router.push({name: "calendar"})
           }
         }else{
-          this.loginError = true;
+          this.loginError = true; 
           
         }
       } catch (error) {
