@@ -3,7 +3,16 @@
     <div class="content">
       <b-row>
         <b-col>
-          <Panel header="Eventos" class="shadow-lg">
+          <Panel class="shadow-lg">
+            <template #header>
+              <div class="header-content">
+                <h5>Eventos</h5>
+                <div>
+                  <Dropdown @input="onGroupChange" :filter="true" v-model="groupSelected" :options="groups" optionLabel="name" optionValue="id" placeholder="Eventos por grupo" />
+                  <Button v-if="groupSelected" @click="clearSearchValue" icon="pi pi-times" class="p-button-rounded p-button-secondary p-button-text" />
+                </div>
+              </div>
+            </template>
             <b-row>
               <b-col cols="12">
                 <div class="calendar-container">
@@ -64,6 +73,7 @@ import eventServices from '../services/event-services'
 import CalendarSkeleton from '@/components/CalendarSkeleton.vue'
 import Tooltip from 'primevue/tooltip';
 import { onError, onToast} from '@/kernel/alerts';
+import {getGroupsByUserId, getEventsbyGroup} from "@/modules/groups/services/groups-services"
 export default
 {
   name: 'Calendar',
@@ -81,6 +91,8 @@ export default
 },
   data() {
     return {
+      groupSelected: null,
+      groups: [],
       sidebarVisible: false,
       showModalEventInfo: false,
       showModalAddEvent: false,
@@ -150,7 +162,13 @@ export default
     };
   },
   methods: {
-
+    onGroupChange(){
+      this.getEventsByUserGroup()
+    },
+    clearSearchValue(){
+      this.groupSelected = null
+      this.getEvents()
+    },
     addEvent(eventData) {
       const newEvent = {
         title: eventData.title,
@@ -187,7 +205,6 @@ export default
       return moment(pop).format("YYYY-MM-DD")
     },
     openModalAddEvent() {
-      console.log('openModalAddEvent')
       this.showModalAddEvent = true;
     },
     eventType(type){
@@ -224,6 +241,44 @@ export default
       } catch (error) {
         onToast('Error al obtener los eventos', 'Parece que hubo un error al obtener los eventos, por favor intenta de nuevo', 'error')
       }
+    },
+    async getEventsByUserGroup(){
+      if(this.groupSelected){
+        try {
+          this.items = []
+          this.isLoading = true
+          const response = await getEventsbyGroup(this.groupSelected)
+          if(response.status === "success"){
+            response.data.forEach((event) => {
+              this.items.push({
+                title: event.title,
+                start: new Date(event.start_date).toISOString(),
+                end: new Date(event.end_date).toISOString(),
+                location: event.location,
+                name: event.name,
+                event
+              })
+            })
+          }
+        } catch (error) {
+          onToast('Error al obtener los eventos', 'Ocurrió un error al obtener los eventos de este grupo', 'error')
+        }finally{
+          this.isLoading = false
+        }
+      }else{
+        this.getEvents()
+      }
+    },
+    async getUserGroups(){
+      try {
+        const userLogged = utils.getIdUserFromToke()
+        const response = await getGroupsByUserId(userLogged)
+        if(response.status === "success"){
+          this.groups = response.data
+        }
+      }catch(error){
+        onToast('Error al obtener los grupos', 'Ocurrió un error al obtener los grupos', 'error')
+      }
     }
   },
   watch: {
@@ -236,12 +291,28 @@ export default
 },
   mounted() {
     this.getEvents()
+    this.getUserGroups()
   }
 }
 </script>
 
 <style>
 /* Estilos globales para FullCalendar */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.header-content h5 {
+  margin: 0;
+}
+
+.header-content .p-dropdown {
+  max-width: 300px;
+}
+
 .fc {
   background-color: white !important;
   color: black !important;

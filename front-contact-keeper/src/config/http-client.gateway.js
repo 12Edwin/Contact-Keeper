@@ -58,11 +58,12 @@ const setUpInterceptors = (client) => {
          (error) => {
             if(!error.response){
                 onToast('Error de conexión', 'No se ha podido establecer conexión con el servidor', 'error')
-                // localStorage.removeItem('token');
-                // localStorage.removeItem('role');
-                // this.$router.push({ name: 'login' });
+                if(error.response.data.message && error.response.data.message === "The incoming token has expired"){
+                    onToast('Sesión expirada', "Tiempo de sesión excedido" , 'error')
+                    localStorage.removeItem('token')
+                    router.push('/login')
+                }
                 return Promise.reject(error)
-
             }
             if(error.response.status){
                 switch(error.response.status){
@@ -70,7 +71,7 @@ const setUpInterceptors = (client) => {
                         onToast('Campo inválido',`${utils.getErrorMessages(error.response.data.message)}` , 'warning')
                         return Promise.resolve()
                     case 401:
-                        console.log("Error 401")
+                        onToast('No autorizado', 'No tienes permisos para realizar esta acción' , 'warning')
                         return Promise.resolve()
                     case 500:
                          onToast('Error interno','Error interno del servidor' , 'error')

@@ -23,7 +23,6 @@ const signUp = async (person) => {
 const confirmAccount = async (access) => {
   try {
     const response = await api.axiosClientApi.doPost("/confirm", access);
-    console.log("from confirmAccount =>",response)
     return response.data;
   } catch (error) {
     return error.response;

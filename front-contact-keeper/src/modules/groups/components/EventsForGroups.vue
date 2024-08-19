@@ -68,7 +68,7 @@
       <TabPanel header="Mensajes" @change="onTabChange()">
         <template v-if="!gettingChat">
           <template v-if="messages.length > 0">
-            <div class="tab-content-scrollable chat-panel">
+            <div ref="chatPanel" class="tab-content-scrollable chat-panel">
               <b-row>
                 <b-col v-for="(message, index) in messages" :key="index" cols="12" :class="alignSide(message.id)">
                   <div class="chat-content">
@@ -92,8 +92,6 @@
         </template>
       </TabPanel>
     </TabView>
-
-    <!-- Botones de acción en el footer del modal -->
     <template #footer>
       <template v-if="!showInput">
         <Button label="Guardar" icon="pi pi-check" iconPos="right" class="button-options"/>
@@ -183,9 +181,20 @@ export default {
         }
       },
       immediate: true
+    },
+    messages() {
+      this.$nextTick(() => {
+        this.scrollToBottom();
+      });
     }
   },
   methods: {
+    scrollToBottom() {
+      const chatPanel = this.$refs.chatPanel;
+      if (chatPanel) {
+        chatPanel.scrollTop = chatPanel.scrollHeight;
+      }
+    },
     alignSide(idUser){
       const userLogged = utils.getIdUserFromToke()
       return userLogged === idUser ? 'd-flex justify-content-end align-items-end' : 'd-flex justify-content-start align-items-start'
@@ -267,6 +276,7 @@ export default {
   },
   mounted() {
     this.getGroupMessages()
+    this.scrollToBottom();
   },
   beforeDestroy() {
     clearTimeout(this.timer);

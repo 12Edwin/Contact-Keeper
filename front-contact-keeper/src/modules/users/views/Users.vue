@@ -21,6 +21,7 @@
             </b-row>
           </div>
           <div>
+          
             <DataTable 
               responsiveLayout="scroll" 
               class="custom-datatable" 
@@ -77,6 +78,7 @@ export default {
       displayModal: false,
       displaySaveModal: false,
       searchByName: true,
+      optionSelected: null,
       searchQuery: '',
       isLoading: false
     }
@@ -109,6 +111,7 @@ export default {
       }
       this.isLoading = false
     },
+
     filterUsers() {
       const query = this.searchQuery.toLowerCase();
       if (this.searchByName) {
