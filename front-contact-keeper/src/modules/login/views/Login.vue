@@ -44,6 +44,10 @@
           <Button type="submit" :disabled="isLoading" @click="login(credentials)" class="login-button">{{ isLoading ?
             'Iniciando sesión...' :
             'Iniciar sesión' }}</Button>
+          <div class="text-center mt-1">
+            <Button label="¡Confirma tu cuenta!" class="p-button-text p-button-text mt-1 p-button-plain text"
+              @click="showConfirmAccount()" />
+          </div>
           <div class="text-center">
             <Button label="Registrate" class="p-button-text p-button-text mt-1 p-button-plain text"
               @click="showSignForm()" />
@@ -51,6 +55,9 @@
         </form>
       </template>
       </div>
+    </template>
+    <template v-else-if="recoveringPassword">
+      <ConfirmPassword @showLoginForm="showLoginForm" />
     </template>
     <template v-else>
       <SignUp @showLoginForm="showLoginForm" />
@@ -64,13 +71,14 @@ import { reactive } from '@vue/composition-api'
 import { useVuelidate } from "@vuelidate/core";
 import services from '../services/Access'
 import { required, helpers, email } from '@vuelidate/validators'
-import { relativeTimeThreshold } from "moment";
+import ConfirmPassword from "./ConfirmPassword.vue";
 import InlineMessage from 'primevue/inlinemessage';
 export default {
   name: 'LoginComponent',
   components: {
     SignUp,
-    InlineMessage
+    InlineMessage,
+    ConfirmPassword
   },
   setup() {
     const credentials = reactive({
@@ -95,7 +103,8 @@ export default {
       isLoggingIn: true,
       showPassword: false,
       isLoading: false,
-      loginError: false
+      loginError: false,
+      recoveringPassword: false
     }
   },
   methods: {
@@ -115,8 +124,6 @@ export default {
           }
         }else{
           this.loginError = true;
-          
-          
         }
       } catch (error) {
         this.loginError = true;
@@ -124,8 +131,14 @@ export default {
         this.isLoading = false;
       }
     },
+    showConfirmAccount(){
+      this.recoveringPassword = true;
+      this.isLoggingIn = false;
+
+    },
     showSignForm() {
       this.isLoggingIn = false
+      this.recoveringPassword = false;
     },
     showLoginForm() {
       this.isLoggingIn = true

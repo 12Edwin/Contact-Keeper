@@ -115,7 +115,6 @@
     },
     methods: {
       createEvent() {
-        console.log('Evento creado:', this.event, this.selectedUsers, this.selectedGuests)
         this.$emit('close')
       },
       onMoveToTarget(event) {

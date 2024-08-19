@@ -11,42 +11,42 @@
     :autoZIndex="true"
     :baseZIndex="1000"
   >
-  <template v-slot:header>
+    <template v-slot:header>
       <h4>{{event.name}}</h4>
     </template>
     <template>
-      <b-row>
-        <b-col cols="12" class="mb-3">
-          <div class="event-header">
-            <h5>Título</h5>
-          </div>
-        </b-col>
-        <b-col cols="12" class="mb-3">
-          <p>{{event.title ? event.title : 'Sin título'}}</p>
-        </b-col>
-        <b-col cols="12" class="mb-3">
-          <div class="event-header">
-            <h5>Información</h5>
-          </div>
-        </b-col>
-        <b-col cols="12" class="mb-2">
-          <p>{{event.description}}</p>
-        </b-col>
-        <b-col cols="12" class="mb-3">
-          <p>{{splitDate(event.start_date).date}} - {{ splitDate(event.end_date).date }}</p>
-          <p>{{ splitDate(event.start_date).time }} - {{ splitDate(event.end_date).time }}</p>
-          <p>{{eventType(event.type)}}</p>
-        </b-col>
-        <b-col cols="12" class="mb-3">
-          <div class="event-header">
-            <h5>Ubicación</h5>
-          </div>
-        </b-col>
-        <b-col cols="12" class="mb-3">
-          <p>{{event.location}}</p>
-        </b-col>
-      </b-row>
-    </template>
+            <b-row>
+              <b-col cols="12" class="mb-3">
+                <div class="event-header">
+                  <h5>Título</h5>
+                </div>
+              </b-col>
+              <b-col cols="12" class="mb-3">
+                <p>{{event.title ? event.title : 'Sin título'}}</p>
+              </b-col>
+              <b-col cols="12" class="mb-3">
+                <div class="event-header">
+                  <h5>Información</h5>
+                </div>
+              </b-col>
+              <b-col cols="12" class="mb-2">
+                <p>{{event.description}}</p>
+              </b-col>
+              <b-col cols="12" class="mb-3">
+                <p>{{splitDate(event.start_date).date}} - {{ splitDate(event.end_date).date }}</p>
+                <p>{{ splitDate(event.start_date).time }} - {{ splitDate(event.end_date).time }}</p>
+                <p>{{eventType(event.type)}}</p>
+              </b-col>
+              <b-col cols="12" class="mb-3">
+                <div class="event-header">
+                  <h5>Ubicación</h5>
+                </div>
+              </b-col>
+              <b-col cols="12" class="mb-3">
+                <p>{{event.location}}</p>
+              </b-col>
+            </b-row>
+          </template>
     <template #footer>
       <Button label="Cerrar" icon="pi pi-times" style="color: gray;" class="p-button-text" @click="closeModal()" />
     </template>
@@ -59,6 +59,9 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import 'primeicons/primeicons.css';
 import utils from '@/kernel/utils';
+import TabView from 'primevue/tabview/TabView';
+import TabPanel from 'primevue/tabpanel/TabPanel';
+import ScrollPanel from 'primevue/scrollpanel/ScrollPanel';
 
 export default {
   name: 'ModalEventInfo',
@@ -119,6 +122,7 @@ export default {
     event: {
       handler(val) {
         if (val && Object.keys(val).length > 0) {
+          console.log(val);
           this.eventData = {
             event: val.title || '',
             description: val.description || '',

@@ -1,6 +1,6 @@
 <template>
   <Dialog header="Crear Nuevo Grupo" :modal="true" :closeOnEscape="false" :closable="false" position="center"
-    :contentStyle="{ overflow: 'visible', width: '50vw' }" :visible.sync="visible">
+    :contentStyle="{ overflow: 'visible', width: '50vw', 'z-index': 999 }" :visible.sync="visible">
     <div class="p-fluid grid">
       <b-row>
         <b-col cols="12">

@@ -9,7 +9,7 @@
     </div>
     <div class="w-100">
       <ul>
-        <li class="item" v-for="(item, index) in menuItems" :key="index" @click="navigate(item.route)">
+        <li class="item" v-for="(item, index) in filteredRoutes" :key="index" @click="navigate(item.route)">
           <i :class="`${item.icon} sidebar-icon`" /> <span class="sidebar-text">{{ item.label }}</span>
         </li>
       </ul>
@@ -54,17 +54,25 @@ export default {
         { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups', roles: ['Administrators', 'NormalUsers'] }
       ],
       showModal: false,
-      menuItems: [
-        { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users' },
-        { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar' },
-        { label: 'Anuncios', icon: 'pi pi-fw pi-megaphone' },
-        { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups' }
-      ]
+      // menuItems: [
+      //   { label: 'Usuarios', icon: 'pi pi-fw pi-users', route: 'users' },
+      //   { label: 'Eventos', icon: 'pi pi-fw pi-calendar', route: 'calendar' },
+      //   { label: 'Anuncios', icon: 'pi pi-fw pi-megaphone' },
+      //   { label: 'Grupos', icon: 'pi pi-fw pi-sitemap', route: 'groups' }
+      // ]
     }
   },
   computed: {
-    filteredMenuItems() {
-      return this.menuItems.filter(item => item.roles.includes(this.userRole));
+    tooltipContent() {
+      const name = this.getName();
+      const role = this.getRole();
+      const content = name && role ? `${name} - ${role}` : '';
+      return content;
+    },
+    filteredRoutes() {
+      const role = utils.getRoleStorage()
+      
+      return this.menuItems.filter(item => item.roles.includes(role));
     }
   },
   methods: {
@@ -134,15 +142,6 @@ export default {
       }
     },
 
-  },
-  computed: {
-    tooltipContent() {
-      const name = this.getName();
-      const role = this.getRole();
-      const content = name && role ? `${name} - ${role}` : '';
-      console.log(content); // Agrega este log para depuración
-      return content;
-    }
   }
 }
 </script>

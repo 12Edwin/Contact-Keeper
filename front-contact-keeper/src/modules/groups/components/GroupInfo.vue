@@ -5,9 +5,8 @@
     :closable="false"
     :visible.sync="visible"
     position="center"
-    :contentStyle="{ width: '60vw' }"
+    :contentStyle="{ width: '60vw', 'z-index': 99 }"
     class="custom-dialog"
-    :autoZIndex="true"
     @before-show="startLoading"
   >
     <template v-slot:header>
