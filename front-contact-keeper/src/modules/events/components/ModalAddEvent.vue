@@ -434,7 +434,7 @@ export default {
         }
         this.onGettingGroups = false
       } catch (error) {
-        console.log(error)
+        onToast('¡Error al obtener los grupos!', 'Inténtalo de nuevo' , 'error')
       }finally{
         this.onGettingGroups = false
       }
@@ -450,7 +450,7 @@ export default {
         }
       this.onGettingUsers = false
       } catch (error) {
-        console.log(error)
+        onToast('¡Error al obtener los usuarios!', 'Inténtalo de nuevo' , 'error')
       }finally{
         this.onGettingUsers = false
       }

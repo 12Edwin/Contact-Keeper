@@ -103,7 +103,6 @@ export default {
                 if (this.v$.password.$invalid || this.v$.new_password.$invalid) return;
                 this.isLoading = true
                 this.confirmInfo.email = this.email
-                console.log(this.confirmInfo)
                 const response = await services.confirmAccount(this.confirmInfo)
                 if (response) {
                     if (response.status === 'success') {
