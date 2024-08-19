@@ -42,7 +42,7 @@
           </template>
 
           <!-- Contenido Real -->
-          <template v-else>
+          <template v-else-if="groups.length > 0">
             <b-row class="mt-2">
               <b-col cols="12" lg="4" md="6" v-for="(group, index) in filteredGroups" :key="index">
                 <div class="card mb-4">
@@ -64,6 +64,17 @@
                     <i class="pi pi-calendar icon-folder" v-tooltip.top="'Eventos'" @click="openModalGetEvents(group)"></i>
                     <i class="pi pi-info-circle icon-folder" v-tooltip.top="'Información'" @click="openInfoModal(group)"></i>
                   </div>
+                </div>
+              </b-col>
+            </b-row>
+          </template>
+
+          <template v-else-if="groups.length === 0">
+            <b-row class="mt-2">
+              <b-col cols="12">
+                <div class="no-groups-img">
+                    <img src="@/assets/no_events.svg" alt="No hay eventos" />
+                    <p class="no-events-text">¡Aquí verás todos tus eventos por venir!</p>
                 </div>
               </b-col>
             </b-row>
