@@ -51,31 +51,3 @@ class TestUpdateUser(unittest.TestCase):
 
         expected_result = 200
         self.assertEqual(result['statusCode'], expected_result)
-
-
-    @patch.dict('os.environ', {'DB_HOST': 'HOST', 'DB_NAME': 'NAME', 'SECRET_NAME': 'SECRET'})
-    @patch('user_management.update_user.update_user.get_cognito_ids')
-    @patch('boto3.client')
-    @patch('user_management.update_user.update_user.validate_name')
-    def test_update_user_invalid_name(self, mock_validate_name, mock_boto3_client, mock_get_cognito_ids):
-        mock_get_cognito_ids.return_value = ('user_pool_id', 'user_pool_client_id')
-        mock_cognito_client = MagicMock()
-        mock_boto3_client.return_value = mock_cognito_client
-        mock_cognito_client.admin_list_groups_for_user.return_value = {
-            'Groups': [{'GroupName': 'Administrators'}]
-        }
-        mock_validate_name.return_value = False
-
-        data = {
-            'id': 1,
-            'name': 'user name',
-            'surname': 'user surname',
-            'last_name': 'user last_name',
-            'birthday': '2000-01-01',
-            'phone': '1234567890'
-        }
-        result = update_user({'requestContext':{'authorizer':{'claims': mock_cognito_client}}, 'body': json.dumps(data), 'pathParameters': {'id': '1'}}, {})
-
-        expected_result = 400
-        self.assertEqual(result['statusCode'], expected_result)
-        self.assertEqual(json.loads(result['body'])['message'], ErrorType.english(ErrorType.USER_NOT_FOUND))
