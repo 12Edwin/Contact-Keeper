@@ -19,13 +19,19 @@
                   <template v-if="!isLoading">
                     <template v-if="items.length > 0">
                     <FullCalendar :options="calendarOptions" id="myCustomCalendar">
-                      <template v-slot:eventContent='{ event }'>
-                        <div class="my-custom-event" @click="handleEventClick(event)">
-                          <span class="my-event-dot" :v-tooltip.top="eventType(event.extendedProps.type)"  :style="{'background-color': setDotBackgrund(event.extendedProps.type)}"></span>
-                          <div class="my-event-info">
-                            <span class="my-event-title"><b>{{ event.extendedProps.title ? event.extendedProps.title : event.extendedProps.name}}</b></span>
-                            <span class="my-event-location">{{ event.extendedProps.location }}</span>
-                            <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
+                      <template v-slot:eventContent="{ event }">
+                        <div class="my-custom-event">
+                          <div class="event-info-wrapper" @click="handleEventClick(event)">
+                            <span class="my-event-dot" :style="{'background-color': setDotBackgrund(event.extendedProps.event.status)}"></span>
+                            <div class="my-event-info">
+                              <span class="my-event-title"><b>{{ event.extendedProps.title ? event.extendedProps.title : event.extendedProps.name}}</b></span>
+                              <span class="my-event-location">{{ event.extendedProps.location }}</span>
+                              <span class="my-event-time">{{ formatCalendarDate(event.start) }} - {{ formatCalendarDate(event.end) }}</span>
+                            </div>
+                          </div>
+                          <div class="event-right-icon">
+                            <Button icon="pi pi-pencil" style="color: white;" class="p-button-rounded p-button-text" @click="openUpdateEventModal(event.extendedProps)" v-tooltip.top="'Modificar'"/>
+                            <Button icon="pi pi-refresh" :loading="event.extendedProps.loading"  style="color: white;"  class="p-button-rounded p-button-text" @click="deleteEvent(event.extendedProps)" v-tooltip.top="'Eliminar'"/>
                           </div>
                         </div>
                       </template>
@@ -50,6 +56,7 @@
           </Panel>
           <ModalEventInfo :event="selectedEvent" :visible.sync="showModalEventInfo" @close="showModalEventInfo = false"/>
           <ModalAddEvent :visible.sync="showModalAddEvent" @getEvents="getEvents"/>
+          <UpdateEventModal :visible.sync="showUpdateEventModal" :event="selectedEvent" @getEvents="getEvents" />
         </b-col>
       </b-row>
     </div>
@@ -72,8 +79,9 @@ import utils from '@/kernel/utils'
 import eventServices from '../services/event-services'
 import CalendarSkeleton from '@/components/CalendarSkeleton.vue'
 import Tooltip from 'primevue/tooltip';
-import { onError, onToast} from '@/kernel/alerts';
+import { onError, onToast, onQuestion} from '@/kernel/alerts';
 import {getGroupsByUserId, getEventsbyGroup} from "@/modules/groups/services/groups-services"
+import UpdateEventModal from '../components/UpdateEventModal.vue'
 export default
 {
   name: 'Calendar',
@@ -84,13 +92,15 @@ export default
     ModalAddEvent,
     Panel,
     Chip,
-    CalendarSkeleton
+    CalendarSkeleton,
+    UpdateEventModal
   },
   directives: {
     'tooltip': Tooltip
 },
   data() {
     return {
+      showUpdateEventModal: false,
       groupSelected: null,
       groups: [],
       sidebarVisible: false,
@@ -159,15 +169,59 @@ export default
       },
       isLoading: false,
       selectedEvent: {},
+      onDeleting: false
     };
   },
   methods: {
+    openUpdateEventModal(event){
+      this.showUpdateEventModal = true
+      this.selectedEvent = JSON.parse(JSON.stringify(event))
+    },
     onGroupChange(){
       this.getEventsByUserGroup()
     },
     clearSearchValue(){
       this.groupSelected = null
       this.getEvents()
+    },
+    getIconByStatus(status) {
+      switch (status) {
+        case 'pending':
+          return 'pi pi-calendar-times';
+        case 'canceled':
+          return 'pi pi-calendar-plus';
+        default:
+          return 'pi pi-check';
+      }
+    },
+    deleteEvent(event){
+      onQuestion(
+        'Eliminar evento', 
+        '¿Estás seguro de eliminar este evento?',
+        'warning'
+      ).then(async (result) =>{
+        if(result) {
+          const {event : {id}} = event
+          const eventIndex = this.items.findIndex(event => event.event.id === id);
+          if(eventIndex !== -1){
+            this.$set(this.items[eventIndex], 'loading', true);
+            try {
+              this.onDeleting = true
+              const response = await eventServices.deleteEvent(id)
+              if(response.status === "success"){
+                onToast('Actualización completada',"Estado de evento modificado", 'success')
+                this.getEvents()
+              }
+            } catch (error) {
+              onToast('Error al actualizar el estado', 'Ocurrió un error al modificar el evento', 'error')
+            }finally{
+              if (this.items[eventIndex]) {
+                this.$set(this.items[eventIndex], 'loading', false);
+              }
+            }
+          }
+        }
+      })
     },
     addEvent(eventData) {
       const newEvent = {
@@ -186,14 +240,11 @@ export default
     setDotBackgrund(status) {
       let color = '';
       switch (status) {
-        case 'meeting':
-          color = '#007bff';
-          break;
-        case 'session':
-          color = '#28a745';
-          break;
-        case 'event':
+        case 'pending':
           color = '#ffc107';
+          break;
+        case 'canceled':
+          color = 'gray';
           break;
         default:
           color = '#dc3545';
@@ -233,6 +284,7 @@ export default
               end: new Date(event.end_date).toISOString(),
               location: event.location,
               name: event.name,
+              loading: false,
               event
             })
           })
@@ -298,12 +350,6 @@ export default
 
 <style>
 /* Estilos globales para FullCalendar */
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
 
 .header-content h5 {
   margin: 0;
@@ -386,6 +432,8 @@ export default
   align-items: center;
   padding-left: 10px;
   cursor: pointer;
+  justify-content: space-between;
+  position: relative;
   background-color: #000;
 }
 
@@ -417,6 +465,26 @@ export default
 <style scoped lang="scss">
 @import '@/styles/colors.scss';
 
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.event-left-icon {
+  margin-right: 10px;
+}
+
+.p-button-rounded {
+  padding: 0.2rem;
+  background-color: transparent; /* Para que el fondo del botón sea transparente */
+  color: white; 
+  border: none;
+  cursor: pointer;
+}
+
 /* Estilos existentes */
 .my-event-dot {
     width: 10px;
@@ -429,6 +497,13 @@ export default
     display: flex;
     align-items: center;
     padding-left: 10px;
+    justify-content: space-between;
+    position: relative;
+}
+
+.event-info-wrapper {
+  display: flex;
+  align-items: center;
 }
 
 .my-event-location {

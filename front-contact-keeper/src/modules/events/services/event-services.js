@@ -27,8 +27,28 @@ const getEvents = async (userLogged) =>{
         return error.response;
     }
 }
+
+const deleteEvent = async (id) => {
+    try {
+        const response = await api.axiosClientEventManagement.doDelete(`/events/${id}`);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
+
+const updateEvent = async (dataEvent) =>{
+    try {
+        const response = await api.axiosClientEventManagement.doPut(`events/${dataEvent.id}`,dataEvent);
+        return response.data;
+    } catch (error) {
+        return error.response;
+    }
+}
 export default {
     saveGroupEvent,
     saveMeetingEvent,
-    getEvents
+    getEvents,
+    deleteEvent,
+    updateEvent
 }
