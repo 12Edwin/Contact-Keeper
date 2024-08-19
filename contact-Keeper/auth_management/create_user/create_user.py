@@ -8,7 +8,7 @@ import boto3
 import pymysql
 
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
-    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'commons', 'python'))
 
 from app import get_cognito_ids, validate_nickname, validate_email, validate_user_type, validate_name, validate_birthday, validate_phone, response_200, response_400, response_500, ErrorType, get_db_connection, exists_user_phone
 
