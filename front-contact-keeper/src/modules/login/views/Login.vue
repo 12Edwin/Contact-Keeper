@@ -73,6 +73,7 @@ import services from '../services/Access'
 import { required, helpers, email } from '@vuelidate/validators'
 import ConfirmPassword from "./ConfirmPassword.vue";
 import InlineMessage from 'primevue/inlinemessage';
+import utils from "@/kernel/utils";
 export default {
   name: 'LoginComponent',
   components: {
@@ -116,15 +117,17 @@ export default {
 
         if (status === 'success') {
           this.isLogging = false;
+          const encodedRole = utils.encrypt(role)
           localStorage.setItem('token', id_token);
-          localStorage.setItem('role', role);
+          localStorage.setItem('role', encodedRole);
           if (role === "Administrators") {
             this.$router.push({name: 'users'})
           } else if(role === "NormalUsers"){
             this.$router.push({name: "calendar"})
           }
         }else{
-          this.loginError = true;
+          this.loginError = true; 
+          
         }
       } catch (error) {
         this.loginError = true;
