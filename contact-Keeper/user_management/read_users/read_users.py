@@ -3,25 +3,16 @@ import os
 import sys
 
 if 'AWS_LAMBDA_FUNCTION_NAME' not in os.environ:
-    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'commons', 'python'))
+    sys.path.append(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'commons', 'python'))
 
 from app import ErrorType, get_db_connection, response_200, response_400, response_500, response_403, get_cognito_ids
 
 
 def lambda_handler(event, context):
     try:
-        claims = event['requestContext']['authorizer']['claims']
         user_pool_id, user_pool_client_id = get_cognito_ids()
         cognito_client = boto3.client('cognito-idp')
-        user_groups = cognito_client.admin_list_groups_for_user(
-            UserPoolId=user_pool_id,
-            Username=claims['cognito:username']
-        )
 
-        is_admin = any(group['GroupName'] == 'Administrators' for group in user_groups['Groups'])
-
-        if not is_admin:
-            return response_403("Access denied. Administrator role required.")
         cognito_users = get_cognito_users(cognito_client, user_pool_id)
         data = read_users()
         result = compare_users(cognito_users, data)
