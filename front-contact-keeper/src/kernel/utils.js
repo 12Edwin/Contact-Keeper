@@ -1,4 +1,5 @@
 import { jwtDecode } from "jwt-decode";
+import CryptoJS from "crypto-js";
 const moment = require('moment-timezone');
 const getUserByName = (name, people) => {
   return people.some((person) => person.name === name);
@@ -26,17 +27,27 @@ const getSubFromToken = () => {
   }
 };
 
+const encrypt = (text) =>{
+  return CryptoJS.AES.encrypt(text, process.env.VUE_APP_SECRET).toString()
+}
+
+const decrypt = (text) => {
+  const bytes = CryptoJS.AES.decrypt(text, process.env.VUE_APP_SECRET);
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
+
 const removeToken = () => {
   return localStorage.removeItem("token");
 };
 const getRoleStorage= () => {
   try {
-      const role = localStorage.getItem('role');
-      if (!role) {
+      const encodedRole = localStorage.getItem('role');
+
+      if (!encodedRole) {
           throw new Error('No role found');
       }
-
-      return role
+      const decodedRole = decrypt(encodedRole);
+      return decodedRole
   } catch (error) {
       removeToken();
   }
@@ -205,5 +216,7 @@ export default {
   isSameDate,
   formatDate,
   splitDateTime,
-  formatDateForChat
+  formatDateForChat,
+  encrypt,
+  decrypt
 };
