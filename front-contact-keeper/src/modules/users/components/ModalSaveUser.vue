@@ -1,7 +1,7 @@
 <template>
   <Dialog header="Crear nuevo usuario" :modal="true" :closeOnEscape="false" :closable="false" position="center"
-    :contentStyle="{ overflow: 'visible', width: '50vw' }" :visible.sync="visible">
-    <div class="p-fluid grid">
+    :contentStyle="{ overflow: 'visible' }" :visible.sync="visible">
+    <div class="p-fluid grid custom-scroll-container">
       <b-row>
         <b-col cols="12">
           <h2 class="form-part">Identificación</h2>
@@ -189,7 +189,7 @@ import useVuelidate from "@vuelidate/core";
 import { required, helpers, maxLength, minLength, email } from '@vuelidate/validators'
 import { nameRegex, noRequiredField, phoneRegex } from "@/kernel/patterns.js";
 import service from '../services/userServices'
-import { onError, onSuccess, onToast } from "@/kernel/alerts";
+import { onError, onToast } from "@/kernel/alerts";
 export default {
   name: 'ModalSaveUser',
   props: {
@@ -265,14 +265,14 @@ export default {
     closeModal() {
       this.$emit('update:visible', false);
       this.v$.name.$model = '',
-      this.v$.surname.$model = '',
-      this.v$.last_name.$model = '',
-      this.v$.email.$model = '',
-      this.v$.phone.$model = '',
-      this.v$.user_type.$model = '',
-      this.v$.username.$model = '',
-      this.v$.birthday.$model = '',
-      this.v$.$reset()
+        this.v$.surname.$model = '',
+        this.v$.last_name.$model = '',
+        this.v$.email.$model = '',
+        this.v$.phone.$model = '',
+        this.v$.user_type.$model = '',
+        this.v$.username.$model = '',
+        this.v$.birthday.$model = '',
+        this.v$.$reset()
     },
     async saveUser() {
       if (!this.v$.$invalid) {
@@ -317,6 +317,11 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/styles/colors';
+
+.custom-scroll-container {
+  max-height: 70vh; 
+  overflow-y: auto;
+}
 
 .button-options {
   background: $primary-color;
