@@ -269,5 +269,10 @@ export default {
   splitDateTime,
   formatDateForChat,
   encrypt,
-  decrypt
+  decrypt,
+  extractDateAndTime,
+  startDateBeforeEndDate,
+  isSameDay,
+  isOneDayDifference,
+  endDateAfterStartDate
 };
