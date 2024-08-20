@@ -64,6 +64,9 @@ import services from '../services/Access'
 import {
     onToast
 } from "@/kernel/alerts";
+import {
+    validPassword
+} from "@/kernel/patterns";
 export default {
     name: 'ConfirmAccount',
     data() {
