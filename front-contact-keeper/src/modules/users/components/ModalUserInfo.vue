@@ -1,6 +1,6 @@
 <template>
   <Dialog header="Información del usuario" :modal="true" :closeOnEscape="false" :closable="false"
-    :visible.sync="visible" position="center" :contentStyle="{ overflow: 'visible', width: '35vw' }" class="custom-dialog"
+    :visible.sync="visible" position="center" :contentStyle="{ overflow: 'visible' }" class="custom-dialog"
     :autoZIndex="true">
     <div class="user-info">
       <Avatar :label="userData.name.charAt(0)" shape="circle" size="xlarge" class="mb-2" />
