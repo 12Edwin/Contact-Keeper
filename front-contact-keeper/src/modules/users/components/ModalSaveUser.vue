@@ -173,35 +173,6 @@
             </div>
           </div>
         </b-col>
-        <b-col class="mt-3 mb-2" lg="6">
-          <div class="field">
-            <span class="p-float-label p-input-icon-right">
-              <Password v-model="v$.password.$model" :class="{ 'invalid-field-custom': v$.password.$error }" toggleMask
-                promptLabel="Elige una contraseña segura" weakLabel="Débil" mediumLabel="Medianamente segura"
-                strongLabel="Muy segura">
-                <template #header>
-                  <h6>Escribe una contraseña</h6>
-                </template>
-                <template #footer>
-                  <Divider />
-                  <p class="mt-2">Sugerencias</p>
-                  <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
-                    <li>Al menos una minúscula</li>
-                    <li>Al menos una mayúscula</li>
-                    <li>Al menos un número</li>
-                    <li>Mínimo 8 caracteres</li>
-                  </ul>
-                </template>
-              </Password>
-              <label for="field-password" class="form-label-required">Contraseña</label>
-            </span>
-            <div class="text-danger text-start pt-2">
-              <p class="error-messages" v-if="v$.password.$dirty && v$.password.required.$invalid">
-                {{ v$.password.required.$message }}
-              </p>
-            </div>
-          </div>
-        </b-col>
       </b-row>
     </div>
     <template #footer>
@@ -242,7 +213,6 @@ export default {
       last_name: '',
       email: '',
       phone: '',
-      password: '',
       user_type: '',
       username: '',
       birthday: ''
@@ -274,9 +244,6 @@ export default {
         minLength: helpers.withMessage("El teléfono debe ser de 10 caracteres", minLength(10)),
         maxLength: helpers.withMessage("El teléfono debe tener máximo 10 caracteres", maxLength(10))
       },
-      password: {
-        required: helpers.withMessage('La contraseña es requerida', required),
-      },
       user_type: {
         required: helpers.withMessage('El tipo de usuario es requerido', required),
       },
@@ -302,7 +269,6 @@ export default {
       this.v$.last_name.$model = '',
       this.v$.email.$model = '',
       this.v$.phone.$model = '',
-      this.v$.password.$model = '',
       this.v$.user_type.$model = '',
       this.v$.username.$model = '',
       this.v$.birthday.$model = '',
@@ -342,7 +308,6 @@ export default {
         phone: this.person.phone,
         birthday: this.formmatDate(this.person.birthday),
         email: this.person.email,
-        password: this.person.password,
         user_type: this.person.user_type
       }
     }
